@@ -1,0 +1,5 @@
+import { PermissionsMatrixSection } from '@/modules/hr/permissions/sections/PermissionsMatrixSection';
+
+export default function PermissionsHelpdeskPage() {
+  return <PermissionsMatrixSection filterMenus={['helpdesk']} />;
+}

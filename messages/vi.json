@@ -1,0 +1,38 @@
+{
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "create": "Tạo mới",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "export": "Xuất",
+    "import": "Nhập",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công"
+  },
+  "task": {
+    "title": "Công việc",
+    "status": "Trạng thái",
+    "priority": "Độ ưu tiên",
+    "type": "Loại công việc",
+    "assignee": "Người thực hiện",
+    "creator": "Người tạo",
+    "deadline": "Thời hạn",
+    "description": "Mô tả",
+    "attachments": "Tệp đính kèm"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "username": "Tên đăng nhập",
+    "password": "Mật khẩu",
+    "forgotPassword": "Quên mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập"
+  }
+}

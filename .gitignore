@@ -1,0 +1,36 @@
+# ─── Dependencies ─────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Next.js ──────────────────────────────────────────────────────────────────
+.next/
+out/
+build/
+
+# ─── Environment (KHÔNG bao giờ commit file này lên Git!) ─────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Uploads (file của user, không commit) ────────────────────────────────────
+uploads/*
+!uploads/.gitkeep
+
+# ─── OS files ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ─── Prisma ───────────────────────────────────────────────────────────────────
+prisma/dev.db
+prisma/test.db
+
+# ─── Build artifacts ─────────────────────────────────────────────────────────
+tsconfig.tsbuildinfo
+
+# ─── Editor / AI tools ───────────────────────────────────────────────────────
+.claude/

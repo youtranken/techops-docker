@@ -1,0 +1,553 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id                String             @id @default(cuid())
+  name              String             @unique
+  label             String
+  isSystem          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  rolePermissions   RolePermission[]
+  roleStatusActions RoleStatusAction[]
+  users             User[]
+  userStatusActions UserStatusAction[]
+}
+
+model Permission {
+  id        String           @id @default(cuid())
+  resource  String
+  action    String
+  rolePerms RolePermission[]
+
+  @@unique([resource, action])
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  role         Role       @relation(fields: [roleId], references: [id])
+
+  @@unique([roleId, permissionId])
+}
+
+model RoleStatusAction {
+  id                String       @id @default(cuid())
+  roleId            String
+  status            TaskStatus
+  workflowMode      WorkflowMode
+  action            String
+  isForceModeLocked Boolean      @default(false)
+  role              Role         @relation(fields: [roleId], references: [id])
+
+  @@unique([roleId, status, workflowMode, action])
+  @@index([roleId, status])
+}
+
+model UserStatusAction {
+  id           String       @id @default(cuid())
+  userId       String
+  roleId       String
+  status       TaskStatus
+  workflowMode WorkflowMode
+  action       String
+  override     OverrideType
+  role         Role         @relation(fields: [roleId], references: [id])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, status, workflowMode, action])
+}
+
+model User {
+  id                String                 @id @default(cuid())
+  username          String                 @unique
+  password          String
+  displayName       String
+  email             String?                @unique
+  roleId            String
+  isActive          Boolean                @default(true)
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  comments          Comment[]
+  extensionReqs     ExtensionRequest[]     @relation("ExtensionRequester")
+
+  notifications     Notification[]
+  sidebarPermission SidebarPermission?
+  createdTasks      Task[]                 @relation("TaskCreator")
+  assignments       TaskAssignee[]
+  auditLogs         TaskAuditLog[]         @relation("AuditPerformer")
+  role              Role                   @relation(fields: [roleId], references: [id])
+  activityLogs      UserActivityLog[]
+  notificationPrefs UserNotificationPrefs?
+  profile           UserProfile?
+  userStatusActions UserStatusAction[]
+
+  @@index([roleId])
+}
+
+model SmtpConfig {
+  id        String   @id @default(cuid())
+  host      String
+  port      Int      @default(587)
+  secure    Boolean  @default(false)
+  user      String
+  password  String
+  fromName  String   @default("TechOps")
+  fromEmail String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  subject   String
+  body      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Priority {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String
+  level     Int
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tasks     Task[]
+}
+
+model TaskType {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  color       String   @default("#6B7280")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  icon        String   @default("Wrench")
+  tasks       Task[]
+}
+
+model Task {
+  id            String             @id @default(cuid())
+  title         String
+  content       String
+  priorityId    String
+  typeId        String
+  status        TaskStatus         @default(DRAFT)
+  workflowMode  WorkflowMode
+  isForceMode   Boolean            @default(false)
+  allFailed     Boolean            @default(false)
+  isDeleted     Boolean            @default(false)
+  deletedAt     DateTime?
+  completedAt   DateTime?
+  scheduleStart DateTime
+  scheduleEnd   DateTime
+  creatorId     String
+  hdId          String?            @unique
+  hdNhanVien    String?
+  hdPhongBan    String?
+  hdNguonNhap   String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  hdCode        String?            @unique
+  taskCode      String?            @unique
+  comments      Comment[]
+  extensions    ExtensionRequest[]
+  notifications Notification[]
+  creator       User               @relation("TaskCreator", fields: [creatorId], references: [id])
+  priority      Priority           @relation(fields: [priorityId], references: [id])
+  type          TaskType           @relation(fields: [typeId], references: [id])
+  assignees     TaskAssignee[]
+  attachments   TaskAttachment[]
+  auditLogs     TaskAuditLog[]
+  tags          TaskTag[]
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([creatorId, status])
+  @@index([priorityId, status])
+  @@index([hdId])
+  @@index([hdCode])
+  @@index([isDeleted, status])
+  @@index([taskCode])
+  @@index([scheduleEnd, status]) // Performance: deadline queries
+}
+
+model TaskAssignee {
+  id              String           @id @default(cuid())
+  taskId          String
+  userId          String
+  status          AssigneeStatus   @default(PENDING)
+  acknowledgedAt  DateTime?
+  completedAt     DateTime?
+  rejectedAt      DateTime?
+  transferredFrom String?
+  transferNotes   String?
+  reports         AssigneeReport[]
+  task            Task             @relation(fields: [taskId], references: [id])
+  user            User             @relation(fields: [userId], references: [id])
+
+  @@unique([taskId, userId])
+  @@index([userId, status])
+  @@index([taskId])
+}
+
+model AssigneeReport {
+  id          String             @id @default(cuid())
+  assigneeId  String
+  content     String
+  version     Int                @default(1)
+  submittedAt DateTime           @default(now())
+  assignee    TaskAssignee       @relation(fields: [assigneeId], references: [id])
+  attachments ReportAttachment[]
+
+  @@unique([assigneeId, version])
+  @@index([assigneeId, submittedAt(sort: Desc)])
+}
+
+model TaskAttachment {
+  id         String   @id @default(cuid())
+  taskId     String
+  fileName   String
+  filePath   String
+  fileSize   Int
+  uploadedBy String
+  createdAt  DateTime @default(now())
+  task       Task     @relation(fields: [taskId], references: [id])
+}
+
+model ReportAttachment {
+  id        String         @id @default(cuid())
+  reportId  String
+  fileName  String
+  filePath  String
+  fileSize  Int
+  createdAt DateTime       @default(now())
+  report    AssigneeReport @relation(fields: [reportId], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  taskId    String
+  authorId  String
+  content   String
+  mentions  String[]
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id])
+  task      Task     @relation(fields: [taskId], references: [id])
+
+  @@index([taskId, createdAt])
+}
+
+model ExtensionRequest {
+  id            String          @id @default(cuid())
+  taskId        String
+  requesterId   String
+  reason        String
+  requestedDate DateTime
+  status        ExtensionStatus @default(PENDING)
+  responseNote  String?
+  respondedAt   DateTime?
+  createdAt     DateTime        @default(now())
+  requester     User            @relation("ExtensionRequester", fields: [requesterId], references: [id])
+  task          Task            @relation(fields: [taskId], references: [id])
+
+  @@index([taskId, status])
+}
+
+model TaskAuditLog {
+  id            String      @id @default(cuid())
+  taskId        String?
+  action        TaskAction
+  performedById String
+  oldStatus     TaskStatus?
+  newStatus     TaskStatus?
+  details       Json?
+  createdAt     DateTime    @default(now())
+  performedBy   User        @relation("AuditPerformer", fields: [performedById], references: [id])
+  task          Task?       @relation(fields: [taskId], references: [id])
+
+  @@index([taskId, createdAt(sort: Desc)])
+  @@index([performedById, createdAt(sort: Desc)])
+}
+
+model UserActivityLog {
+  id        String     @id @default(cuid())
+  userId    String
+  action    UserAction
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime   @default(now())
+  city      String?
+  country   String?
+  ipType    String?
+  ispName   String?
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+}
+
+
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  taskId    String?
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  task      Task?            @relation(fields: [taskId], references: [id])
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model HelpdeskPendingTask {
+  id            String    @id @default(cuid())
+  hdId          String    @unique
+  tieuDe        String
+  dienGiai      String
+  uuTien        String
+  loaiYeuCau    String
+  nhanVien      String
+  phongBan      String
+  thoiGian      DateTime
+  status        String    @default("UNASSIGNED")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  trangThai     String    @default("Pending")
+  itSupport     String?
+  ngayHoanThanh DateTime?
+
+  @@index([trangThai])
+  @@index([thoiGian(sort: Desc)])
+  @@index([status])
+  @@index([phongBan])
+}
+
+/// Lưu config hệ thống dạng key-value (JSON). Dùng cho cron config, settings...
+model SystemConfig {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+/// Lịch sử mỗi lần chạy sync Helpdesk (manual hoặc cron)
+model HelpdeskSyncLog {
+  id           String   @id @default(cuid())
+  mode         String   /// 'auto' | 'manual'
+  synced       Int      @default(0)
+  pending      Int      @default(0)
+  skipped      Int      @default(0)
+  errors       Int      @default(0)
+  errorDetail  Json?    /// Array of { code, message, hdId? }
+  fetchedCount Int      @default(0)
+  ranAt        DateTime @default(now())
+
+  @@index([ranAt(sort: Desc)])
+}
+
+model SidebarPermission {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  /// JSON array of visible menu keys, e.g. ["logs","analytics","helpdesk","hr"]
+  visibleMenus       String   @default("[\"logs\",\"analytics\",\"helpdesk\",\"hr\"]")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  /// JSON object of sub-feature permissions per menu, e.g. {"logs":["task_activity","user_activity"],"hr":["edit","deactivate","delete"]}
+  featurePermissions String   @default("{}")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  avatarColor String   @default("#3B82F6")
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  bio         String?
+  department  String?
+  phone       String?
+  position    String?
+  timezone    String   @default("Asia/Ho_Chi_Minh")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserNotificationPrefs {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  emailEnabled Boolean  @default(true)
+  emailTypes   String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  color       String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  taskTags    TaskTag[]
+}
+
+model TaskTag {
+  id        String   @id @default(cuid())
+  taskId    String
+  tagId     String
+  createdAt DateTime @default(now())
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, tagId])
+  @@index([taskId])
+  @@index([tagId])
+}
+
+model OverdueReminderConfig {
+  id         String   @id @default("singleton")
+  enabled    Boolean  @default(false)
+  sendDays   Int[]    @default([1,2,3,4,5])
+  sendHour   Int      @default(9)
+  sendMinute Int      @default(0)
+  updatedAt  DateTime @updatedAt
+  updatedBy  String?
+}
+
+model DigestConfig {
+  id           String   @id @default(cuid())
+  enabled      Boolean  @default(false)
+  sendWeekly   Boolean  @default(false)
+  sendMonthly  Boolean  @default(false)
+  sendDays     Int[]    @default([])  // daily: 0=CN,1=T2,2=T3,3=T4,4=T5,5=T6,6=T7
+  sendHour     Int      @default(8)
+  sendMinute   Int      @default(0)
+  contentTypes String[] @default([])  // DEADLINE_SOON | IN_PROGRESS | OVERDUE | PENDING_APPROVAL | SUMMARY_BY_EMPLOYEE
+  emailSubject String   @default("Báo cáo định kỳ TechOps - {date}")
+  emailGreeting String  @default("Xin chào, đây là báo cáo tình trạng công việc định kỳ từ hệ thống TechOps.")
+  updatedAt    DateTime @updatedAt
+  recipientIds String[] @default([])  // user IDs; empty = all Bosses
+  updatedBy    String?
+}
+
+enum TaskStatus {
+  DRAFT
+  PENDING_APPROVAL
+  WAITING_ACKNOWLEDGE
+  IN_PROGRESS
+  PENDING_REVIEW
+  COMPLETED
+  CANCELLED
+}
+
+enum WorkflowMode {
+  IMMEDIATE
+  NEED_APPROVAL
+}
+
+enum AssigneeStatus {
+  PENDING
+  ACKNOWLEDGED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+  TRANSFERRED
+  REVISION_REQUIRED
+}
+
+enum ExtensionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TaskAction {
+  TASK_CREATED
+  TASK_UPDATED
+  TASK_CANCELLED
+  TASK_DELETED
+  PLAN_APPROVED
+  PLAN_REJECTED
+  ACKNOWLEDGED
+  REJECTED
+  TRANSFERRED
+  COMPLETED
+  REVIEW_APPROVED
+  REVIEW_REJECTED
+  REASSIGNED
+  EXTENSION_REQUESTED
+  EXTENSION_APPROVED
+  EXTENSION_REJECTED
+  EXTENSION_WITHDRAWN
+  FORCE_MODE_TOGGLED
+  COMMENT_ADDED
+  STATUS_CHANGED
+}
+
+enum UserAction {
+  LOGIN
+  LOGOUT
+  SESSION_TIMEOUT
+  LOGIN_FAILED
+  VIEW_PAGE
+  EXPORT_DATA
+  CREATE_USER
+  UPDATE_USER
+  DELETE_USER
+  DEACTIVATE_USER
+  ACTIVATE_USER
+  RESET_PASSWORD
+  CHANGE_SETTINGS
+  REVOKE_SESSION
+  // Security events (Phase 2)
+  RATE_LIMIT_EXCEEDED
+  ACCOUNT_LOCKED
+  ACCOUNT_UNLOCKED
+  PASSWORD_POLICY_VIOLATION
+  SECURITY_SETTING_CHANGED
+}
+
+enum NotificationType {
+  TASK_ASSIGNED
+  TASK_APPROVED
+  TASK_REJECTED
+  TRANSFER_RECEIVED
+  EXTENSION_APPROVED
+  EXTENSION_REJECTED
+  REVIEW_REQUIRED
+  REVISION_REQUIRED
+  TASK_COMPLETED
+  COMMENT_ADDED
+  DEADLINE_REMINDER
+  ALL_FAILED
+  PLAN_APPROVAL_REQUESTED
+  EXTENSION_REQUESTED
+}
+
+enum OverrideType {
+  GRANT
+  REVOKE
+}

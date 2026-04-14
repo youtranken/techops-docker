@@ -1,0 +1,98 @@
+services:
+  # ─── Next.js App Container (PRODUCTION) ─────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: techops-app
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      DATABASE_URL: postgresql://techops:lN7gE%&^=Minh@db:5432/techops_db
+      REDIS_URL: redis://redis:6379
+      AUTH_SECRET: rfyf2emqBfSpLm0+4MW8egmLm1UWgBbs6s2rGAuLxZ0=
+      TZ: Asia/Ho_Chi_Minh
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+      PRISMA_QUERY_ENGINE_LIBRARY: /app/node_modules/.prisma/client/libquery_engine-linux-musl-openssl-3.0.x.so.node
+    volumes:
+      - ./uploads:/app/uploads
+      - ./public:/app/public:ro
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+
+  # ─── PostgreSQL Container ────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: techops-db
+    environment:
+      POSTGRES_USER: techops
+      POSTGRES_PASSWORD: lN7gE%&^=Minh
+      POSTGRES_DB: techops_db
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U techops -d techops_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 8G
+        reservations:
+          cpus: '1.0'
+          memory: 4G
+
+  # ─── Redis Container ─────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: techops-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redisdata:/data
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+# ─── Volumes ─────────────────────────────────────────────────────────────────────
+volumes:
+  pgdata:
+    name: techops-pgdata
+  redisdata:
+    name: techops-redisdata
