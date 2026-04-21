@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-utils';
+import { canAccessSettingsFeature } from '@/lib/settings-guard';
 import { rateLimitApi, getRateLimitIdentifier } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
@@ -21,7 +22,8 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   const user = await requireAuth();
   if (user instanceof NextResponse) return user;
 
-  if (!['ADMIN', 'BOSS'].includes(user.role.name)) {
+  const allowed = await canAccessSettingsFeature(user.id, user.role.name, 'completion_templates');
+  if (!allowed) {
     return NextResponse.json({ error: { code: 'FORBIDDEN', message: 'Không có quyền' } }, { status: 403 });
   }
 
@@ -53,7 +55,8 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
   const user = await requireAuth();
   if (user instanceof NextResponse) return user;
 
-  if (!['ADMIN', 'BOSS'].includes(user.role.name)) {
+  const allowed = await canAccessSettingsFeature(user.id, user.role.name, 'completion_templates');
+  if (!allowed) {
     return NextResponse.json({ error: { code: 'FORBIDDEN', message: 'Không có quyền' } }, { status: 403 });
   }
 
