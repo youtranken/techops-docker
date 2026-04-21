@@ -6,6 +6,9 @@ import { taskDetailService } from './task-detail.service';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export type TaskSortField = 'createdAt' | 'scheduleEnd' | 'title' | 'status';
+export type TaskSortOrder = 'asc' | 'desc';
+
 export interface TaskListFilters {
   status?: TaskStatus;
   priorityId?: string;
@@ -17,6 +20,8 @@ export interface TaskListFilters {
   page?: number;
   limit?: number;
   source?: 'helpdesk' | 'techops';
+  sortField?: TaskSortField;
+  sortOrder?: TaskSortOrder;
 }
 
 export interface TaskListItem {
@@ -158,7 +163,6 @@ export const taskQueryService = {
 
     // Filters
     const filterWhere: Prisma.TaskWhereInput = {
-      isDeleted: false,
       ...(filters.status && { status: filters.status }),
       ...(filters.priorityId && { priorityId: filters.priorityId }),
       ...(filters.typeId && { typeId: filters.typeId }),
@@ -183,7 +187,7 @@ export const taskQueryService = {
       prisma.task.findMany({
         where,
         include: taskInclude,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [filters.sortField ?? 'createdAt']: filters.sortOrder ?? 'desc' },
         skip,
         take: limit,
       }),
@@ -222,7 +226,6 @@ export const taskQueryService = {
     const isPrivileged = ['ADMIN', 'BOSS'].includes(currentUser.role.name);
 
     const where: Prisma.TaskWhereInput = {
-      isDeleted: false,
       ...(isPrivileged
         ? {}
         : {

@@ -10,8 +10,8 @@ import type { TaskListItem } from '../../services/task-query.service';
 
 export interface TaskPermissions {
   canEdit: boolean;
-  canDelete: boolean;
   canCancel: boolean;
+  canRestore: boolean;
   canAcknowledge: boolean;
   canComplete: boolean;
   canTransfer: boolean;
@@ -44,7 +44,7 @@ export function useTaskPermissions(
   // Guard: task chưa load → trả về all-false
   if (!task) {
     return {
-      canEdit: false, canDelete: false, canCancel: false,
+      canEdit: false, canCancel: false, canRestore: false,
       canAcknowledge: false, canComplete: false, canTransfer: false,
       canRejectTask: false, canApprovePlan: false, canRejectPlan: false,
       canApproveReview: false, canRejectReview: false,
@@ -92,8 +92,8 @@ export function useTaskPermissions(
 
   return {
     canEdit:   has('EDIT'),
-    canDelete: has('DELETE'),
     canCancel: has('CANCEL'),
+    canRestore: has('RESTORE'),
 
     // canAcknowledge: assignee PENDING — cả WAITING_ACKNOWLEDGE lẫn IN_PROGRESS (sau transfer)
     canAcknowledge: has('ACKNOWLEDGE') && isAssignee && assigneeStatus === 'PENDING',

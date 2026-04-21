@@ -7,6 +7,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import type { TaskStatus } from '@prisma/client';
 import {
   getTaskOrThrow,
@@ -45,8 +46,8 @@ export async function complete(
     );
   }
 
-  if (data.reportContent.length < 10) {
-    throw new WorkflowError('REPORT_TOO_SHORT', 'Báo cáo phải có ít nhất 10 ký tự');
+  if (!data.reportContent?.trim()) {
+    throw new WorkflowError('REPORT_REQUIRED', 'Nội dung báo cáo không được để trống');
   }
 
   if (data.files && data.files.length > 3) {
@@ -58,11 +59,24 @@ export async function complete(
     if (f.fileSize > MAX_FILE_SIZE) {
       throw new WorkflowError('FILE_LIMIT_EXCEEDED', `File ${f.fileName} vượt quá 10MB`);
     }
+    // S2: validate filePath — reject path traversal / absolute paths / URLs
+    if (
+      !f.filePath ||
+      /\.\./.test(f.filePath) ||
+      /^[/\\]/.test(f.filePath) ||
+      /^[a-zA-Z]:/.test(f.filePath) ||
+      /:\/\//.test(f.filePath)
+    ) {
+      throw new WorkflowError('INVALID_FILE_PATH', `Đường dẫn file không hợp lệ: ${f.fileName}`);
+    }
   }
 
   // nextStatus được resolve sau transaction (cần biết allDone trước)
   let resolvedNextStatus: TaskStatus | null = null;
 
+  // Serializable isolation: ngăn race condition khi 2 assignee cùng submit lúc cuối.
+  // Nếu T1 và T2 cùng chạy: một cái sẽ retry sau khi cái kia commit,
+  // thấy đầy đủ các assignee COMPLETED và trigger status transition đúng.
   await prisma.$transaction(async (tx) => {
     // Tạo báo cáo (version tăng dần, tránh race condition qua @@unique)
     const lastReport = await tx.assigneeReport.findFirst({
@@ -102,8 +116,16 @@ export async function complete(
     const activeAssignees = allAssignees.filter(
       (a) => !['TRANSFERRED', 'REJECTED', 'CANCELLED'].includes(a.status),
     );
+    // G8: Điều kiện chuyển PENDING_REVIEW / COMPLETED:
+    // 1. Tất cả active assignees đều COMPLETED (every)
+    // 2. Có ≥1 báo cáo thực sự được nộp (chống path side-channel set status COMPLETED không qua complete())
+    const reportsCount = await tx.assigneeReport.count({
+      where: { assignee: { taskId } },
+    });
     const allDone =
-      activeAssignees.length > 0 && activeAssignees.every((a) => a.status === 'COMPLETED');
+      activeAssignees.length > 0 &&
+      activeAssignees.every((a) => a.status === 'COMPLETED') &&
+      reportsCount > 0;
 
     if (allDone) {
       // REVISION_REQUIRED: luôn chuyển sang PENDING_REVIEW để Boss review lại.
@@ -151,7 +173,7 @@ export async function complete(
         },
       });
     }
-  });
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
   // Notify boss để review (chỉ khi tất cả xong và là NEED_APPROVAL mode)
   if (resolvedNextStatus === 'PENDING_REVIEW') {
@@ -191,26 +213,53 @@ export async function cancel(
     );
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.task.update({
-      where: { id: taskId },
-      data: { status: 'CANCELLED' },
+  // APPROVAL mode: creator chỉ hủy được khi task đang ở PENDING_APPROVAL (Boss chưa duyệt plan)
+  if (!isPrivileged && isCreator && task.workflowMode === 'NEED_APPROVAL') {
+    if (task.status !== 'PENDING_APPROVAL') {
+      throw new WorkflowError(
+        'FORBIDDEN',
+        'Trong quy trình phê duyệt, bạn chỉ có thể hủy khi task đang chờ Boss duyệt kế hoạch',
+      );
+    }
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // G13: lưu status trước khi cancel để Admin có thể restore về đúng trạng thái cũ
+      // Optimistic lock: ngăn double-cancel concurrent
+      await tx.task.update({
+        where: { id: taskId, status: { notIn: ['COMPLETED', 'CANCELLED'] } },
+        data: { status: 'CANCELLED', statusBeforeCancel: task.status },
+      });
+      // Hủy task = phủ nhận TOÀN BỘ assignees, kể cả COMPLETED.
+      // Không loại trừ COMPLETED vì task đã hủy thì kết quả không còn ý nghĩa.
+      await tx.taskAssignee.updateMany({
+        where: {
+          taskId,
+          status: { in: ['PENDING', 'IN_PROGRESS', 'REVISION_REQUIRED', 'COMPLETED'] },
+        },
+        data: { status: 'REJECTED', rejectedAt: new Date() },
+      });
+      await tx.extensionRequest.updateMany({
+        where: { taskId, status: 'PENDING' },
+        data: { status: 'REJECTED', responseNote: 'Tự động hủy khi hủy công việc', respondedAt: new Date() },
+      });
+      await tx.taskAuditLog.create({
+        data: {
+          taskId,
+          performedById: currentUser.id,
+          action: 'TASK_CANCELLED',
+          oldStatus: task.status,
+          newStatus: 'CANCELLED',
+          details: data.reason ? { reason: data.reason } as never : undefined,
+        },
+      });
     });
-    await tx.extensionRequest.updateMany({
-      where: { taskId, status: 'PENDING' },
-      data: { status: 'REJECTED', responseNote: 'Tự động hủy khi hủy công việc', respondedAt: new Date() },
-    });
-    await tx.taskAuditLog.create({
-      data: {
-        taskId,
-        performedById: currentUser.id,
-        action: 'TASK_CANCELLED',
-        oldStatus: task.status,
-        newStatus: 'CANCELLED',
-        details: data.reason ? { reason: data.reason } as never : undefined,
-      },
-    });
-  });
+  } catch (err: unknown) {
+    const e = err as { code?: string };
+    if (e.code === 'P2025') throw new WorkflowError('INVALID_STATUS', 'Công việc đã được xử lý trước đó');
+    throw err;
+  }
 
   // Notify assignees (trừ người hủy)
   const ref = formatTaskRef(task.taskCode, task.title);

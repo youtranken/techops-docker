@@ -36,7 +36,7 @@ export async function collectDigestData(contentTypes: DigestContentType[]): Prom
     has('DEADLINE_SOON') ? prisma.taskAssignee.findMany({
       where: {
         status: 'IN_PROGRESS',
-        task: { isDeleted: false, scheduleEnd: { gte: now.toDate(), lte: in2Days } },
+        task: { scheduleEnd: { gte: now.toDate(), lte: in2Days } },
       },
       include: { task: { select: { id: true, title: true, scheduleEnd: true } }, user: { select: { displayName: true } } },
       orderBy: { task: { scheduleEnd: 'asc' } },
@@ -44,7 +44,7 @@ export async function collectDigestData(contentTypes: DigestContentType[]): Prom
 
     // 2. In progress
     has('IN_PROGRESS') ? prisma.taskAssignee.findMany({
-      where: { status: 'IN_PROGRESS', task: { isDeleted: false } },
+      where: { status: 'IN_PROGRESS' },
       include: { task: { select: { id: true, title: true, updatedAt: true } }, user: { select: { displayName: true } } },
       orderBy: { task: { updatedAt: 'desc' } },
       take: 20,
@@ -54,7 +54,7 @@ export async function collectDigestData(contentTypes: DigestContentType[]): Prom
     has('OVERDUE') ? prisma.taskAssignee.findMany({
       where: {
         status: 'IN_PROGRESS',
-        task: { isDeleted: false, scheduleEnd: { lt: now.toDate() } },
+        task: { scheduleEnd: { lt: now.toDate() } },
       },
       include: { task: { select: { id: true, title: true, scheduleEnd: true } }, user: { select: { displayName: true } } },
       orderBy: { task: { scheduleEnd: 'asc' } },
@@ -62,7 +62,7 @@ export async function collectDigestData(contentTypes: DigestContentType[]): Prom
 
     // 4. Pending approval
     has('PENDING_APPROVAL') ? prisma.task.findMany({
-      where: { isDeleted: false, status: { in: ['PENDING_APPROVAL', 'PENDING_REVIEW'] } },
+      where: { status: { in: ['PENDING_APPROVAL', 'PENDING_REVIEW'] } },
       include: { assignees: { include: { user: { select: { displayName: true } } }, take: 1 } },
       orderBy: { updatedAt: 'desc' },
       take: 20,
@@ -74,7 +74,6 @@ export async function collectDigestData(contentTypes: DigestContentType[]): Prom
       select: {
         displayName: true,
         assignments: {
-          where: { task: { isDeleted: false } },
           select: { status: true, task: { select: { scheduleEnd: true } } },
         },
       },

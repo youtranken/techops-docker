@@ -3,6 +3,10 @@ import { helpdeskSyncService } from '@/modules/helpdesk/services/helpdesk-sync.s
 import { prisma } from '@/lib/prisma';
 import { helpdeskCronConfigService } from '@/modules/helpdesk/services/helpdesk-cron-config.service';
 import type { CronConfig } from '@/modules/helpdesk/services/helpdesk-cron-config.service';
+import { getRedis } from '@/lib/redis';
+
+const LOCK_KEY = 'lock:cron:helpdesk-sync';
+const LOCK_TTL = 120; // giây — đủ cho 1 lần sync hoàn thành
 
 /** Tasks đang chạy — giữ ref để hủy khi reschedule */
 let _task:  ReturnType<typeof cron.schedule> | null = null;
@@ -15,6 +19,14 @@ function toExpression(hour: number, minute: number): string {
 
 /** Logic chạy khi cron trigger */
 async function runSync(): Promise<void> {
+  // Distributed lock: chỉ 1 instance chạy sync tại 1 thời điểm
+  const redis = getRedis();
+  const acquired = await redis.set(LOCK_KEY, '1', 'EX', LOCK_TTL, 'NX');
+  if (!acquired) {
+    console.log('⏭️  [HelpdeskSync] Bỏ qua — instance khác đang chạy (lock held)');
+    return;
+  }
+
   console.log('🔄 [HelpdeskSync] Bắt đầu auto-sync...');
   try {
     const result = await helpdeskSyncService.sync();
@@ -45,6 +57,8 @@ async function runSync(): Promise<void> {
       prisma.helpdeskSyncLog.create({ data: { mode: 'auto', errors: 1 } }).catch(() => { /* ignore */ }),
     ]);
     console.error('❌ [HelpdeskSync] Cron lỗi:', error);
+  } finally {
+    await redis.del(LOCK_KEY);
   }
 }
 

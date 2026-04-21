@@ -3,6 +3,29 @@ import { prisma } from '@/lib/prisma';
 const DEFAULT_TYPES = ['TASK_ASSIGNED', 'TASK_APPROVED', 'TASK_REJECTED', 'DEADLINE_REMINDER'];
 
 export const notificationPrefsService = {
+  /**
+   * Kiểm tra xem có nên gửi email cho userId với loại sự kiện eventType không.
+   * - EMPLOYEE: dùng prefs riêng.
+   * - BOSS/ADMIN: dùng shared prefs.
+   * In-app notification vẫn luôn tạo — hàm này chỉ kiểm soát email.
+   */
+  async shouldSendEmail(userId: string, eventType: string): Promise<boolean> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: { select: { name: true } } },
+    });
+    if (!user) return false;
+
+    const isPrivileged = ['ADMIN', 'BOSS'].includes(user.role?.name ?? '');
+
+    if (isPrivileged) {
+      const prefs = await notificationPrefsService.getShared();
+      return prefs.emailEnabled && (prefs.emailTypes as string[]).includes(eventType);
+    } else {
+      const prefs = await notificationPrefsService.get(userId);
+      return prefs.emailEnabled && (prefs.emailTypes as string[]).includes(eventType);
+    }
+  },
   /** Employee: per-user prefs */
   async get(userId: string) {
     const prefs = await prisma.userNotificationPrefs.findUnique({ where: { userId } });

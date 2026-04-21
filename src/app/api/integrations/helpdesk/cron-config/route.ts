@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth-utils';
+import { requireRole, validateSameOrigin } from '@/lib/auth-utils';
 import { helpdeskCronConfigService } from '@/modules/helpdesk/services/helpdesk-cron-config.service';
 
 export async function GET() {
@@ -13,6 +13,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const user = await requireRole(['ADMIN', 'BOSS']);
   if (user instanceof NextResponse) return user;
+
+  if (!validateSameOrigin(req)) return NextResponse.json({ error: { code: 'FORBIDDEN', message: 'Invalid origin' } }, { status: 403 });
 
   try {
     const body = await req.json() as { enabled?: boolean; hour?: number; minute?: number; enabled2?: boolean; hour2?: number; minute2?: number };

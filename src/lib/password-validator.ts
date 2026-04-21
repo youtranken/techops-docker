@@ -10,12 +10,21 @@ export interface PasswordValidationResult {
   policy: PasswordPolicyConfig;
 }
 
+let cachedPolicy: { config: PasswordPolicyConfig; expiry: number } | null = null;
+
 /**
  * Validate password theo policy hiện tại
  */
 export async function validatePassword(password: string): Promise<PasswordValidationResult> {
-  const config = await securityConfigService.get();
-  const policy = config.passwordPolicy;
+  const now = Date.now();
+  let policy: PasswordPolicyConfig;
+  if (cachedPolicy && now < cachedPolicy.expiry) {
+    policy = cachedPolicy.config;
+  } else {
+    const config = await securityConfigService.get();
+    policy = config.passwordPolicy;
+    cachedPolicy = { config: policy, expiry: now + 60_000 };
+  }
   const errors: string[] = [];
 
   // Kiểm tra độ dài
@@ -78,9 +87,9 @@ export function describePolicyRequirements(policy: PasswordPolicyConfig): string
     requirements.push(`Hết hạn sau ${policy.expiryDays} ngày`);
   }
 
-  if (policy.historyCount > 0) {
-    requirements.push(`Không trùng ${policy.historyCount} mật khẩu gần nhất`);
-  }
+  // S6: historyCount config có nhưng KHÔNG enforce (chưa lưu lịch sử password hash).
+  // Giữ field trong type/config để tương lai mở rộng — KHÔNG hiện requirement gây hiểu lầm.
+  // TODO: triển khai PasswordHistory table + check khi đổi password.
 
   return requirements;
 }

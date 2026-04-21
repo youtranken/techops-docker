@@ -4,6 +4,10 @@ import fs from 'fs';
 import path from 'path';
 import { prisma } from '@/lib/prisma';
 import dayjs from '@/lib/date';
+import { getRedis } from '@/lib/redis';
+
+const LOCK_KEY = 'lock:cron:log-archive';
+const LOCK_TTL = 300; // giây — export Excel có thể mất vài phút
 
 function styleHeader(row: ExcelJS.Row, bgColor = 'FF4F46E5') {
   row.eachCell((cell) => {
@@ -144,11 +148,23 @@ export function startLogArchiveCron(): void {
   }
 
   cron.schedule('0 1 1 * *', async () => {
+    const redis = getRedis();
+    let acquired = false;
+    try {
+      acquired = !!(await redis.set(LOCK_KEY, '1', 'EX', LOCK_TTL, 'NX'));
+    } catch { /* Redis down — skip */ }
+    if (!acquired) {
+      console.log('⏭️  [LogArchive] Bỏ qua — instance khác đang chạy (lock held)');
+      return;
+    }
+
     console.log('[log-archive] Starting monthly log archive...');
     try {
       await runArchive();
     } catch (err) {
       console.error('[log-archive] Error:', err);
+    } finally {
+      try { await redis.del(LOCK_KEY); } catch { /* ignore */ }
     }
   });
 

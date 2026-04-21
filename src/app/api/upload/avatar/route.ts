@@ -3,7 +3,7 @@ import { requireAuth } from '@/lib/auth-utils';
 import { validateFile } from '@/lib/file-validation';
 import { rateLimitApi, getRateLimitIdentifier } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
+import { writeFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 
 export async function POST(req: NextRequest) {
@@ -48,6 +48,19 @@ export async function POST(req: NextRequest) {
   await writeFile(path.join(uploadDir, fileName), Buffer.from(bytes));
 
   const avatarUrl = `/api/files/avatars/${fileName}`;
+
+  // Xóa avatar cũ trước khi lưu mới (US4.5)
+  const existing = await prisma.userProfile.findUnique({
+    where: { userId: user.id },
+    select: { avatarUrl: true },
+  });
+  if (existing?.avatarUrl) {
+    const oldFileName = existing.avatarUrl.split('/').pop();
+    if (oldFileName) {
+      const oldPath = path.join(process.cwd(), 'uploads', 'avatars', oldFileName);
+      unlink(oldPath).catch(() => { /* file có thể đã bị xóa trước đó */ });
+    }
+  }
 
   await prisma.userProfile.upsert({
     where: { userId: user.id },

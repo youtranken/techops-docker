@@ -7,11 +7,17 @@ export interface CreateUserPayload {
   username: string;
   displayName: string;
   email?: string;
-  password: string;
+  password?: string;
   roleId: string;
+  sendSetupLink?: boolean;
 }
 
-async function createUser(data: CreateUserPayload): Promise<UserWithRole> {
+export interface CreateUserResult {
+  user: UserWithRole;
+  warning?: string;
+}
+
+async function createUser(data: CreateUserPayload): Promise<CreateUserResult> {
   const res = await fetch('/api/hr/users', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -22,13 +28,13 @@ async function createUser(data: CreateUserPayload): Promise<UserWithRole> {
   if (!res.ok) {
     throw new Error(body?.error?.message ?? 'Failed to create user');
   }
-  return body.data;
+  return { user: body.data, warning: body.warning };
 }
 
 export function useCreateUser() {
   const queryClient = useQueryClient();
 
-  return useMutation<UserWithRole, Error, CreateUserPayload>({
+  return useMutation<CreateUserResult, Error, CreateUserPayload>({
     mutationFn: createUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hr', 'users'] });

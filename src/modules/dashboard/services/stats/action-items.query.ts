@@ -5,9 +5,8 @@ import type { SessionUser, ActionItem } from './types';
 export async function queryActionItems(user: SessionUser): Promise<ActionItem[]> {
   const isBoss = ['BOSS', 'ADMIN'].includes(user.role.name);
   const where: Prisma.TaskWhereInput = isBoss
-    ? { isDeleted: false, status: { in: ['PENDING_APPROVAL', 'PENDING_REVIEW'] } }
+    ? { status: { in: ['PENDING_APPROVAL', 'PENDING_REVIEW'] } }
     : {
-        isDeleted: false,
         status: { in: ['WAITING_ACKNOWLEDGE', 'IN_PROGRESS'] },
         assignees: { some: { userId: user.id } },
       };

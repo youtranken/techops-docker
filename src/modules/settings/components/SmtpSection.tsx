@@ -84,7 +84,7 @@ export function SmtpSection() {
             ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
             : 'bg-muted text-muted-foreground')}>
           {isConfigured && config?.isActive
-            ? <><CheckCircle2 className="h-3.5 w-3.5" />Đang hoạt động</>
+            ? <><CheckCircle2 className="h-3.5 w-3.5" />Đã cấu hình</>
             : <><XCircle className="h-3.5 w-3.5" />Chưa cấu hình</>}
         </div>
       </div>

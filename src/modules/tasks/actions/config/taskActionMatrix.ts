@@ -5,7 +5,7 @@
  */
 
 export type TaskAction =
-  | 'VIEW' | 'EDIT' | 'DELETE' | 'CANCEL'
+  | 'VIEW' | 'EDIT' | 'CANCEL' | 'RESTORE'
   | 'APPROVE' | 'REJECT' | 'ACKNOWLEDGE'
   | 'TRANSFER' | 'COMPLETE'
   | 'REQUEST_EXTENSION' | 'WITHDRAW_EXTENSION' | 'APPROVE_EXTENSION'
@@ -18,7 +18,7 @@ export const ACTION_MATRIX: Record<string, Record<string, TaskAction[]>> = {
   PENDING_APPROVAL: {
     BOSS:    ['VIEW', 'APPROVE', 'REJECT', 'EDIT'],
     CREATOR: ['VIEW', 'EDIT', 'CANCEL'],          // Employee creator only
-    ADMIN:   ['VIEW', 'APPROVE', 'REJECT', 'EDIT', 'CANCEL', 'DELETE'],
+    ADMIN:   ['VIEW', 'APPROVE', 'REJECT', 'EDIT', 'CANCEL'],
     OTHER:   [],                                  // ← FIX Bug2: assignee/người khác KHÔNG thấy khi chưa duyệt
   },
 
@@ -29,20 +29,20 @@ export const ACTION_MATRIX: Record<string, Record<string, TaskAction[]>> = {
     BOSS:             ['VIEW', 'EDIT', 'CANCEL', 'FORCE_MODE'],
     CREATOR_ONLY:     ['VIEW'],           // creator nhưng KHÔNG phải assignee — Boss đã duyệt, không còn EDIT
     ASSIGNEE_PENDING: ['VIEW', 'ACKNOWLEDGE', 'REJECT'],  // Transfer chỉ ở IN_PROGRESS
-    ADMIN:            ['VIEW', 'EDIT', 'CANCEL', 'REASSIGN', 'FORCE_MODE', 'DELETE'],
+    ADMIN:            ['VIEW', 'EDIT', 'CANCEL', 'REASSIGN', 'FORCE_MODE'],
     OTHER:            ['VIEW'],
   },
 
   // 3. ĐANG THỰC HIỆN
   //    - ASSIGNEE_PENDING: người mới được transfer vào, chưa acknowledge
   //    - ASSIGNEE: người đang IN_PROGRESS
-  //    - CREATOR_ONLY: creator nhưng không phải assignee → chỉ VIEW
+  //    - CREATOR_ONLY: Direct flow → EDIT; Approval flow → EDIT bị xóa bởi post-condition (plan locked)
   IN_PROGRESS: {
     BOSS:             ['VIEW', 'EDIT', 'FORCE_MODE', 'APPROVE_EXTENSION', 'CANCEL'],
-    CREATOR_ONLY:     ['VIEW'],                   // creator không tham gia thực hiện chỉ xem
-    ASSIGNEE_PENDING: ['VIEW', 'ACKNOWLEDGE', 'REJECT'],  // ← FIX Bug1: transfer vào → cần acknowledge/reject
-    ASSIGNEE:         ['VIEW', 'COMPLETE', 'TRANSFER', 'REQUEST_EXTENSION', 'WITHDRAW_EXTENSION'],
-    ADMIN:            ['VIEW', 'EDIT', 'FORCE_MODE', 'CANCEL', 'APPROVE_EXTENSION', 'REASSIGN', 'DELETE'],
+    CREATOR_ONLY:     ['VIEW', 'EDIT'],           // Direct: EDIT ok; Approval: post-condition xóa EDIT
+    ASSIGNEE_PENDING: ['VIEW', 'ACKNOWLEDGE', 'REJECT'],
+    ASSIGNEE:         ['VIEW', 'EDIT', 'COMPLETE', 'TRANSFER', 'REQUEST_EXTENSION', 'WITHDRAW_EXTENSION'],
+    ADMIN:            ['VIEW', 'EDIT', 'FORCE_MODE', 'CANCEL', 'APPROVE_EXTENSION', 'REASSIGN'],
     OTHER:            ['VIEW'],
   },
 
@@ -51,7 +51,7 @@ export const ACTION_MATRIX: Record<string, Record<string, TaskAction[]>> = {
     BOSS:     ['VIEW', 'APPROVE', 'REJECT_REVIEW'],
     CREATOR:  ['VIEW'],
     ASSIGNEE: ['VIEW'],
-    ADMIN:    ['VIEW', 'APPROVE', 'REJECT_REVIEW', 'CANCEL', 'DELETE'],
+    ADMIN:    ['VIEW', 'APPROVE', 'REJECT_REVIEW', 'CANCEL'],
     OTHER:    ['VIEW'],
   },
 
@@ -60,19 +60,19 @@ export const ACTION_MATRIX: Record<string, Record<string, TaskAction[]>> = {
     BOSS:     ['VIEW', 'APPROVE', 'REJECT_REVIEW'],
     CREATOR:  ['VIEW'],
     ASSIGNEE: ['VIEW', 'COMPLETE'],  // spec: chỉ nộp lại (Complete), không Transfer
-    ADMIN:    ['VIEW', 'APPROVE', 'REJECT_REVIEW', 'CANCEL', 'DELETE'],
+    ADMIN:    ['VIEW', 'APPROVE', 'REJECT_REVIEW', 'CANCEL'],
     OTHER:    ['VIEW'],
   },
   // 5. HOÀN THÀNH
   COMPLETED: {
     ALL:   ['VIEW'],
-    ADMIN: ['VIEW', 'DELETE'],
+    ADMIN: ['VIEW'],
   },
 
   // 6. ĐÃ HỦY
   CANCELLED: {
     ALL:   ['VIEW'],
-    ADMIN: ['VIEW', 'DELETE'],
+    ADMIN: ['VIEW', 'RESTORE'],
   },
 };
 
@@ -153,6 +153,11 @@ export function getAllowedActions(p: GetActionsParams): TaskAction[] {
     }
   }
 
+  // G4: FORCE_MODE chỉ áp dụng khi workflow = APPROVAL
+  if (p.workflowMode !== 'NEED_APPROVAL') {
+    allowed.delete('FORCE_MODE');
+  }
+
   // Force mode: khoá REJECT và TRANSFER
   if (p.isForceMode) {
     allowed.delete('REJECT');
@@ -160,11 +165,22 @@ export function getAllowedActions(p: GetActionsParams): TaskAction[] {
     if (!['BOSS', 'ADMIN'].includes(p.role)) allowed.delete('CANCEL');
   }
 
-  // ── FIX Bug3: EDIT/CANCEL chỉ khi chưa có assignee nào nhận (IN_PROGRESS) ─
-  // Nếu allAssigneesAccepted = true → creator không thể EDIT/CANCEL nữa
-  if (p.isCreator && !p.isAssignee && p.allAssigneesAccepted) {
-    allowed.delete('EDIT');
+  // ── CANCEL chỉ khi chưa có assignee nào nhận (allAssigneesAccepted = false) ─
+  if (p.isCreator && !p.isAssignee && p.allAssigneesAccepted && p.workflowMode !== 'IMMEDIATE') {
     allowed.delete('CANCEL');
+  }
+
+  // ── Direct flow (IMMEDIATE): creator được EDIT ở WAITING_ACKNOWLEDGE ──
+  if (p.workflowMode === 'IMMEDIATE' && p.isCreator && !p.isAssignee
+      && p.status === 'WAITING_ACKNOWLEDGE') {
+    allowed.add('EDIT');
+  }
+
+  // ── Approval flow: plan bị lock sau khi Boss duyệt — employee không được EDIT ──
+  // (chỉ PENDING_APPROVAL mới cho employee edit; WAITING_ACKNOWLEDGE và IN_PROGRESS bị lock)
+  if (p.workflowMode !== 'IMMEDIATE' && !['BOSS', 'ADMIN'].includes(p.role)
+      && ['WAITING_ACKNOWLEDGE', 'IN_PROGRESS'].includes(p.status)) {
+    allowed.delete('EDIT');
   }
 
   // ── Creator-only: thêm CANCEL khi allFailed (tất cả từ chối) ────────────────

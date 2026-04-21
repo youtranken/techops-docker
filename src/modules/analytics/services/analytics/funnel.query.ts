@@ -49,7 +49,6 @@ export async function queryTaskFlowFunnel(
     ...(filters.dateTo && { lte: filters.dateTo }),
   };
   const baseWhere = {
-    isDeleted: false,
     ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter }),
   };
 

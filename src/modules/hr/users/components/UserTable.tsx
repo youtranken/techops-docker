@@ -5,9 +5,14 @@ import { toast } from 'sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { UserActionsMenu } from './UserActionsMenu';
 import { useSession } from 'next-auth/react';
 import { ROLE_LABELS, ROLE_BADGE_VARIANTS } from '@/lib/constants';
@@ -16,6 +21,7 @@ import { useDeactivateUser } from '../hooks/useDeactivateUser';
 import { useActivateUser } from '../hooks/useActivateUser';
 import { useDeleteUser } from '../hooks/useDeleteUser';
 import { useBulkAction } from '../hooks/useBulkAction';
+import { useRoles } from '../hooks/useRoles';
 import { DeleteUserDialog } from './DeleteUserDialog';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import { UserHistoryModal } from './UserHistoryModal';
@@ -29,6 +35,13 @@ function getInitials(name: string): string {
 
 function formatDate(date: Date | string): string {
   return new Date(date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+interface ConfirmDialogState {
+  open: boolean;
+  title: string;
+  description: string;
+  onConfirm: () => void;
 }
 
 interface Props {
@@ -47,10 +60,16 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
   const deactivate = useDeactivateUser();
   const activate = useActivateUser();
   const deleteUser = useDeleteUser();
-  const bulkAction = useBulkAction(() => onSelectChange([]));
+  const bulkAction = useBulkAction(() => { onSelectChange([]); setBulkRoleId(''); });
+  const { data: roles = [] } = useRoles();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [changePwTarget, setChangePwTarget] = useState<UserWithRoleAndTasks | null>(null);
   const [historyTarget, setHistoryTarget] = useState<UserWithRoleAndTasks | null>(null);
+  const [sendingResetLinkId, setSendingResetLinkId] = useState<string | null>(null);
+  const [bulkRoleId, setBulkRoleId] = useState<string>('');
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    open: false, title: '', description: '', onConfirm: () => {},
+  });
 
   const deleteTarget = users.find((u) => u.id === deleteTargetId);
 
@@ -68,6 +87,11 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
   function toggleUser(id: string) {
     onSelectChange(selectedIds.includes(id) ? selectedIds.filter((s) => s !== id) : [...selectedIds, id]);
   }
+
+  function openConfirm(title: string, description: string, onConfirm: () => void) {
+    setConfirmDialog({ open: true, title, description, onConfirm });
+  }
+
   async function handleDeactivate(userId: string) {
     try { await deactivate.mutateAsync(userId); toast.success('Đã vô hiệu hóa người dùng'); }
     catch (err: unknown) { toast.error((err as Error).message ?? 'Không thể vô hiệu hóa người dùng'); }
@@ -76,6 +100,26 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
   async function handleActivate(userId: string) {
     try { await activate.mutateAsync(userId); toast.success('Đã kích hoạt lại người dùng'); }
     catch (err: unknown) { toast.error((err as Error).message ?? 'Không thể kích hoạt người dùng'); }
+  }
+
+  async function handleSendResetLink(user: UserWithRoleAndTasks) {
+    openConfirm(
+      'Gửi link đặt lại mật khẩu',
+      `Gửi link reset mật khẩu đến email ${user.email ?? '(chưa có email)'} của ${user.displayName}?`,
+      async () => {
+        setSendingResetLinkId(user.id);
+        try {
+          const res = await fetch(`/api/hr/users/${user.id}/send-reset-link`, { method: 'POST' });
+          const body = await res.json() as { error?: { message?: string } };
+          if (!res.ok) throw new Error(body.error?.message ?? 'Không thể gửi email');
+          toast.success('Đã gửi link reset mật khẩu');
+        } catch (err: unknown) {
+          toast.error((err as Error).message ?? 'Gửi email thất bại');
+        } finally {
+          setSendingResetLinkId(null);
+        }
+      },
+    );
   }
 
   async function handleDeleteConfirmed() {
@@ -97,19 +141,64 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
 
   return (
     <>
+      {/* Confirm Dialog — dùng chung cho mọi action cần xác nhận */}
+      <AlertDialog open={confirmDialog.open} onOpenChange={(open) => setConfirmDialog((s) => ({ ...s, open }))}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmDialog.title}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmDialog.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={() => confirmDialog.onConfirm()}>Xác nhận</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Bulk Action Toolbar — only for ADMIN/BOSS with active selection */}
       {actorIsPrivileged && selectedIds.length > 0 && (
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-indigo-50/50 rounded-xl border border-indigo-100/80 mb-2">
+        <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-indigo-50/50 rounded-xl border border-indigo-100/80 mb-2">
           <span className="text-sm font-medium text-foreground">Đã chọn {selectedIds.length} người dùng</span>
           <Button size="sm" variant="outline" disabled={bulkAction.isPending}
             onClick={() => bulkAction.mutate({ action: 'deactivate', userIds: selectedIds })}>
-            Vô hiệu hóa tất cả
+            Vô hiệu hóa
           </Button>
           <Button size="sm" variant="outline" disabled={bulkAction.isPending}
             onClick={() => bulkAction.mutate({ action: 'activate', userIds: selectedIds })}>
-            Kích hoạt lại tất cả
+            Kích hoạt
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => onSelectChange([])}>Bỏ chọn</Button>
+          <Button size="sm" variant="outline" disabled={bulkAction.isPending}
+            onClick={() => openConfirm(
+              'Bắt buộc đổi mật khẩu',
+              `Bắt buộc ${selectedIds.length} người dùng đổi mật khẩu lần đăng nhập tiếp theo?`,
+              () => bulkAction.mutate({ action: 'forceChangePassword', userIds: selectedIds }),
+            )}>
+            Bắt buộc đổi MK
+          </Button>
+          <div className="flex items-center gap-1.5">
+            <Select value={bulkRoleId} onValueChange={setBulkRoleId}>
+              <SelectTrigger className="h-8 text-xs w-36">
+                <SelectValue placeholder="Chọn vai trò..." />
+              </SelectTrigger>
+              <SelectContent>
+                {roles.map((r) => (
+                  <SelectItem key={r.id} value={r.id}>{ROLE_LABELS[r.name] ?? r.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button size="sm" variant="outline" disabled={bulkAction.isPending || !bulkRoleId}
+              onClick={() => {
+                if (!bulkRoleId) return;
+                openConfirm(
+                  'Đổi vai trò',
+                  `Đổi vai trò cho ${selectedIds.length} người dùng?`,
+                  () => bulkAction.mutate({ action: 'changeRole', userIds: selectedIds, roleId: bulkRoleId }),
+                );
+              }}>
+              Đổi vai trò
+            </Button>
+          </div>
+          <Button size="sm" variant="ghost" onClick={() => { onSelectChange([]); setBulkRoleId(''); }}>Bỏ chọn</Button>
         </div>
       )}
 
@@ -140,25 +229,22 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
             {users.map((user) => {
               const isSelf = session?.user?.id === user.id;
               const targetIsPrivileged = ['ADMIN', 'BOSS'].includes(user.role.name);
-              
+
               // Logic phân quyền:
               // - ADMIN/BOSS: Manage tất cả users khác (không phải mình)
               // - EMPLOYEE: CHỈ được edit/đổi pw/xem lịch sử CHÍNH MÌNH
               let effectiveFeatures: string[];
               if (isSelf) {
-                // Chính mình: chỉ được edit, change_password, view history
-                effectiveFeatures = hrFeatures.filter(f => ['edit', 'change_password'].includes(f));
+                // Chính mình trong HR chỉ được edit thông tin — đổi mật khẩu dùng Settings > Profile
+                effectiveFeatures = hrFeatures.filter(f => ['edit'].includes(f));
               } else if (!actorIsPrivileged && targetIsPrivileged) {
-                // EMPLOYEE không được manage ADMIN/BOSS
                 effectiveFeatures = [];
               } else if (!actorIsPrivileged) {
-                // EMPLOYEE không được manage EMPLOYEE khác
                 effectiveFeatures = [];
               } else {
-                // ADMIN/BOSS manage user khác
                 effectiveFeatures = hrFeatures;
               }
-              
+
               const canManage = effectiveFeatures.length > 0;
               const isSelectable = actorIsPrivileged && !isSelf;
               return (
@@ -177,7 +263,14 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
                   <TableCell><Avatar className="h-8 w-8"><AvatarImage src={user.profile?.avatarUrl ?? ''} alt={user.displayName} className="object-cover" /><AvatarFallback style={{ backgroundColor: user.profile?.avatarColor ?? '#3B82F6' }} className="text-white text-xs font-semibold">{getInitials(user.displayName)}</AvatarFallback></Avatar></TableCell>
                   <TableCell className="font-medium">{user.displayName}</TableCell>
                   <TableCell className="text-muted-foreground font-mono text-sm">{user.username}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{user.email ?? '—'}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm">
+                    <div className="flex items-center gap-1.5">
+                      <span>{user.email ?? '—'}</span>
+                      {user.email && user.emailVerifiedAt && (
+                        <span title="Email đã xác nhận"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" /></span>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell><Badge variant={ROLE_BADGE_VARIANTS[user.role.name] ?? 'outline'}>{ROLE_LABELS[user.role.name] ?? user.role.name}</Badge></TableCell>
                   <TableCell>
                     {user.isActive
@@ -186,7 +279,7 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">{formatDate(user.createdAt)}</TableCell>
                   <TableCell>
-                    <UserActionsMenu user={user} hrFeatures={canManage ? effectiveFeatures : []} onEdit={onEdit} onChangePassword={setChangePwTarget} onViewHistory={setHistoryTarget} onDeactivate={handleDeactivate} onActivate={handleActivate} onDelete={setDeleteTargetId} deactivating={deactivate.isPending} activating={activate.isPending} deleting={deleteUser.isPending} />
+                    <UserActionsMenu user={user} hrFeatures={canManage ? effectiveFeatures : []} onEdit={onEdit} onChangePassword={setChangePwTarget} onSendResetLink={handleSendResetLink} onViewHistory={setHistoryTarget} onDeactivate={handleDeactivate} onActivate={handleActivate} onDelete={setDeleteTargetId} deactivating={deactivate.isPending} activating={activate.isPending} deleting={deleteUser.isPending} sendingResetLink={sendingResetLinkId === user.id} />
                   </TableCell>
                 </TableRow>
               );

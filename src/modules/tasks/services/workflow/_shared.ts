@@ -59,7 +59,7 @@ export function formatTaskRef(taskCode: string | null | undefined, title: string
 
 export async function getTaskOrThrow(id: string) {
   const task = await prisma.task.findUnique({
-    where: { id, isDeleted: false },
+    where: { id },
     include: {
       assignees: {
         include: { user: { select: { id: true, displayName: true } } },

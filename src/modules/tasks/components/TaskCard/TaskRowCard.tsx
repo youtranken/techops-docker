@@ -18,12 +18,12 @@ export function TaskRowCard({
   permissions,
   onOpenQuickView,
   onEdit,
-  onDelete,
   onOpenComplete,
   onOpenTransfer,
   onOpenRejectTask,
   onOpenRejectReview,
   onOpenCancel,
+  onOpenRestore,
   onOpenRejectPlan,
   onOpenExtension,
   onOpenApproveExtension,
@@ -74,10 +74,10 @@ export function TaskRowCard({
           </div>
           <TaskCardMenu
             task={task} permissions={permissions}
-            onOpenQuickView={onOpenQuickView} onEdit={onEdit} onDelete={onDelete}
+            onOpenQuickView={onOpenQuickView} onEdit={onEdit}
             onOpenComplete={onOpenComplete} onOpenTransfer={onOpenTransfer}
             onOpenRejectTask={onOpenRejectTask} onOpenRejectReview={onOpenRejectReview}
-            onOpenCancel={onOpenCancel} onOpenRejectPlan={onOpenRejectPlan}
+            onOpenCancel={onOpenCancel} onOpenRestore={onOpenRestore} onOpenRejectPlan={onOpenRejectPlan}
             onOpenExtension={onOpenExtension} onOpenApproveExtension={onOpenApproveExtension}
             onAcknowledge={handleAcknowledge} onApprovePlan={handleApprovePlan} onApproveReview={handleApproveReview}
           />

@@ -32,8 +32,14 @@ export async function GET(req: NextRequest) {
     new Date(u.createdAt).toLocaleDateString('vi-VN'),
   ]);
 
+  const sanitizeCsv = (v: unknown): string => {
+    const s = String(v ?? '').replace(/"/g, '""');
+    // Strip formula injection prefixes (=, +, -, @, tab, CR)
+    return /^[=+\-@\t\r]/.test(s) ? `'${s}` : s;
+  };
+
   const csv = [header, ...rows]
-    .map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
+    .map((row) => row.map((v) => `"${sanitizeCsv(v)}"`).join(','))
     .join('\r\n');
 
   const fileName = `users_${new Date().toISOString().slice(0, 10)}.csv`;

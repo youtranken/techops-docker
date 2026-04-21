@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth-utils';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireRole, validateSameOrigin } from '@/lib/auth-utils';
 import { ticketProcessorService } from '@/modules/helpdesk/services/ticket-processor.service';
 import { prisma } from '@/lib/prisma';
 
@@ -7,9 +7,11 @@ import { prisma } from '@/lib/prisma';
  * POST /api/integrations/helpdesk/push-to-tasks
  * Day tat ca HelpdeskPendingTask co IT Support sang Task.
  */
-export async function POST() {
+export async function POST(req: NextRequest) {
   const user = await requireRole(['ADMIN', 'BOSS']);
   if (user instanceof NextResponse) return user;
+
+  if (!validateSameOrigin(req)) return NextResponse.json({ error: { code: 'FORBIDDEN', message: 'Invalid origin' } }, { status: 403 });
 
   try {
     // Lay tat ca ticket Completed co IT Support

@@ -32,5 +32,10 @@ prisma/test.db
 # ─── Build artifacts ─────────────────────────────────────────────────────────
 tsconfig.tsbuildinfo
 
+# ─── DB backups (chứa data nhạy cảm — KHÔNG commit) ─────────────────────────
+backups/
+*.dump
+*.sql.gz
+
 # ─── Editor / AI tools ───────────────────────────────────────────────────────
 .claude/

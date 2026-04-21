@@ -10,14 +10,14 @@ import { useRejectReview } from './useRejectReview';
 import { useRejectTask } from './useRejectTask';
 import { useTransferTask } from './useTransferTask';
 import { useReassignTask } from './useReassignTask';
-import { useDeleteTask } from './useDeleteTask';
 import { useCancelTask } from './useCancelTask';
+import { useRestoreTask } from './useRestoreTask';
 import { useRequestExtension } from './useExtensions';
 
 export type ActionModalType =
   | 'acknowledge' | 'complete' | 'approve-plan' | 'reject-plan'
   | 'approve-review' | 'reject-review' | 'reject-task'
-  | 'transfer' | 'reassign' | 'cancel' | 'delete' | 'extension' | null;
+  | 'transfer' | 'reassign' | 'cancel' | 'restore' | 'extension' | null;
 
 export function useTaskActionPanel() {
   const [modal, setModal] = useState<ActionModalType>(null);
@@ -32,21 +32,21 @@ export function useTaskActionPanel() {
   const rejectTask      = useRejectTask();
   const transfer        = useTransferTask();
   const reassign        = useReassignTask();
-  const deleteTask      = useDeleteTask();
   const cancelTask      = useCancelTask();
+  const restoreTask     = useRestoreTask();
   const requestExtension = useRequestExtension();
 
   const anyLoading =
     acknowledge.isPending || complete.isPending || approvePlan.isPending ||
     rejectPlan.isPending || approveReview.isPending || rejectReview.isPending ||
     rejectTask.isPending || transfer.isPending || reassign.isPending ||
-    deleteTask.isPending || cancelTask.isPending || requestExtension.isPending;
+    cancelTask.isPending || restoreTask.isPending || requestExtension.isPending;
 
   return {
     modal, setModal, close,
     acknowledge, complete, approvePlan, rejectPlan,
     approveReview, rejectReview, rejectTask,
-    transfer, reassign, deleteTask, cancelTask, requestExtension,
+    transfer, reassign, cancelTask, restoreTask, requestExtension,
     anyLoading,
   };
 }

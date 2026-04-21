@@ -35,6 +35,7 @@ export const MENU_CONFIG: MenuConfig[] = [
     features: [
       { key: 'priorities', label: 'Mức ưu tiên' },
       { key: 'task_types', label: 'Loại công việc' },
+      { key: 'completion_templates', label: 'Mẫu hoàn thành' },
       { key: 'profile', label: 'Profile' },
       { key: 'notifications', label: 'Thông báo' },
       // NOTE: SMTP config chỉ dành cho ADMIN - không thêm vào permissions vì rất nguy hiểm

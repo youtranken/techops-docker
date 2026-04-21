@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { RefreshCw, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { RefreshCw, Clock, CheckCircle2, AlertCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useHelpdeskSync } from '../hooks/useHelpdeskSync';
 import { useHelpdeskCronConfig } from '../hooks/useHelpdeskCronConfig';
 import { CronPanel } from '../components/admin/CronPanel';
 import { SyncHistorySection } from './SyncHistorySection';
+import { toast } from 'sonner';
 
 function pad(n: number) { return String(n).padStart(2, '0'); }
 
@@ -16,6 +18,36 @@ export function HelpdeskAdminPanel() {
   const { mutate: runSync, isLoading: isSyncing, data: syncResult, error: syncError } = useHelpdeskSync();
   const { config, isLoading: loadingCron } = useHelpdeskCronConfig();
   const [showCron, setShowCron] = useState(false);
+  const [resetStep, setResetStep] = useState<'idle' | 'otp'>('idle');
+  const [otpValue, setOtpValue] = useState('');
+  const [isRequestingOtp, setIsRequestingOtp] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  async function handleRequestOtp() {
+    setIsRequestingOtp(true);
+    try {
+      const res = await fetch('/api/integrations/helpdesk/reset/request-otp', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error?.message ?? 'Lỗi gửi OTP'); return; }
+      toast.success(data.hint ?? 'OTP đã gửi đến email của bạn');
+      setResetStep('otp');
+    } catch { toast.error('Lỗi kết nối'); }
+    finally { setIsRequestingOtp(false); }
+  }
+
+  async function handleConfirmReset() {
+    if (otpValue.length !== 6) { toast.error('Mã OTP phải 6 số'); return; }
+    setIsResetting(true);
+    try {
+      const res = await fetch(`/api/integrations/helpdesk/reset?otp=${encodeURIComponent(otpValue)}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error?.message ?? 'Reset thất bại'); return; }
+      toast.success(`Đã xóa ${data.tasks} task và ${data.pending} pending`);
+      setResetStep('idle');
+      setOtpValue('');
+    } catch { toast.error('Lỗi kết nối'); }
+    finally { setIsResetting(false); }
+  }
 
   const cronLabel = !loadingCron && config
     ? (config.enabled ? `${pad(config.hour)}:${pad(config.minute)}` : 'Tắt')
@@ -48,6 +80,34 @@ export function HelpdeskAdminPanel() {
               {cronLabel}
             </span>
           </Button>
+
+          {resetStep === 'idle' ? (
+            <Button
+              variant="outline"
+              className="gap-2 text-destructive border-destructive/40 hover:bg-destructive/5 ml-auto"
+              disabled={isRequestingOtp}
+              onClick={handleRequestOtp}
+            >
+              <Trash2 className="h-4 w-4" />
+              {isRequestingOtp ? 'Đang gửi OTP...' : 'Reset dữ liệu'}
+            </Button>
+          ) : (
+            <div className="flex items-center gap-2 ml-auto">
+              <Input
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="Nhập OTP 6 số"
+                value={otpValue}
+                onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                className="h-8 w-36 text-center font-mono tracking-widest"
+              />
+              <Button size="sm" variant="destructive" disabled={isResetting || otpValue.length !== 6} onClick={handleConfirmReset}>
+                {isResetting ? 'Đang xóa...' : 'Xác nhận xóa'}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => { setResetStep('idle'); setOtpValue(''); }}>Hủy</Button>
+            </div>
+          )}
         </div>
 
         {/* ── Feedback ─────────────────────────────────────────────────── */}

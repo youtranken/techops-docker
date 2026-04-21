@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole, validateSameOrigin } from '@/lib/auth-utils';
 import { emailTemplateService } from '@/modules/settings/services/email-template.service';
-import { sanitizeHtml } from '@/lib/sanitize';
 import { rateLimitApi, getRateLimitIdentifier } from '@/lib/rate-limit';
 import { logUserActivity } from '@/lib/audit';
 import { z } from 'zod';
@@ -16,12 +15,12 @@ const VALID_TEMPLATE_KEYS = [
 const upsertSchema = z.object({
   key: z.enum(VALID_TEMPLATE_KEYS),
   subject: z.string().min(1).max(200),
-  body: z.string().min(1).transform((v) => sanitizeHtml(v, true)),
+  body: z.string().min(1),
   isActive: z.boolean().optional(),
 });
 
 export async function GET() {
-  const user = await requireRole(['ADMIN']);
+  const user = await requireRole(['ADMIN', 'BOSS']);
   if (user instanceof NextResponse) return user;
 
   const templates = await emailTemplateService.list();
@@ -36,7 +35,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: { code: 'FORBIDDEN', message: 'Invalid origin' } }, { status: 403 });
   }
 
-  const user = await requireRole(['ADMIN']);
+  const user = await requireRole(['ADMIN', 'BOSS']);
   if (user instanceof NextResponse) return user;
 
   const body = await req.json();

@@ -63,6 +63,20 @@ export function SecurityPasswordCard({ value, onChange }: Props) {
       >
         <Toggle checked={value.requireSpecialChar} onChange={(val) => onChange('requireSpecialChar', val)} />
       </SecurityFormField>
+
+      <SecurityFormField
+        label="Mật khẩu hết hạn sau (ngày)"
+        description="Mật khẩu hết hạn sau N ngày tính từ lần đổi cuối (0 = không hết hạn)"
+        helpText="Khuyến nghị 60-90 ngày. Hệ thống tự gửi email reset link 3 ngày trước hết hạn. Hết hạn sẽ buộc đổi khi đăng nhập."
+      >
+        <NumberInput
+          value={value.expiryDays}
+          onChange={(val) => onChange('expiryDays', val)}
+          min={0}
+          max={365}
+          unit="ngày"
+        />
+      </SecurityFormField>
     </SecurityCard>
   );
 }

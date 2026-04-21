@@ -2,7 +2,6 @@
 
 import { Zap, ShieldCheck, Lock, Headset } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
-import { sanitizeHtml } from '@/lib/sanitize';
 import type { TaskDetail } from '../../services/task-query.service';
 import { TaskStatusBadge } from '../TaskCard/TaskStatusBadge';
 
@@ -70,7 +69,7 @@ export function QuickViewHero({ task }: QuickViewHeroProps) {
               className="mt-3 text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3 border-t border-slate-100 dark:border-slate-700/60 pt-3
                 [&_b]:font-semibold [&_strong]:font-semibold [&_i]:italic [&_em]:italic [&_u]:underline
                 [&_ul]:list-disc [&_ul]:ml-4 [&_ol]:list-decimal [&_ol]:ml-4 [&_li]:my-0.5"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(task.content) }}
+              dangerouslySetInnerHTML={{ __html: task.content }}
             />
           )}
         </div>

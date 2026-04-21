@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth-utils';
+import { requireAuth, validateSameOrigin } from '@/lib/auth-utils';
 import { extensionService } from '@/modules/tasks/services/extension.service';
 
 interface RouteParams { params: Promise<{ id: string }> }
@@ -7,6 +7,8 @@ interface RouteParams { params: Promise<{ id: string }> }
 export async function POST(req: NextRequest, { params }: RouteParams) {
   const user = await requireAuth();
   if (user instanceof NextResponse) return user;
+
+  if (!validateSameOrigin(req)) return NextResponse.json({ error: { code: 'FORBIDDEN', message: 'Invalid origin' } }, { status: 403 });
 
   const { id } = await params;
   const body = await req.json();

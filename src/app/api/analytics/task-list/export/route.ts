@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth-utils';
+import { requireMenuPermission } from '@/lib/auth-utils';
 import { analyticsService } from '@/modules/analytics/services/analytics.service';
 import ExcelJS from 'exceljs';
 import dayjs from 'dayjs';
@@ -74,7 +74,7 @@ function addTaskSheet(wb: ExcelJS.Workbook, sheetName: string, rows: Awaited<Ret
 }
 
 export async function GET(req: Request) {
-  const user = await requireRole(['ADMIN', 'BOSS']);
+  const user = await requireMenuPermission('analytics');
   if (user instanceof NextResponse) return user;
 
   const { searchParams } = new URL(req.url);

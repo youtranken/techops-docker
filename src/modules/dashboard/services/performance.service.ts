@@ -51,13 +51,12 @@ class PerformanceService {
     // Lấy tasks tạo mới trong khoảng và tasks hoàn thành trong khoảng
     const [createdRows, completedRows] = await Promise.all([
       prisma.task.findMany({
-        where: { ...baseFilter, isDeleted: false, createdAt: { gte: start } },
+        where: { ...baseFilter, createdAt: { gte: start } },
         select: { createdAt: true },
       }),
       prisma.task.findMany({
         where: {
           ...baseFilter,
-          isDeleted: false,
           status: 'COMPLETED',
           completedAt: { gte: start, not: null },
         },

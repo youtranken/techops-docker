@@ -1,11 +1,14 @@
 'use client';
 
-import { Trophy } from 'lucide-react';
+import { Trophy, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { UserPerformance } from '../services/analytics.service';
 
 interface PerformanceTableProps {
   data: UserPerformance[];
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 const COLS = [
@@ -18,9 +21,16 @@ const COLS = [
 
 type ColKey = (typeof COLS)[number]['key'];
 
-export function PerformanceTable({ data }: PerformanceTableProps) {
+export function PerformanceTable({ data, dateFrom, dateTo }: PerformanceTableProps) {
   if (data.length === 0) {
     return <div className="text-center py-10 text-gray-400 text-sm">Chưa có dữ liệu</div>;
+  }
+
+  function drillDownUrl(userId: string) {
+    const p = new URLSearchParams({ userId });
+    if (dateFrom) p.set('dateFrom', dateFrom);
+    if (dateTo) p.set('dateTo', dateTo);
+    return `/analytics/task-list?${p}`;
   }
 
   return (
@@ -72,9 +82,12 @@ export function PerformanceTable({ data }: PerformanceTableProps) {
 
                 {/* Name + bar */}
                 <td className="px-2 py-3 align-middle">
-                  <p className="font-semibold text-gray-900 dark:text-white text-sm leading-tight">
-                    {user.displayName}
-                  </p>
+                  <Link href={drillDownUrl(user.userId)} className="group flex items-center gap-1 hover:underline">
+                    <p className="font-semibold text-gray-900 dark:text-white text-sm leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {user.displayName}
+                    </p>
+                    <ExternalLink className="h-3 w-3 text-gray-300 group-hover:text-indigo-500 shrink-0" />
+                  </Link>
                   <div className="flex items-center gap-2 mt-1.5">
                     <div className="w-20 h-[3px] bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                       <div

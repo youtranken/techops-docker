@@ -1,0 +1,24 @@
+{
+  "userIgnoreFilters": [
+    "node_modules/chai/",
+    "node_modules/canvg/",
+    "node_modules/caniuse-lite/",
+    "node_modules/callsites/",
+    "node_modules/buffers/",
+    "node_modules/buffer-indexof-polyfill/",
+    "node_modules/base64-arraybuffer/",
+    "node_modules/@acemir/",
+    "node_modules/@adobe/",
+    "node_modules/@alloc/",
+    "node_modules/",
+    "node_modules/@bramus/",
+    "node_modules/@esbuild/",
+    "node_modules/@csstools/",
+    "node_modules/@emnapi/",
+    "node_modules/@esbuild/",
+    "node_modules/@prisma/",
+    "node_modules/@polka/",
+    "node_modules/@rollup/",
+    "node_modules/@tailwindcss/"
+  ]
+}

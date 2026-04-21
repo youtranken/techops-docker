@@ -9,7 +9,6 @@ export async function queryUpcomingDeadlines(baseFilter: Prisma.TaskWhereInput):
   const rows = await prisma.task.findMany({
     where: {
       ...baseFilter,
-      isDeleted: false,
       scheduleEnd: { gte: now, lte: in7Days },
       status: { notIn: ['COMPLETED', 'CANCELLED'] },
     },

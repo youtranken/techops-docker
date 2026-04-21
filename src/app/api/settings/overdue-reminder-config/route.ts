@@ -5,11 +5,16 @@ import { rateLimitApi, getRateLimitIdentifier } from '@/lib/rate-limit';
 import { logUserActivity } from '@/lib/audit';
 import { z } from 'zod';
 
+const VALID_CATEGORIES = ['PENDING_APPROVAL', 'PENDING_REVIEW', 'IN_PROGRESS', 'WAITING_ACKNOWLEDGE'] as const;
+const VALID_INDIVIDUAL_TYPES = ['OVERDUE', 'PENDING_ACK', 'UPCOMING'] as const;
+
 const updateSchema = z.object({
-  enabled:    z.boolean(),
-  sendDays:   z.array(z.number().int().min(0).max(6)).default([1,2,3,4,5]),
-  sendHour:   z.number().int().min(0).max(23),
-  sendMinute: z.number().int().min(0).max(59),
+  enabled:              z.boolean(),
+  sendDays:             z.array(z.number().int().min(0).max(6)).default([1,2,3,4,5]),
+  sendHour:             z.number().int().min(0).max(23),
+  sendMinute:           z.number().int().min(0).max(59),
+  digestCategories:     z.array(z.enum(VALID_CATEGORIES)).default([...VALID_CATEGORIES]),
+  individualEmailTypes: z.array(z.enum(VALID_INDIVIDUAL_TYPES)).default([...VALID_INDIVIDUAL_TYPES]),
 });
 
 export async function GET() {

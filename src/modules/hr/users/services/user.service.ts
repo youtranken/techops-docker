@@ -16,6 +16,8 @@ export const userService = {
   deactivate:        userMutationService.deactivate.bind(userMutationService),
   deleteHard:        userMutationService.deleteHard.bind(userMutationService),
   resetPassword:     userMutationService.resetPassword.bind(userMutationService),
-  bulkDeactivate:    userMutationService.bulkDeactivate.bind(userMutationService),
-  bulkActivate:      userMutationService.bulkActivate.bind(userMutationService),
+  bulkDeactivate:           userMutationService.bulkDeactivate.bind(userMutationService),
+  bulkActivate:             userMutationService.bulkActivate.bind(userMutationService),
+  bulkChangeRole:           userMutationService.bulkChangeRole.bind(userMutationService),
+  bulkSetMustChangePassword: userMutationService.bulkSetMustChangePassword.bind(userMutationService),
 };

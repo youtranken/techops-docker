@@ -1,8 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
-import { Paperclip, X, Save, FileText } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Paperclip, X, Save, FileText, ImagePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { usePasteImage } from '@/modules/tasks/components/CreateTask/usePasteImage';
+import { PasteImageModal } from '@/modules/tasks/components/CreateTask/PasteImageModal';
 
 interface ExistingFile { id: string; fileName: string; fileSize: number }
 
@@ -29,6 +31,15 @@ export function EditTaskFooter({
   onCancel, onSubmit, isPending,
 }: EditTaskFooterProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pastedImage, setPastedImage] = useState<File | null>(null);
+
+  // Listen clipboard paste image (Win+Shift+S → Ctrl+V workflow)
+  usePasteImage(true, (img) => setPastedImage(img));
+
+  function handlePasteConfirm(resized: File) {
+    onNewFilesChange([...newFiles, resized]);
+    setPastedImage(null);
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = Array.from(e.target.files ?? []);
@@ -92,21 +103,34 @@ export function EditTaskFooter({
       )}
 
       <div className="flex items-center justify-between px-5 py-3">
-        {/* Left: attach button */}
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 transition-colors"
-        >
-          <Paperclip className="w-4 h-4" />
-          <span>Đính kèm</span>
-          {newFiles.length > 0 && (
-            <span className="text-[11px] bg-indigo-100 text-indigo-600 font-medium rounded-full px-1.5 py-0.5">
-              +{newFiles.length}
-            </span>
-          )}
-        </button>
-        <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileChange} />
+        {/* Left: attach button + paste hint */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 transition-colors"
+          >
+            <Paperclip className="w-4 h-4" />
+            <span>Đính kèm</span>
+            {newFiles.length > 0 && (
+              <span className="text-[11px] bg-indigo-100 text-indigo-600 font-medium rounded-full px-1.5 py-0.5">
+                +{newFiles.length}
+              </span>
+            )}
+          </button>
+          <span className="hidden md:flex items-center gap-1 text-[11px] text-slate-400 border-l border-slate-200 pl-3">
+            <ImagePlus className="w-3.5 h-3.5" />
+            Tip: <kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">Win</kbd>+<kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">Shift</kbd>+<kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">S</kbd> rồi <kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">Ctrl</kbd>+<kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">V</kbd>
+          </span>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept=".pdf,.jpg,.jpeg,.png"
+          className="hidden"
+          onChange={handleFileChange}
+        />
 
         {/* Right: actions */}
         <div className="flex items-center gap-3">
@@ -122,6 +146,12 @@ export function EditTaskFooter({
           </Button>
         </div>
       </div>
+
+      <PasteImageModal
+        file={pastedImage}
+        onConfirm={handlePasteConfirm}
+        onCancel={() => setPastedImage(null)}
+      />
     </div>
   );
 }

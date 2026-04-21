@@ -105,10 +105,16 @@ export interface TaskListResponse {
   kpi: TaskListKpi;
 }
 
+export type TaskListSortBy = 'createdAt' | 'scheduleEnd' | 'status' | 'title';
+export type SortOrder = 'asc' | 'desc';
+
 export interface TaskListFilters {
   dateFrom?: Date;
   dateTo?: Date;
   userId?: string;
+  search?: string;
+  sortBy?: TaskListSortBy;
+  sortOrder?: SortOrder;
   page: number;
   pageSize: number;
 }

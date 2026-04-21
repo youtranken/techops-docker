@@ -21,8 +21,8 @@ const ACTION_CFG: Record<string, { label: string; tone: Tone }> = {
   COMPLETED:           { label: 'Hoàn thành',           tone: 'positive' },
   REVIEW_APPROVED:     { label: 'Duyệt KQ hoàn thành', tone: 'positive' },
   REVIEW_REJECTED:     { label: 'Yêu cầu làm lại',     tone: 'negative' },
-  TRANSFERRED:         { label: 'Chuyển giao',          tone: 'neutral'  },
-  REASSIGNED:          { label: 'Phân công lại',        tone: 'neutral'  },
+  TRANSFERRED:         { label: 'Chuyển giao',   tone: 'neutral'  },
+  REASSIGNED:          { label: 'Phân công lại', tone: 'neutral'  },
   EXTENSION_REQUESTED: { label: 'Xin gia hạn',          tone: 'neutral'  },
   EXTENSION_APPROVED:  { label: 'Duyệt gia hạn',        tone: 'positive' },
   EXTENSION_REJECTED:  { label: 'Từ chối gia hạn',      tone: 'negative' },
@@ -48,6 +48,11 @@ function fmtDate(iso: string) {
 function getContext(log: Log, assignees: Assignee[]): string | null {
   const d = (log.details ?? {}) as Record<string, unknown>;
   const names = assignees.map((a) => a.user.displayName).join(', ');
+  // Map user.id → displayName (dùng cho TRANSFERRED, REASSIGNED)
+  const userIdToName = Object.fromEntries(assignees.map((a) => [a.user.id, a.user.displayName]));
+  // Map assignee record id → displayName (dùng cho REVIEW_REJECTED)
+  const assigneeIdToName = Object.fromEntries(assignees.map((a) => [a.id, a.user.displayName]));
+
   switch (log.action) {
     case 'TASK_CREATED':        return names ? `Giao cho: ${names}` : null;
     case 'PLAN_APPROVED':       return names ? `Chờ tiếp nhận bởi: ${names}` : null;
@@ -58,10 +63,31 @@ function getContext(log: Log, assignees: Assignee[]): string | null {
     case 'REVIEW_REJECTED': {
       const entries = d.entries as { assigneeId?: string; reason?: string }[] | undefined;
       if (!entries?.length) return null;
-      const idToName = Object.fromEntries(assignees.map((a) => [a.id, a.user.displayName]));
-      return entries.filter((e) => e.reason).map((e) => `${e.assigneeId ? (idToName[e.assigneeId] ?? 'Assignee') : 'Tất cả'}: "${e.reason}"`).join(' · ');
+      return entries.filter((e) => e.reason).map((e) => `${e.assigneeId ? (assigneeIdToName[e.assigneeId] ?? 'Assignee') : 'Tất cả'}: "${e.reason}"`).join(' · ');
     }
-    case 'TRANSFERRED':         return d.notes ? `Ghi chú: "${d.notes}"` : null;
+    case 'TRANSFERRED': {
+      // Case phục hồi: người nhận từ chối → trả lại người giao gốc
+      if (d.isRestore) {
+        const restoredName = (d.restoredToName as string | undefined) ?? userIdToName[d.restoredTo as string];
+        const rejectedName = d.rejectedByName as string | undefined;
+        const parts: string[] = [];
+        if (rejectedName) parts.push(`${rejectedName} từ chối nhận`);
+        if (restoredName) parts.push(`Trả lại: ${restoredName}`);
+        return parts.join(' — ') || 'Người nhận từ chối — phục hồi người giao';
+      }
+      // Case chuyển giao thông thường
+      const parts: string[] = [];
+      const toName = (d.transferToName as string | undefined) ?? userIdToName[d.transferTo as string];
+      if (toName) parts.push(`Chuyển cho: ${toName}`);
+      if (d.notes) parts.push(`Ghi chú: "${d.notes}"`);
+      return parts.join(' · ') || null;
+    }
+    case 'REASSIGNED': {
+      const ids = d.newAssigneeIds as string[] | undefined;
+      if (!ids?.length) return null;
+      const resolvedNames = ids.map((uid) => userIdToName[uid] ?? uid).filter(Boolean);
+      return resolvedNames.length ? `Giao lại cho: ${resolvedNames.join(', ')}` : null;
+    }
     case 'EXTENSION_REQUESTED': return [d.requestedDate ? `Đề xuất: ${fmtDate(d.requestedDate as string)}` : null, d.reason ? `Lý do: "${d.reason}"` : null].filter(Boolean).join(' · ') || null;
     case 'EXTENSION_APPROVED':  return d.newDeadline ? `Deadline mới: ${fmtDate(d.newDeadline as string)}` : null;
     case 'EXTENSION_REJECTED':  return d.reason ? `Lý do: "${d.reason}"` : null;

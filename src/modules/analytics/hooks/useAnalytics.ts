@@ -51,10 +51,13 @@ export function useWorkloadBalance() {
   });
 }
 
-export function useOverdueTasks() {
+export function useOverdueTasks(filters: DateFilters = {}) {
+  const params = new URLSearchParams(
+    Object.fromEntries(Object.entries(filters).filter(([, v]) => v)),
+  );
   return useQuery<OverdueTask[]>({
-    queryKey: ['analytics', 'overdue'],
-    queryFn: () => fetchWithCheck('/api/analytics/overdue'),
+    queryKey: ['analytics', 'overdue', filters],
+    queryFn: () => fetchWithCheck(`/api/analytics/overdue?${params}`),
     staleTime: 60_000,
   });
 }
@@ -91,6 +94,9 @@ export function useTaskFlowFunnel(filters: DateFilters = {}) {
 
 interface TaskListQueryFilters extends DateFilters {
   userId?: string;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: string;
   page?: number;
   pageSize?: number;
 }

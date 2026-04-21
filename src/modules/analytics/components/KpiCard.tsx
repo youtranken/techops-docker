@@ -1,5 +1,6 @@
 'use client';
 
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +11,10 @@ interface KpiCardProps {
   subtitle?: string;
   progress?: number;
   color?: 'blue' | 'green' | 'orange' | 'red' | 'purple' | 'teal';
+  /** Delta so với kỳ trước (dương = tăng, âm = giảm) */
+  delta?: number;
+  /** Click handler — nếu có, card trở thành clickable (drill-down) */
+  onClick?: () => void;
 }
 
 const theme = {
@@ -21,14 +26,19 @@ const theme = {
   teal:   { icon: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',      dot: 'bg-teal-500',    bar: 'bg-teal-500',    sub: 'text-teal-600 dark:text-teal-400',     ring: 'ring-teal-500/15'    },
 } as const;
 
-export function KpiCard({ title, value, icon: Icon, subtitle, progress, color = 'blue' }: KpiCardProps) {
+export function KpiCard({ title, value, icon: Icon, subtitle, progress, color = 'blue', delta, onClick }: KpiCardProps) {
   const t = theme[color];
   return (
-    <div className={cn(
-      'relative bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800',
-      'shadow-sm ring-1 flex flex-col overflow-hidden transition-shadow hover:shadow-md',
-      t.ring,
-    )}>
+    <div
+      className={cn(
+        'relative bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800',
+        'shadow-sm ring-1 flex flex-col overflow-hidden transition-shadow hover:shadow-md',
+        t.ring,
+        onClick && 'cursor-pointer hover:ring-2',
+      )}
+      onClick={onClick}
+      title={onClick ? 'Nhấn để xem chi tiết' : undefined}
+    >
       <div className="px-4 pt-4 pb-3 flex items-start gap-3">
         <div className={cn('p-2 rounded-lg shrink-0', t.icon)}>
           <Icon className="w-4 h-4" />
@@ -44,6 +54,12 @@ export function KpiCard({ title, value, icon: Icon, subtitle, progress, color = 
             <p className={cn('text-[11px] font-medium mt-1.5 leading-none truncate', t.sub)}>
               {subtitle}
             </p>
+          )}
+          {delta !== undefined && delta !== 0 && (
+            <div className={cn('flex items-center gap-0.5 mt-1', delta > 0 ? 'text-emerald-600' : 'text-red-500')}>
+              {delta > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+              <span className="text-[11px] font-semibold">{delta > 0 ? '+' : ''}{delta}</span>
+            </div>
           )}
         </div>
         <div className={cn('w-2 h-2 rounded-full mt-1 shrink-0', t.dot)} />

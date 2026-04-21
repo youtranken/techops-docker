@@ -2,7 +2,22 @@ import { auth } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { permissionService } from '@/modules/rbac/services/permission.service';
 import { prisma } from '@/lib/prisma';
+import { cache } from '@/lib/cache';
 import type { TaskStatus, WorkflowMode } from '@prisma/client';
+
+function safeParseArray(raw: string): string[] {
+  try {
+    const p = JSON.parse(raw);
+    return Array.isArray(p) ? p.filter((x): x is string => typeof x === 'string') : [];
+  } catch { return []; }
+}
+
+function safeParseRecord(raw: string): Record<string, string[]> {
+  try {
+    const p = JSON.parse(raw);
+    return p && typeof p === 'object' && !Array.isArray(p) ? (p as Record<string, string[]>) : {};
+  } catch { return {}; }
+}
 
 /**
  * Get the currently authenticated user from session.
@@ -15,6 +30,7 @@ export async function getCurrentUser() {
 
 /**
  * Require authentication. Returns the user or a 401 JSON response.
+ * Also checks isActive / isDeleted via Redis cache (TTL 30s) — deactivate user ngắt session ≤30s.
  * Usage: const user = await requireAuth(); if (user instanceof NextResponse) return user;
  */
 export async function requireAuth() {
@@ -25,6 +41,35 @@ export async function requireAuth() {
       { status: 401 },
     );
   }
+
+  // Check isActive via cache (TTL 30s) — invalidated immediately on deactivate
+  // S2: fail-closed nếu DB lỗi (return 401 thay vì throw 500)
+  const CACHE_KEY = `user:active:${user.id}`;
+  let isActive = await cache.get<boolean>(CACHE_KEY);
+  if (isActive === null) {
+    try {
+      const dbUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { isActive: true },
+      });
+      isActive = !!dbUser?.isActive;
+      await cache.set(CACHE_KEY, isActive, 30);
+    } catch (err) {
+      console.error('[requireAuth] DB error checking isActive → fail-closed:', err);
+      return NextResponse.json(
+        { error: { code: 'UNAUTHORIZED', message: 'Không thể xác thực phiên — thử lại' } },
+        { status: 401 },
+      );
+    }
+  }
+
+  if (!isActive) {
+    return NextResponse.json(
+      { error: { code: 'UNAUTHORIZED', message: 'Tài khoản đã bị vô hiệu hóa' } },
+      { status: 401 },
+    );
+  }
+
   return user;
 }
 
@@ -70,7 +115,7 @@ export async function requirePermission(
 
   if (!allowed) {
     return NextResponse.json(
-      { error: { code: 'PERMISSION_DENIED', message: `Action '${actionName}' not permitted` } },
+      { error: { code: 'PERMISSION_DENIED', message: 'Insufficient permissions' } },
       { status: 403 },
     );
   }
@@ -95,7 +140,7 @@ export async function requireSettingsPermission(featureKey: string) {
 
   // EMPLOYEE: read SidebarPermission record from DB
   const record = await prisma.sidebarPermission.findUnique({ where: { userId: user.id } });
-  const visibleMenus: string[] = record ? (JSON.parse(record.visibleMenus) as string[]) : [];
+  const visibleMenus = record ? safeParseArray(record.visibleMenus) : [];
 
   if (!visibleMenus.includes('settings')) {
     return NextResponse.json(
@@ -104,11 +149,36 @@ export async function requireSettingsPermission(featureKey: string) {
     );
   }
 
-  const featurePerms: Record<string, string[]> = record
-    ? (JSON.parse(record.featurePermissions) as Record<string, string[]>)
-    : {};
+  const featurePerms = record ? safeParseRecord(record.featurePermissions) : {};
 
   if (!(featurePerms['settings'] ?? []).includes(featureKey)) {
+    return NextResponse.json(
+      { error: { code: 'FORBIDDEN', message: 'Insufficient permissions' } },
+      { status: 403 },
+    );
+  }
+
+  return user;
+}
+
+/**
+ * API-level guard cho bất kỳ menu nào trong sidebar.
+ * - ADMIN/BOSS: luôn được phép.
+ * - EMPLOYEE: phải có menuKey trong visibleMenus (SidebarPermission).
+ *
+ * Trả về user nếu được phép, NextResponse 401/403 nếu không.
+ */
+export async function requireMenuPermission(menuKey: string) {
+  const user = await requireAuth();
+  if (user instanceof NextResponse) return user;
+
+  const isPrivileged = ['ADMIN', 'BOSS'].includes(user.role.name);
+  if (isPrivileged) return user;
+
+  const record = await prisma.sidebarPermission.findUnique({ where: { userId: user.id } });
+  const visibleMenus = record ? safeParseArray(record.visibleMenus) : [];
+
+  if (!visibleMenus.includes(menuKey)) {
     return NextResponse.json(
       { error: { code: 'FORBIDDEN', message: 'Insufficient permissions' } },
       { status: 403 },

@@ -13,8 +13,8 @@ async function resetPassword({ userId, password }: ResetPasswordPayload): Promis
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password }),
   });
-  const body = await res.json();
-  if (!res.ok) throw new Error(body?.error?.message ?? 'Đổi mật khẩu thất bại');
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error((body as { error?: { message?: string } })?.error?.message ?? 'Đổi mật khẩu thất bại');
 }
 
 export function useResetPassword() {

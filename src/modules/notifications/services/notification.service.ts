@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/email';
 import { emailTemplateService } from '@/modules/settings/services/email-template.service';
+import { notificationPrefsService } from '@/modules/settings/services/notification-prefs.service';
 import dayjs from 'dayjs';
 import type { NotificationType, Notification } from '@prisma/client';
 
@@ -25,7 +26,7 @@ export interface NotificationWithTask extends Notification {
 
 const STATUS_LABELS: Record<string, string> = {
   DRAFT: 'Bản nháp',
-  PENDING_APPROVAL: 'Chờ duyệt kế hoạch',
+  PENDING_APPROVAL: 'Chờ duyệt công việc',
   WAITING_ACKNOWLEDGE: 'Chờ xác nhận',
   IN_PROGRESS: 'Đang thực hiện',
   PENDING_REVIEW: 'Chờ review',
@@ -45,7 +46,7 @@ async function buildRichEmail(
       where: { id: taskId },
       select: {
         title: true, taskCode: true, status: true,
-        scheduleStart: true, scheduleEnd: true,
+        createdAt: true, scheduleStart: true, scheduleEnd: true,
         priority: { select: { name: true, color: true } },
         assignees: {
           where: { status: { notIn: ['REJECTED', 'TRANSFERRED'] } },
@@ -66,6 +67,7 @@ async function buildRichEmail(
     userName: user.displayName,
     taskTitle: task?.title ?? '',
     taskCode: task?.taskCode ?? '—',
+    createdAt: task?.createdAt ? dayjs(task.createdAt).format('DD/MM/YYYY') : '—',
     deadline: task?.scheduleEnd ? dayjs(task.scheduleEnd).format('DD/MM/YYYY') : '—',
     scheduleStart: task?.scheduleStart ? dayjs(task.scheduleStart).format('DD/MM/YYYY') : '—',
     statusLabel: task?.status ? (STATUS_LABELS[task.status] ?? task.status) : '—',
@@ -93,20 +95,22 @@ class NotificationService {
       },
     });
 
-    // 2. Optionally send email
-    // 2. Optionally send rich email using Settings template
+    // 2. Optionally send rich email — gated by user notification prefs
     if (data.sendEmail) {
-      const userEmail = await prisma.user.findUnique({
-        where: { id: data.userId }, select: { email: true },
-      });
-      if (userEmail?.email) {
-        try {
-          const email = await buildRichEmail(data.userId, data.type, data.taskId, data.actorName);
-          if (email) {
-            await sendEmail({ to: userEmail.email, subject: email.subject, html: email.html });
+      const canSend = await notificationPrefsService.shouldSendEmail(data.userId, data.type);
+      if (canSend) {
+        const userEmail = await prisma.user.findUnique({
+          where: { id: data.userId }, select: { email: true },
+        });
+        if (userEmail?.email) {
+          try {
+            const email = await buildRichEmail(data.userId, data.type, data.taskId, data.actorName);
+            if (email) {
+              await sendEmail({ to: userEmail.email, subject: email.subject, html: email.html });
+            }
+          } catch (error) {
+            console.error(`[Notification] Email failed for user ${data.userId}:`, error);
           }
-        } catch (error) {
-          console.error(`[Notification] Email failed for user ${data.userId}:`, error);
         }
       }
     }

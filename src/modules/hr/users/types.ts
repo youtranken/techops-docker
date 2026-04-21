@@ -19,6 +19,7 @@ export interface CreateUserInput {
   email?: string;
   password: string;
   roleId: string;
+  mustChangePassword?: boolean;
 }
 
 export interface UpdateUserInput {

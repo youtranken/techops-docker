@@ -1,5 +1,7 @@
-﻿$log = "E:\techops-docker\autostart.log"
-$compose = "E:\techops-docker"
+# Dynamic path — script chạy từ folder cài đặt thực tế (không hard-code drive letter)
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$log = Join-Path $scriptDir "autostart.log"
+$compose = $scriptDir
 
 Add-Content $log "
 [$(Get-Date)] Windows khoi dong, dang cho Docker..."

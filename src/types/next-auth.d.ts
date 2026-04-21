@@ -6,6 +6,7 @@ declare module 'next-auth' {
       id: string;
       username: string;
       displayName: string;
+      mustChangePassword?: boolean;
       role: {
         id: string;
         name: string; // 'ADMIN' | 'BOSS' | 'EMPLOYEE'
@@ -16,6 +17,7 @@ declare module 'next-auth' {
   interface User extends DefaultUser {
     username: string;
     displayName: string;
+    mustChangePassword?: boolean;
     role: {
       id: string;
       name: string;
@@ -28,6 +30,7 @@ declare module 'next-auth/jwt' {
     id: string;
     username: string;
     displayName: string;
+    mustChangePassword?: boolean;
     role: {
       id: string;
       name: string;

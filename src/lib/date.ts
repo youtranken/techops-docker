@@ -4,7 +4,7 @@ import timezone from 'dayjs/plugin/timezone';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault('Asia/Ho_Chi_Minh');
+dayjs.tz.setDefault('Asia/Bangkok');
 
 export default dayjs;
 

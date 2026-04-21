@@ -13,8 +13,8 @@ export * from './hooks/useRejectReview';
 export * from './hooks/useRejectTask';
 export * from './hooks/useTransferTask';
 export * from './hooks/useReassignTask';
-export * from './hooks/useDeleteTask';
 export * from './hooks/useCancelTask';
+export * from './hooks/useRestoreTask';
 export * from './hooks/useExtensions';
 
 // Components — buttons

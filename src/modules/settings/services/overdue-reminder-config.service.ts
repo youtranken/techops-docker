@@ -6,6 +6,8 @@ const DEFAULT = {
   sendDays: [1, 2, 3, 4, 5],
   sendHour: 9,
   sendMinute: 0,
+  digestCategories: ['PENDING_APPROVAL', 'PENDING_REVIEW', 'IN_PROGRESS', 'WAITING_ACKNOWLEDGE'],
+  individualEmailTypes: ['OVERDUE', 'PENDING_ACK', 'UPCOMING'],
 };
 
 export const overdueReminderConfigService = {

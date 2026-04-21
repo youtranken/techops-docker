@@ -1,18 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, AlertCircle, Clock } from 'lucide-react';
+import { Loader2, AlertCircle, Clock, CheckSquare, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useOverdueReminderConfig, useUpdateOverdueReminderConfig } from '../hooks/useOverdueReminderConfig';
-import type { OverdueReminderConfigInput } from '../types';
+import { DIGEST_CATEGORIES, INDIVIDUAL_EMAIL_TYPES, INDIVIDUAL_EMAIL_TYPE_INFO } from '../types';
+import type { OverdueReminderConfigInput, DigestCategory, IndividualEmailType } from '../types';
+
+const ALL_CATEGORIES = [...DIGEST_CATEGORIES] as DigestCategory[];
+const ALL_INDIVIDUAL_TYPES = [...INDIVIDUAL_EMAIL_TYPES] as IndividualEmailType[];
 
 const DEFAULT: OverdueReminderConfigInput = {
   enabled: false,
   sendDays: [1, 2, 3, 4, 5],
   sendHour: 9,
   sendMinute: 0,
+  digestCategories: ALL_CATEGORIES,
+  individualEmailTypes: ALL_INDIVIDUAL_TYPES,
+};
+
+const CATEGORY_INFO: Record<DigestCategory, { icon: string; label: string; colorClass: string }> = {
+  PENDING_APPROVAL:    { icon: '📝', label: 'Chờ phê duyệt (quá deadline)',    colorClass: 'text-amber-700' },
+  PENDING_REVIEW:      { icon: '🔍', label: 'Chờ review (quá deadline)',        colorClass: 'text-purple-700' },
+  IN_PROGRESS:         { icon: '⏳', label: 'Đang thực hiện (quá deadline)',    colorClass: 'text-blue-700' },
+  WAITING_ACKNOWLEDGE: { icon: '📬', label: 'Chờ xác nhận (quá deadline)',      colorClass: 'text-emerald-700' },
 };
 
 const DAYS = [
@@ -37,7 +50,14 @@ export function OverdueReminderSection() {
 
   useEffect(() => {
     if (data) {
-      setForm({ enabled: data.enabled, sendDays: data.sendDays ?? [1,2,3,4,5], sendHour: data.sendHour, sendMinute: data.sendMinute });
+      setForm({
+        enabled: data.enabled,
+        sendDays: data.sendDays ?? [1, 2, 3, 4, 5],
+        sendHour: data.sendHour,
+        sendMinute: data.sendMinute,
+        digestCategories: (data.digestCategories as DigestCategory[] | undefined) ?? ALL_CATEGORIES,
+        individualEmailTypes: (data.individualEmailTypes as IndividualEmailType[] | undefined) ?? ALL_INDIVIDUAL_TYPES,
+      });
       setIsDirty(false);
     }
   }, [data]);
@@ -55,6 +75,40 @@ export function OverdueReminderSection() {
   function toggleWeekdays() {
     const allSelected = WEEKDAYS.every((d) => form.sendDays.includes(d));
     patch('sendDays', allSelected ? form.sendDays.filter((d) => !WEEKDAYS.includes(d)) : Array.from(new Set([...form.sendDays, ...WEEKDAYS])));
+  }
+
+  function toggleCategory(cat: DigestCategory) {
+    const current = form.digestCategories;
+    if (current.includes(cat)) {
+      if (current.length <= 1) return;
+      patch('digestCategories', current.filter((c) => c !== cat));
+    } else {
+      patch('digestCategories', [...current, cat]);
+    }
+  }
+
+  function toggleIndividualType(type: IndividualEmailType) {
+    const current = form.individualEmailTypes;
+    if (current.includes(type)) {
+      if (current.length <= 1) return;
+      patch('individualEmailTypes', current.filter((t) => t !== type));
+    } else {
+      patch('individualEmailTypes', [...current, type]);
+    }
+  }
+
+  function resetForm() {
+    if (data) {
+      setForm({
+        enabled: data.enabled,
+        sendDays: data.sendDays ?? [1, 2, 3, 4, 5],
+        sendHour: data.sendHour,
+        sendMinute: data.sendMinute,
+        digestCategories: (data.digestCategories as DigestCategory[] | undefined) ?? ALL_CATEGORIES,
+        individualEmailTypes: (data.individualEmailTypes as IndividualEmailType[] | undefined) ?? ALL_INDIVIDUAL_TYPES,
+      });
+    }
+    setIsDirty(false);
   }
 
   async function handleSave() {
@@ -146,11 +200,83 @@ export function OverdueReminderSection() {
             </p>
           )}
 
-          <div className="pt-2 border-t">
-            <p className="text-xs text-muted-foreground font-medium mb-1">Email sẽ bao gồm:</p>
-            <div className="flex flex-wrap gap-2">
-              <span className="text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 font-medium">📝 Chờ phê duyệt (quá deadline)</span>
-              <span className="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">🔍 Chờ review (quá deadline)</span>
+          {/* Digest category selection */}
+          <div className="pt-2 border-t space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-muted-foreground">Email Quản lý (digest tổng hợp) sẽ bao gồm:</p>
+              <button type="button"
+                onClick={() => patch('digestCategories', ALL_CATEGORIES)}
+                className="text-xs text-primary hover:underline font-medium">
+                Chọn tất cả
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+              {ALL_CATEGORIES.map((cat) => {
+                const info = CATEGORY_INFO[cat];
+                const checked = form.digestCategories.includes(cat);
+                const isLast = form.digestCategories.length <= 1 && checked;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => toggleCategory(cat)}
+                    disabled={isLast}
+                    title={isLast ? 'Phải chọn ít nhất 1 loại' : undefined}
+                    className={cn(
+                      'flex items-center gap-2.5 px-3 py-2.5 rounded-lg border text-left transition-all',
+                      checked
+                        ? 'bg-primary/5 border-primary/30'
+                        : 'bg-background border-border opacity-60 hover:opacity-80',
+                      isLast && 'cursor-not-allowed',
+                    )}>
+                    {checked
+                      ? <CheckSquare className="h-4 w-4 shrink-0 text-primary" />
+                      : <Square className="h-4 w-4 shrink-0 text-muted-foreground" />}
+                    <span className={cn('text-xs font-medium', checked ? info.colorClass : 'text-muted-foreground')}>
+                      {info.icon} {info.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Individual email reminder */}
+          <div className="pt-2 border-t space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-muted-foreground">Email cá nhân gửi riêng cho từng người thực hiện:</p>
+              <button type="button"
+                onClick={() => patch('individualEmailTypes', ALL_INDIVIDUAL_TYPES)}
+                className="text-xs text-primary hover:underline font-medium">
+                Chọn tất cả
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-1.5">
+              {ALL_INDIVIDUAL_TYPES.map((type) => {
+                const info = INDIVIDUAL_EMAIL_TYPE_INFO[type];
+                const checked = form.individualEmailTypes.includes(type);
+                const isLast = form.individualEmailTypes.length <= 1 && checked;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => toggleIndividualType(type)}
+                    disabled={isLast}
+                    title={isLast ? 'Phải chọn ít nhất 1 loại' : undefined}
+                    className={cn(
+                      'flex items-center gap-2.5 px-3 py-2.5 rounded-lg border text-left transition-all',
+                      checked ? 'bg-primary/5 border-primary/30' : 'bg-background border-border opacity-60 hover:opacity-80',
+                      isLast && 'cursor-not-allowed',
+                    )}>
+                    {checked
+                      ? <CheckSquare className="h-4 w-4 shrink-0 text-primary" />
+                      : <Square className="h-4 w-4 shrink-0 text-muted-foreground" />}
+                    <span className={cn('text-xs font-medium', checked ? info.colorClass : 'text-muted-foreground')}>
+                      {info.icon} {info.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -161,10 +287,7 @@ export function OverdueReminderSection() {
           <Button onClick={handleSave} disabled={update.isPending} size="sm">
             {update.isPending ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Đang lưu...</> : 'Lưu thay đổi'}
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => {
-            if (data) setForm({ enabled: data.enabled, sendDays: data.sendDays ?? [1,2,3,4,5], sendHour: data.sendHour, sendMinute: data.sendMinute });
-            setIsDirty(false);
-          }}>Hủy</Button>
+          <Button variant="ghost" size="sm" onClick={resetForm}>Hủy</Button>
         </div>
       )}
     </div>

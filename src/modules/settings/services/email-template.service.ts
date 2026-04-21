@@ -122,12 +122,16 @@ function richTaskCard(extraRows?: string): string {
         <div style="font-size:12px;font-weight:600">{{priority}}</div>
       </td>
       <td style="padding:10px 16px;border-bottom:1px solid #f1f5f9;vertical-align:top">
-        <div style="font-size:10px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Bắt đầu</div>
-        <div style="font-size:12px;font-weight:600;color:#374151">{{scheduleStart}}</div>
+        <div style="font-size:10px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Ngày tạo</div>
+        <div style="font-size:12px;font-weight:600;color:#374151">{{createdAt}}</div>
       </td>
     </tr>
     <tr>
-      <td colspan="2" style="padding:10px 16px;vertical-align:top${extraRows ? ';border-bottom:1px solid #f1f5f9' : ''}">
+      <td style="padding:10px 16px;border-bottom:1px solid #f1f5f9;border-right:1px solid #f1f5f9;vertical-align:top">
+        <div style="font-size:10px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Bắt đầu</div>
+        <div style="font-size:12px;font-weight:600;color:#374151">{{scheduleStart}}</div>
+      </td>
+      <td style="padding:10px 16px;border-bottom:1px solid #f1f5f9;vertical-align:top${extraRows ? ';border-bottom:1px solid #f1f5f9' : ''}">
         <div style="font-size:10px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Deadline</div>
         <div style="font-size:13px;font-weight:700;color:#374151">{{deadline}}</div>
       </td>

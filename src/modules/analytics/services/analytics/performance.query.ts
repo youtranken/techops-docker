@@ -21,7 +21,7 @@ export async function queryUserPerformance(filters: AnalyticsFilters): Promise<U
   const assignees = await prisma.taskAssignee.findMany({
     where: {
       ...userFilter,
-      task: { isDeleted: false, ...taskDateFilter },
+      task: { status: { not: 'CANCELLED' }, ...taskDateFilter },
       user: { role: { name: 'EMPLOYEE' } },
     },
     select: {

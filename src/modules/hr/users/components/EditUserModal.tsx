@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUpdateUser } from '../hooks/useUpdateUser';
@@ -43,9 +44,12 @@ export function EditUserModal({ user, onClose, canChangeRole = false }: Props) {
     if (values.password) payload.password = values.password;
     try {
       await updateUser.mutateAsync({ id: user.id, data: payload });
+      toast.success(`Đã cập nhật thông tin ${values.displayName}`);
       handleClose();
     } catch (err: unknown) {
-      setServerError((err as Error).message ?? 'Đã xảy ra lỗi');
+      const msg = (err as Error).message ?? 'Đã xảy ra lỗi';
+      setServerError(msg);
+      toast.error(msg);
     }
   }
 

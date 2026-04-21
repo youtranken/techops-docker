@@ -16,6 +16,8 @@ import { useRejectTask } from '../../actions/hooks/useRejectTask';
 import { useRejectReview } from '../../actions/hooks/useRejectReview';
 import { useRejectPlan } from '../../actions/hooks/useRejectPlan';
 import { useCancelTask } from '../../actions/hooks/useCancelTask';
+import { useRestoreTask } from '../../actions/hooks/useRestoreTask';
+import { ConfirmActionModal } from '../../actions/components/modals/ConfirmActionModal';
 import { useRequestExtension, useApproveExtension, useRejectExtension } from '../../actions/hooks/useExtensions';
 
 interface TaskListModalsProps {
@@ -30,6 +32,7 @@ interface TaskListModalsProps {
   rejectTaskId: string | null;
   rejectReviewId: string | null;
   cancelTaskId: string | null;
+  restoreTaskId: string | null;
   rejectPlanTaskId: string | null;
   extensionTaskId: string | null;
   approveExtState: { taskId: string; extId: string } | null;
@@ -41,6 +44,7 @@ interface TaskListModalsProps {
   setRejectTaskId: (v: string | null) => void;
   setRejectReviewId: (v: string | null) => void;
   setCancelTaskId: (v: string | null) => void;
+  setRestoreTaskId: (v: string | null) => void;
   setRejectPlanTaskId: (v: string | null) => void;
   setExtensionTaskId: (v: string | null) => void;
   setApproveExtState: (v: { taskId: string; extId: string } | null) => void;
@@ -50,10 +54,10 @@ export function TaskListModals({
   tasks, currentUserId, role,
   showCreate, editingTask, quickViewTaskId,
   completeTaskId, transferTaskId, rejectTaskId, rejectReviewId,
-  cancelTaskId, rejectPlanTaskId, extensionTaskId, approveExtState,
+  cancelTaskId, restoreTaskId, rejectPlanTaskId, extensionTaskId, approveExtState,
   setShowCreate, setEditingTask, setQuickViewTaskId,
   setCompleteTaskId, setTransferTaskId, setRejectTaskId, setRejectReviewId,
-  setCancelTaskId, setRejectPlanTaskId, setExtensionTaskId, setApproveExtState,
+  setCancelTaskId, setRestoreTaskId, setRejectPlanTaskId, setExtensionTaskId, setApproveExtState,
 }: TaskListModalsProps) {
   const complete         = useCompleteTask();
   const transfer         = useTransferTask();
@@ -61,6 +65,7 @@ export function TaskListModals({
   const rejectReview     = useRejectReview();
   const rejectPlan       = useRejectPlan();
   const cancelTask       = useCancelTask();
+  const restoreTask      = useRestoreTask();
   const requestExtension = useRequestExtension();
   const approveExtension = useApproveExtension();
   const rejectExtension  = useRejectExtension();
@@ -87,6 +92,7 @@ export function TaskListModals({
       />
 
       <CompleteTaskModal
+        taskId={completeTaskId ?? undefined}
         open={!!completeTaskId}
         onClose={() => setCompleteTaskId(null)}
         isLoading={complete.isPending}
@@ -154,6 +160,18 @@ export function TaskListModals({
             { onSuccess: () => setCancelTaskId(null) },
           )
         }
+      />
+
+      <ConfirmActionModal
+        open={!!restoreTaskId}
+        onClose={() => setRestoreTaskId(null)}
+        variant="success"
+        title="Khôi phục công việc"
+        icon="check"
+        description="Công việc sẽ trở về trạng thái trước khi bị hủy. Tất cả người thực hiện sẽ được giao lại từ đầu (chờ tiếp nhận)."
+        confirmLabel="Khôi phục"
+        isLoading={restoreTask.isPending}
+        onConfirm={() => restoreTask.mutate(restoreTaskId!, { onSuccess: () => setRestoreTaskId(null) })}
       />
 
       <ReasonModal

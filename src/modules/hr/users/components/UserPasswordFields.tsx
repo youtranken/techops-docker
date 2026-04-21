@@ -23,7 +23,7 @@ export function PasswordField({
       <Input
         id="password"
         type="password"
-        placeholder="Tối thiểu 6 ký tự"
+        placeholder="Tối thiểu 8 ký tự"
         autoComplete="new-password"
         {...register('password')}
       />

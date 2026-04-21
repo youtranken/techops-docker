@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import type { UserPermRow, SavePermissionInput } from '../types';
 
 type ApiResponse = { data: UserPermRow[] };
@@ -33,6 +34,12 @@ export function useSavePermission() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: savePermission,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['hr', 'sidebar-permissions'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['hr', 'sidebar-permissions'] });
+      toast.success('Đã cập nhật phân quyền');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message ?? 'Lưu phân quyền thất bại');
+    },
   });
 }

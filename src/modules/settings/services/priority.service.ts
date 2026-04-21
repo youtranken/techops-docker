@@ -24,7 +24,7 @@ export const priorityService = {
   },
 
   async delete(id: string) {
-    const used = await prisma.task.count({ where: { priorityId: id, isDeleted: false } });
+    const used = await prisma.task.count({ where: { priorityId: id } });
     if (used > 0) throw new Error('PRIORITY_IN_USE');
     return prisma.priority.delete({ where: { id } });
   },

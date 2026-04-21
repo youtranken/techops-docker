@@ -1,7 +1,6 @@
 'use client';
 
 import { ArrowLeft, Pencil } from 'lucide-react';
-import { sanitizeHtml } from '@/lib/sanitize';
 import { TaskStatusBadge } from '../TaskCard/TaskStatusBadge';
 import { TaskActionPanel } from '../../actions/components/buttons/TaskActionPanel';
 import type { TaskDetail } from '../../services/task-query.service';
@@ -33,7 +32,7 @@ export function DetailHero({ task, permissions, currentAssigneeIds, currentUserI
     permissions.canApproveReview || permissions.canRejectReview ||
     permissions.canRejectTask || permissions.canTransfer ||
     permissions.canReassign || permissions.canCancel ||
-    permissions.canDelete || permissions.canRequestExtension;
+    permissions.canRestore || permissions.canRequestExtension;
 
   return (
     <div className="animate-in fade-in slide-in-from-top-2 duration-300 shrink-0 bg-gradient-to-br from-slate-50/80 to-white dark:from-slate-800/50 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 pt-4 pb-4">
@@ -92,7 +91,7 @@ export function DetailHero({ task, permissions, currentAssigneeIds, currentUserI
             [&_b]:font-semibold [&_strong]:font-semibold [&_i]:italic [&_em]:italic [&_u]:underline
             [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:my-1 [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:my-1
             [&_li]:my-0.5 [&_p]:mb-1"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(task.content) }}
+          dangerouslySetInnerHTML={{ __html: task.content }}
         />
       ) : (
         <p className="text-sm text-slate-400 dark:text-slate-500 italic">Không có mô tả</p>

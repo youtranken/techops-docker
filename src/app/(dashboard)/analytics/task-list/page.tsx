@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { Download } from 'lucide-react';
+import { useState, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Download, Search } from 'lucide-react';
 import dayjs from 'dayjs';
 import { useTaskList, useTaskListEmployees } from '@/modules/analytics/hooks/useAnalytics';
 import { useExportPdf } from '@/modules/analytics/hooks/useExportPdf';
@@ -49,30 +50,58 @@ function buildPeriodTitle(range: TLDateRange): string {
   return 'Toàn bộ';
 }
 
-export default function TaskListPage() {
-  const [range, setRange]     = useState<TLDateRange>(getDefaultRange);
-  const [userId, setUserId]   = useState<string>('');
-  const [page, setPage]       = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+function TaskListContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { exportPdf, isExporting } = useExportPdf();
+
+  const defaultRange = getDefaultRange();
+  const range: TLDateRange = {
+    preset: (searchParams.get('preset') as TLPreset) ?? 'month',
+    dateFrom: searchParams.get('dateFrom') ?? defaultRange.dateFrom,
+    dateTo: searchParams.get('dateTo') ?? defaultRange.dateTo,
+  };
+  const userId = searchParams.get('userId') ?? '';
+  const search = searchParams.get('search') ?? '';
+  const sortBy = searchParams.get('sortBy') ?? 'createdAt';
+  const sortOrder = (searchParams.get('sortOrder') as 'asc' | 'desc') ?? 'desc';
+  const page = Math.max(1, Number(searchParams.get('page') ?? 1));
+  const pageSize = Number(searchParams.get('pageSize') ?? 20);
+  const [searchInput, setSearchInput] = useState(search);
+
+  const updateParams = useCallback((updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([k, v]) => v ? params.set(k, v) : params.delete(k));
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [router, searchParams]);
 
   const { data: employees = [] } = useTaskListEmployees();
   const { data, isLoading } = useTaskList({
     dateFrom: range.dateFrom || undefined,
     dateTo: range.dateTo || undefined,
     userId: userId || undefined,
+    search: search || undefined,
+    sortBy,
+    sortOrder,
     page,
     pageSize,
   });
 
   function handleRangeChange(v: TLDateRange) {
-    setRange(v);
-    setPage(1);
+    updateParams({ dateFrom: v.dateFrom, dateTo: v.dateTo, preset: v.preset, page: '1' });
   }
 
   function handleEmployeeChange(uid: string) {
-    setUserId(uid);
-    setPage(1);
+    updateParams({ userId: uid, page: '1' });
+  }
+
+  function handleSearch() {
+    updateParams({ search: searchInput, page: '1' });
+  }
+
+  function handleSort(field: string) {
+    const newOrder = sortBy === field && sortOrder === 'desc' ? 'asc' : 'desc';
+    updateParams({ sortBy: field, sortOrder: newOrder, page: '1' });
   }
 
   function excelExportUrl() {
@@ -131,12 +160,43 @@ export default function TaskListPage() {
         {data?.kpi && <TaskListKpiCards kpi={data.kpi} />}
 
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white">Danh sách công việc</h3>
               {data && (
                 <p className="text-sm text-gray-500 mt-0.5">{data.total.toLocaleString('vi-VN')} task trong kỳ</p>
               )}
+            </div>
+            <div className="flex items-center gap-2">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder="Tìm theo tên, mã..."
+                  className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 outline-none focus:ring-2 focus:ring-indigo-500/30 w-44"
+                />
+              </div>
+              {/* Sort */}
+              <select
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [field, order] = e.target.value.split('-');
+                  updateParams({ sortBy: field, sortOrder: order, page: '1' });
+                }}
+                className="text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-gray-700 dark:text-gray-300 outline-none cursor-pointer"
+              >
+                <option value="createdAt-desc">Mới nhất</option>
+                <option value="createdAt-asc">Cũ nhất</option>
+                <option value="scheduleEnd-asc">Deadline tăng</option>
+                <option value="scheduleEnd-desc">Deadline giảm</option>
+                <option value="title-asc">Tên A→Z</option>
+                <option value="title-desc">Tên Z→A</option>
+                <option value="status-asc">Trạng thái A→Z</option>
+              </select>
             </div>
           </div>
 
@@ -152,13 +212,21 @@ export default function TaskListPage() {
               total={data.total}
               page={page}
               pageSize={pageSize}
-              onPageChange={setPage}
-              onPageSizeChange={(s) => { setPageSize(s); setPage(1); }}
+              onPageChange={(p) => updateParams({ page: String(p) })}
+              onPageSizeChange={(s) => updateParams({ pageSize: String(s), page: '1' })}
               showEmployee={!userId}
             />
           ) : null}
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TaskListPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Đang tải...</div>}>
+      <TaskListContent />
+    </Suspense>
   );
 }

@@ -54,7 +54,18 @@ export async function PUT(req: NextRequest) {
       metadata: { setting: 'smtp', host: parsed.data.host, port: parsed.data.port },
     });
     return NextResponse.json(smtpService.mask(config));
-  } catch {
-    return NextResponse.json({ error: { code: 'SAVE_FAILED', message: 'Không thể lưu cấu hình SMTP' } }, { status: 400 });
+  } catch (err: unknown) {
+    const e = err as { message?: string };
+    // S3: nếu thiếu SMTP_ENCRYPT_KEY ở production → trả message rõ để admin biết phải set env
+    if (e.message?.includes('SMTP_ENCRYPT_KEY')) {
+      return NextResponse.json(
+        { error: { code: 'SMTP_KEY_MISSING', message: 'Server thiếu SMTP_ENCRYPT_KEY — admin cần set env trước khi lưu (sinh bằng: openssl rand -base64 32)' } },
+        { status: 503 },
+      );
+    }
+    return NextResponse.json(
+      { error: { code: 'SAVE_FAILED', message: e.message ?? 'Không thể lưu cấu hình SMTP' } },
+      { status: 400 },
+    );
   }
 }

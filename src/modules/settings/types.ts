@@ -253,12 +253,26 @@ export interface DigestConfig {
 
 export type DigestConfigInput = Omit<DigestConfig, 'id' | 'updatedAt' | 'updatedBy'>;
 
+export const DIGEST_CATEGORIES = ['PENDING_APPROVAL', 'PENDING_REVIEW', 'IN_PROGRESS', 'WAITING_ACKNOWLEDGE'] as const;
+export type DigestCategory = typeof DIGEST_CATEGORIES[number];
+
+export const INDIVIDUAL_EMAIL_TYPES = ['OVERDUE', 'PENDING_ACK', 'UPCOMING'] as const;
+export type IndividualEmailType = typeof INDIVIDUAL_EMAIL_TYPES[number];
+
+export const INDIVIDUAL_EMAIL_TYPE_INFO: Record<IndividualEmailType, { icon: string; label: string; colorClass: string }> = {
+  OVERDUE:     { icon: '🚨', label: 'Quá hạn chưa hoàn thành',         colorClass: 'text-red-700' },
+  PENDING_ACK: { icon: '⚠️', label: 'Chưa tiếp nhận & đã quá hạn',     colorClass: 'text-orange-700' },
+  UPCOMING:    { icon: '⏰', label: 'Sắp đến hạn trong 24h (task ≥ 1 ngày)', colorClass: 'text-sky-700' },
+};
+
 export interface OverdueReminderConfig {
   id: string;
   enabled: boolean;
   sendDays: number[];
   sendHour: number;
   sendMinute: number;
+  digestCategories: DigestCategory[];
+  individualEmailTypes: IndividualEmailType[];
   updatedAt: string;
   updatedBy: string | null;
 }

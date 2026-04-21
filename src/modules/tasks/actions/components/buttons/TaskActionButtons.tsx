@@ -7,7 +7,7 @@
 
 import {
   CheckCircle, XCircle, ThumbsUp, ThumbsDown, RotateCcw,
-  ArrowRightLeft, UserPlus, Trash2, ClipboardCheck, Ban, CalendarPlus,
+  ArrowRightLeft, UserPlus, ClipboardCheck, Ban, CalendarPlus, ArchiveRestore,
 } from 'lucide-react';
 import { ActionButton } from './ActionButton';
 import type { TaskPermissions } from '../../hooks/useTaskPermissions';
@@ -62,9 +62,9 @@ export function TaskActionButtons({ permissions, onModal, isPending }: Props) {
         isVisible={permissions.canCancel} isLoading={isPending.cancelTask}
         onClick={() => onModal('cancel')} />
 
-      <ActionButton label="Xóa" icon={Trash2} variant="destructive"
-        isVisible={permissions.canDelete} isLoading={isPending.deleteTask}
-        onClick={() => onModal('delete')} />
+      <ActionButton label="Khôi phục" icon={ArchiveRestore} variant="success"
+        isVisible={permissions.canRestore} isLoading={isPending.restoreTask}
+        onClick={() => onModal('restore')} />
 
       <ActionButton label="Xin gia hạn" icon={CalendarPlus} variant="warning"
         isVisible={permissions.canRequestExtension} isLoading={isPending.requestExtension}

@@ -7,11 +7,11 @@ import {
   AlertCircle,
   ArrowRightLeft,
   Edit,
-  Trash2,
   Ban,
   Eye,
   CalendarPlus,
   CalendarClock,
+  ArchiveRestore,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,12 +29,12 @@ interface TaskCardMenuProps {
   permissions: TaskPermissions;
   onOpenQuickView: (taskId: string) => void;
   onEdit: (taskId: string) => void;
-  onDelete: (task: TaskListItem) => void;
   onOpenComplete: (taskId: string) => void;
   onOpenTransfer: (taskId: string) => void;
   onOpenRejectTask: (taskId: string) => void;
   onOpenRejectReview: (taskId: string) => void;
   onOpenCancel: (taskId: string) => void;
+  onOpenRestore: (taskId: string) => void;
   onOpenRejectPlan: (taskId: string) => void;
   onOpenExtension: (taskId: string) => void;
   onOpenApproveExtension: (taskId: string, extId: string) => void;
@@ -48,12 +48,12 @@ export function TaskCardMenu({
   permissions,
   onOpenQuickView,
   onEdit,
-  onDelete,
   onOpenComplete,
   onOpenTransfer,
   onOpenRejectTask,
   onOpenRejectReview,
   onOpenCancel,
+  onOpenRestore,
   onOpenRejectPlan,
   onOpenExtension,
   onOpenApproveExtension,
@@ -134,20 +134,25 @@ export function TaskCardMenu({
             </DropdownMenuItem>
           )}
 
-          {permissions.canApproveExtension && task.extensions.some((e) => e.status === 'PENDING') && (
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                const pendingExt = task.extensions.find((ex) => ex.status === 'PENDING');
-                if (pendingExt) onOpenApproveExtension(task.id, pendingExt.id);
-              }}
-              className="text-emerald-600"
-            >
-              <CalendarClock className="mr-2 h-4 w-4" />Duyệt gia hạn
-            </DropdownMenuItem>
-          )}
+          {/* Bug 4: Boss thấy 1 đơn xin gia hạn XA NHẤT (latest requestedDate). Đơn cũ hơn xem trong tab chi tiết */}
+          {permissions.canApproveExtension && (() => {
+            const pending = task.extensions.filter((e) => e.status === 'PENDING');
+            if (pending.length === 0) return null;
+            const latest = pending.reduce((max, e) =>
+              new Date(e.requestedDate) > new Date(max.requestedDate) ? e : max,
+            );
+            return (
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); onOpenApproveExtension(task.id, latest.id); }}
+                className="text-emerald-600"
+              >
+                <CalendarClock className="mr-2 h-4 w-4" />
+                Duyệt gia hạn ({new Date(latest.requestedDate).toLocaleDateString('vi-VN')})
+              </DropdownMenuItem>
+            );
+          })()}
 
-          {(permissions.canCancel || permissions.canDelete) && <DropdownMenuSeparator />}
+          {(permissions.canCancel || permissions.canRestore) && <DropdownMenuSeparator />}
 
           {permissions.canCancel && (
             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onOpenCancel(task.id); }} className="text-red-600">
@@ -155,9 +160,9 @@ export function TaskCardMenu({
             </DropdownMenuItem>
           )}
 
-          {permissions.canDelete && (
-            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete(task); }} className="text-red-600">
-              <Trash2 className="mr-2 h-4 w-4" />Xóa
+          {permissions.canRestore && (
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onOpenRestore(task.id); }} className="text-emerald-600">
+              <ArchiveRestore className="mr-2 h-4 w-4" />Khôi phục
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>

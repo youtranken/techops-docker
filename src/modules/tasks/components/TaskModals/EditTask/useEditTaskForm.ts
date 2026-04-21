@@ -71,6 +71,9 @@ export function useEditTaskForm(task: TaskDetail, onClose: () => void) {
       for (const file of newFiles) {
         const fd = new FormData();
         fd.append('file', file);
+        // Upload thẳng vào folder <taskId>/attachments/ (không vào misc/)
+        fd.append('taskId', task.id);
+        fd.append('subFolder', 'attachments');
         const res = await fetch('/api/upload', { method: 'POST', body: fd });
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));

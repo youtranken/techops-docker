@@ -32,7 +32,7 @@ export function TaskActionPanel({
     modal, setModal, close,
     acknowledge, complete, approvePlan, rejectPlan,
     approveReview, rejectReview, rejectTask,
-    transfer, reassign, deleteTask, cancelTask, requestExtension,
+    transfer, reassign, cancelTask, restoreTask, requestExtension,
   } = useTaskActionPanel();
 
   const completedAssignees = taskAssignees
@@ -51,8 +51,9 @@ export function TaskActionPanel({
     approvePlan: approvePlan.isPending, rejectPlan: rejectPlan.isPending,
     approveReview: approveReview.isPending, rejectReview: rejectReview.isPending,
     rejectTask: rejectTask.isPending, transfer: transfer.isPending,
-    reassign: reassign.isPending, deleteTask: deleteTask.isPending,
-    cancelTask: cancelTask.isPending, requestExtension: requestExtension.isPending,
+    reassign: reassign.isPending,
+    cancelTask: cancelTask.isPending, restoreTask: restoreTask.isPending,
+    requestExtension: requestExtension.isPending,
   };
 
   return (
@@ -75,7 +76,7 @@ export function TaskActionPanel({
         onConfirm={() => acknowledge.mutate(taskId, { onSuccess: close })}
       />
 
-      <CompleteTaskModal open={modal === 'complete'} onClose={close}
+      <CompleteTaskModal taskId={taskId} open={modal === 'complete'} onClose={close}
         isLoading={complete.isPending}
         onConfirm={(reportContent, files) =>
           complete.mutate({ taskId, reportContent, files }, { onSuccess: close })
@@ -84,7 +85,7 @@ export function TaskActionPanel({
 
       <ConfirmActionModal open={modal === 'approve-plan'} onClose={close} variant="success"
         title="Duyệt công việc" icon="check"
-        description="Xác nhận duyệt kế hoạch? Công việc sẽ chuyển sang trạng thái Chờ tiếp nhận."
+        description="Xác nhận duyệt công việc? Công việc sẽ chuyển sang trạng thái Chờ tiếp nhận."
         confirmLabel="Duyệt" isLoading={approvePlan.isPending}
         onConfirm={() => approvePlan.mutate(taskId, { onSuccess: close })}
       />
@@ -134,11 +135,11 @@ export function TaskActionPanel({
         onConfirm={(reason) => cancelTask.mutate({ taskId, reason }, { onSuccess: close })}
       />
 
-      <ConfirmActionModal open={modal === 'delete'} onClose={close} variant="destructive"
-        title="Xóa công việc" icon="trash"
-        description="Công việc sẽ bị xóa (ẩn khỏi danh sách). Hành động này không thể hoàn tác."
-        confirmLabel="Xóa" isDestructive isLoading={deleteTask.isPending}
-        onConfirm={() => deleteTask.mutate(taskId, { onSuccess: close })}
+      <ConfirmActionModal open={modal === 'restore'} onClose={close} variant="success"
+        title="Khôi phục công việc" icon="check"
+        description="Công việc sẽ trở về trạng thái trước khi bị hủy. Tất cả người thực hiện sẽ được giao lại từ đầu (chờ tiếp nhận)."
+        confirmLabel="Khôi phục" isLoading={restoreTask.isPending}
+        onConfirm={() => restoreTask.mutate(taskId, { onSuccess: close })}
       />
     </>
   );

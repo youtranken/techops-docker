@@ -7,7 +7,6 @@ export const taskReferenceService = {
     const { search, creatorId, scheduleFrom, scheduleTo, page, limit } = filters;
 
     const where = {
-      isDeleted: false,
       ...(search && {
         OR: [
           { taskCode: { contains: search, mode: 'insensitive' as const } },

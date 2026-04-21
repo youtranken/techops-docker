@@ -6,6 +6,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Starting seed...");
 
+  // ─── ADMIN PASSWORD ─────────────────────────���────────────────────────────────
+  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD;
+  if (!adminPassword || adminPassword.length < 8) {
+    console.error("❌ ADMIN_INITIAL_PASSWORD env var không được đặt hoặc quá ngắn (min 8 ký tự).");
+    console.error("   Đặt trong .env: ADMIN_INITIAL_PASSWORD=<password mạnh>");
+    process.exit(1);
+  }
+
   // ─── ROLES ──────────────────────────────────────────────────────────────────
 
   const adminRole = await prisma.role.upsert({
@@ -47,11 +55,12 @@ async function main() {
     update: {},
     create: {
       username: "admin",
-      password: await bcrypt.hash("admin123", 10),
+      password: await bcrypt.hash(adminPassword, 10),
       displayName: "Administrator",
       email: "admin@techops.com",
       roleId: adminRole.id,
       isActive: true,
+      mustChangePassword: true, // Force đổi password lần đầu đăng nhập
     },
   });
 
@@ -386,12 +395,56 @@ async function main() {
 
   console.log("✅ Role status actions (3D matrix) created");
 
+  // ─── REPORT TEMPLATES ───────────────────────────────────────────────────────
+
+  const reportTemplates = [
+    {
+      title: "Đã xử lý xong",
+      content: "Đã kiểm tra và xử lý xong vấn đề. Kết quả: [mô tả kết quả]. Không phát sinh vấn đề thêm.",
+      category: "Kết quả",
+    },
+    {
+      title: "Đã gửi phản hồi cho người dùng",
+      content: "Đã liên hệ và phản hồi cho người dùng về vấn đề này. Người dùng đã xác nhận và đồng ý với hướng giải quyết.",
+      category: "Kết quả",
+    },
+    {
+      title: "Đã cài đặt / cập nhật",
+      content: "Đã tiến hành cài đặt / cập nhật [tên phần mềm / thiết bị]. Phiên bản: [phiên bản]. Hệ thống hoạt động bình thường sau khi cập nhật.",
+      category: "Kỹ thuật",
+    },
+    {
+      title: "Cần theo dõi thêm",
+      content: "Đã xử lý bước đầu nhưng vấn đề cần theo dõi thêm trong [X ngày]. Sẽ cập nhật tình trạng sau khi có kết quả rõ ràng.",
+      category: "Theo dõi",
+    },
+    {
+      title: "Chuyển giao cho bộ phận khác",
+      content: "Đã xem xét và nhận thấy vấn đề thuộc phạm vi của [bộ phận khác]. Đã chuyển giao và thông báo cho người liên quan.",
+      category: "Chuyển giao",
+    },
+  ];
+
+  // Lấy adminId để set createdBy
+  const adminUser = await prisma.user.findUnique({ where: { username: "admin" }, select: { id: true } });
+  if (adminUser) {
+    for (const tpl of reportTemplates) {
+      const existing = await prisma.reportTemplate.findFirst({ where: { title: tpl.title } });
+      if (!existing) {
+        await prisma.reportTemplate.create({ data: { ...tpl, createdBy: adminUser.id } });
+      }
+    }
+  }
+
+  console.log("✅ Report templates created");
+
   console.log("\n🎉 Seed completed successfully!");
   console.log("📊 Summary:");
   console.log("  - 3 Roles: ADMIN, BOSS, EMPLOYEE");
-  console.log("  - 1 User: admin (others created via UI)");
+  console.log("  - 1 User: admin (password từ ADMIN_INITIAL_PASSWORD, mustChangePassword=true)");
   console.log("  - 4 Priorities: Khẩn cấp, Cao, Bình thường, Thấp");
   console.log("  - 5 Task Types: Phần mềm, Phần cứng, Mạng, Phát triển, Khác");
+  console.log("  - 5 Report Templates mẫu");
   console.log("  - Full permission set + 3D RBAC matrix");
 }
 

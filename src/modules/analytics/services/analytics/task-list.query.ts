@@ -5,15 +5,20 @@ import type { TaskListFilters, TaskListResponse, TaskListEmployee } from './type
 const ACTIVE_STATUSES = ['PENDING', 'ACKNOWLEDGED', 'IN_PROGRESS', 'REVISION_REQUIRED'] as const;
 
 export async function queryTaskList(filters: TaskListFilters): Promise<TaskListResponse> {
-  const { dateFrom, dateTo, userId, page, pageSize } = filters;
+  const { dateFrom, dateTo, userId, search, sortBy = 'createdAt', sortOrder = 'desc', page, pageSize } = filters;
 
   const dateFilter = {
     ...(dateFrom && { gte: dateFrom }),
     ...(dateTo && { lte: dateTo }),
   };
   const taskBase = {
-    isDeleted: false,
     ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter }),
+    ...(search?.trim() && {
+      OR: [
+        { title: { contains: search.trim(), mode: 'insensitive' as const } },
+        { taskCode: { contains: search.trim(), mode: 'insensitive' as const } },
+      ],
+    }),
   };
 
   const baseWhere = {
@@ -21,6 +26,15 @@ export async function queryTaskList(filters: TaskListFilters): Promise<TaskListR
     task: taskBase,
     ...(userId && { userId }),
   };
+
+  // Build orderBy based on sortBy
+  const orderBy = sortBy === 'scheduleEnd'
+    ? [{ task: { scheduleEnd: sortOrder } }]
+    : sortBy === 'title'
+    ? [{ task: { title: sortOrder } }]
+    : sortBy === 'status'
+    ? [{ status: sortOrder }]
+    : [{ task: { createdAt: sortOrder } }];
 
   const now = new Date();
 
@@ -41,7 +55,7 @@ export async function queryTaskList(filters: TaskListFilters): Promise<TaskListR
       where: baseWhere,
       skip: (page - 1) * pageSize,
       take: pageSize,
-      orderBy: [{ task: { createdAt: 'desc' } }],
+      orderBy,
       select: {
         id: true,
         userId: true,

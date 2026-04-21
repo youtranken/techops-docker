@@ -34,7 +34,7 @@ export function SettingsMenu({ collapsed, isAdmin, isPrivileged, featurePerms }:
   }, [settingsActive]);
 
   // Filter system items by permissions
-  const settingFeats = isPrivileged ? ['priorities', 'task_types', 'profile', 'notifications'] : (featurePerms['settings'] ?? []);
+  const settingFeats = isPrivileged ? ['priorities', 'task_types', 'completion_templates', 'profile', 'notifications'] : (featurePerms['settings'] ?? []);
   const systemItems = SETTINGS_SYSTEM_ITEMS.filter((i) => settingFeats.includes(i.feat));
   const showAdmin = isAdmin;
   const showNotifications = settingFeats.includes('notifications');

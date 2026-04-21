@@ -37,7 +37,6 @@ class ResearchService {
   async getBottlenecks(): Promise<BottleneckTask[]> {
     const tasks = await prisma.task.findMany({
       where: {
-        isDeleted: false,
         status: { notIn: ['COMPLETED', 'CANCELLED', 'DRAFT'] },
       },
       include: {
@@ -64,7 +63,6 @@ class ResearchService {
     const assignees = await prisma.taskAssignee.findMany({
       where: {
         task: {
-          isDeleted: false,
           status: { notIn: ['COMPLETED', 'CANCELLED', 'DRAFT'] },
         },
       },
@@ -107,13 +105,15 @@ class ResearchService {
     return result.filter((u) => u.totalActive > 0).sort((a, b) => b.totalActive - a.totalActive);
   }
 
-  async getOverdueTasks(): Promise<OverdueTask[]> {
+  async getOverdueTasks(filters: { dateFrom?: Date; dateTo?: Date } = {}): Promise<OverdueTask[]> {
     const now = new Date();
     const tasks = await prisma.task.findMany({
       where: {
-        isDeleted: false,
         scheduleEnd: { lt: now },
         status: { notIn: ['COMPLETED', 'CANCELLED'] },
+        ...(filters.dateFrom || filters.dateTo
+          ? { createdAt: { ...(filters.dateFrom ? { gte: filters.dateFrom } : {}), ...(filters.dateTo ? { lte: filters.dateTo } : {}) } }
+          : {}),
       },
       include: {
         priority: { select: { name: true, color: true } },

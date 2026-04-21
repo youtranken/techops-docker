@@ -17,7 +17,7 @@ export const taskTypeService = {
   },
 
   async delete(id: string) {
-    const used = await prisma.task.count({ where: { typeId: id, isDeleted: false } });
+    const used = await prisma.task.count({ where: { typeId: id } });
     if (used > 0) throw new Error('TASK_TYPE_IN_USE');
     return prisma.taskType.delete({ where: { id } });
   },

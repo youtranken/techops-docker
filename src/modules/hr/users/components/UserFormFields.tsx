@@ -28,8 +28,7 @@ export interface UserFormBase {
 
 export interface CreateUserForm extends UserFormBase {
   username: string;
-  password: string;
-  confirmPassword: string;
+  // password/confirmPassword inherited as optional from UserFormBase — mode xác định bởi schema runtime
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

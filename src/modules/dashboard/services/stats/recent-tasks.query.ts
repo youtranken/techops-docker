@@ -5,7 +5,7 @@ import { assigneeSelect, mapAssignees } from './types';
 
 export async function queryRecentTasks(baseFilter: Prisma.TaskWhereInput): Promise<RecentTask[]> {
   const rows = await prisma.task.findMany({
-    where: { ...baseFilter, isDeleted: false },
+    where: { ...baseFilter },
     orderBy: { updatedAt: 'desc' },
     take: 5,
     select: {

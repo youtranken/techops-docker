@@ -13,20 +13,19 @@ export async function queryMonthlyOverview(year: number): Promise<MonthlyOvervie
 
   const [created, completed, cancelled] = await Promise.all([
     prisma.task.findMany({
-      where: { isDeleted: false, createdAt: { gte: yearStart, lte: yearEnd } },
+      where: { createdAt: { gte: yearStart, lte: yearEnd } },
       select: { createdAt: true },
     }),
+    // Lấy cả scheduleEnd để tính on-time đúng công thức
     prisma.task.findMany({
       where: {
-        isDeleted: false,
         status: 'COMPLETED',
         completedAt: { gte: yearStart, lte: yearEnd },
       },
-      select: { completedAt: true },
+      select: { completedAt: true, scheduleEnd: true },
     }),
     prisma.task.findMany({
       where: {
-        isDeleted: false,
         status: 'CANCELLED',
         updatedAt: { gte: yearStart, lte: yearEnd },
       },
@@ -35,8 +34,9 @@ export async function queryMonthlyOverview(year: number): Promise<MonthlyOvervie
   ]);
 
   // Build per-month maps
-  const createdMap = new Map<number, number>();
+  const createdMap  = new Map<number, number>();
   const completedMap = new Map<number, number>();
+  const onTimeMap   = new Map<number, number>(); // số task hoàn thành đúng hạn
   const cancelledMap = new Map<number, number>();
 
   for (const t of created) {
@@ -47,6 +47,12 @@ export async function queryMonthlyOverview(year: number): Promise<MonthlyOvervie
   for (const t of completed) {
     const m = dayjs(t.completedAt!).month();
     completedMap.set(m, (completedMap.get(m) ?? 0) + 1);
+    // Đúng hạn: completedAt (ngày) <= scheduleEnd (ngày)
+    const completedDay = dayjs(t.completedAt!).startOf('day');
+    const deadlineDay  = dayjs(t.scheduleEnd).startOf('day');
+    if (!completedDay.isAfter(deadlineDay)) {
+      onTimeMap.set(m, (onTimeMap.get(m) ?? 0) + 1);
+    }
   }
 
   for (const t of cancelled) {
@@ -62,9 +68,11 @@ export async function queryMonthlyOverview(year: number): Promise<MonthlyOvervie
 
   const result: MonthlyOverview[] = Array.from({ length: 12 }, (_, i) => {
     const completedCount = completedMap.get(i) ?? 0;
-    const createdCount = createdMap.get(i) ?? 0;
-    // onTimeRate = hoàn thành / tạo mới (trong tháng đó)
-    const onTimeRate = createdCount > 0 ? Math.round((completedCount / createdCount) * 100) : 0;
+    // Công thức đúng: onTimeRate = đúng hạn / hoàn thành (trong tháng này)
+    // Không dùng created vì task tạo tháng X có thể hoàn thành tháng X+N
+    const onTimeRate = completedCount > 0
+      ? Math.round(((onTimeMap.get(i) ?? 0) / completedCount) * 100)
+      : 0;
     return {
       month: `${year}-${String(i + 1).padStart(2, '0')}`,
       monthLabel: MONTH_LABELS[i],

@@ -48,18 +48,3 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: RouteParams) {
-  const user = await requireAuth();
-  if (user instanceof NextResponse) return user;
-
-  const { id } = await params;
-  try {
-    await taskService.delete(id, user);
-    return NextResponse.json({ success: true });
-  } catch (err: unknown) {
-    const e = err as { message?: string };
-    const code = e.message || 'DELETE_FAILED';
-    const status = code === 'TASK_NOT_FOUND' ? 404 : code === 'PERMISSION_DENIED' ? 403 : 400;
-    return NextResponse.json({ error: { code, message: code } }, { status });
-  }
-}

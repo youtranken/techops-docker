@@ -13,11 +13,11 @@ export async function queryTrends(period: 'day' | 'week' | 'month' = 'day'): Pro
 
   const [created, completed] = await Promise.all([
     prisma.task.findMany({
-      where: { isDeleted: false, createdAt: { gte: from } },
+      where: { createdAt: { gte: from } },
       select: { createdAt: true },
     }),
     prisma.task.findMany({
-      where: { isDeleted: false, status: 'COMPLETED', completedAt: { gte: from } },
+      where: { status: 'COMPLETED', completedAt: { gte: from } },
       select: { completedAt: true },
     }),
   ]);

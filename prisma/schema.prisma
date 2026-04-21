@@ -34,8 +34,8 @@ model RolePermission {
   id           String     @id @default(cuid())
   roleId       String
   permissionId String
-  permission   Permission @relation(fields: [permissionId], references: [id])
-  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, permissionId])
 }
@@ -47,7 +47,7 @@ model RoleStatusAction {
   workflowMode      WorkflowMode
   action            String
   isForceModeLocked Boolean      @default(false)
-  role              Role         @relation(fields: [roleId], references: [id])
+  role              Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, status, workflowMode, action])
   @@index([roleId, status])
@@ -61,7 +61,7 @@ model UserStatusAction {
   workflowMode WorkflowMode
   action       String
   override     OverrideType
-  role         Role         @relation(fields: [roleId], references: [id])
+  role         Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, status, workflowMode, action])
@@ -74,9 +74,12 @@ model User {
   displayName       String
   email             String?                @unique
   roleId            String
-  isActive          Boolean                @default(true)
-  createdAt         DateTime               @default(now())
-  updatedAt         DateTime               @updatedAt
+  isActive            Boolean                @default(true)
+  mustChangePassword  Boolean                @default(false)
+  passwordChangedAt   DateTime?
+  emailVerifiedAt     DateTime?
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
 
   comments          Comment[]
   extensionReqs     ExtensionRequest[]     @relation("ExtensionRequester")
@@ -131,14 +134,15 @@ model Priority {
 }
 
 model TaskType {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  color       String   @default("#6B7280")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  icon        String   @default("Wrench")
-  tasks       Task[]
+  id              String           @id @default(cuid())
+  name            String           @unique
+  description     String?
+  color           String           @default("#6B7280")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  icon            String           @default("Wrench")
+  tasks           Task[]
+  reportTemplates ReportTemplate[]
 }
 
 model Task {
@@ -151,9 +155,8 @@ model Task {
   workflowMode  WorkflowMode
   isForceMode   Boolean            @default(false)
   allFailed     Boolean            @default(false)
-  isDeleted     Boolean            @default(false)
-  deletedAt     DateTime?
   completedAt   DateTime?
+  statusBeforeCancel TaskStatus?
   scheduleStart DateTime
   scheduleEnd   DateTime
   creatorId     String
@@ -181,24 +184,24 @@ model Task {
   @@index([priorityId, status])
   @@index([hdId])
   @@index([hdCode])
-  @@index([isDeleted, status])
   @@index([taskCode])
   @@index([scheduleEnd, status]) // Performance: deadline queries
 }
 
 model TaskAssignee {
-  id              String           @id @default(cuid())
-  taskId          String
-  userId          String
-  status          AssigneeStatus   @default(PENDING)
-  acknowledgedAt  DateTime?
-  completedAt     DateTime?
-  rejectedAt      DateTime?
-  transferredFrom String?
-  transferNotes   String?
-  reports         AssigneeReport[]
-  task            Task             @relation(fields: [taskId], references: [id])
-  user            User             @relation(fields: [userId], references: [id])
+  id                          String           @id @default(cuid())
+  taskId                      String
+  userId                      String
+  status                      AssigneeStatus   @default(PENDING)
+  acknowledgedAt              DateTime?
+  completedAt                 DateTime?
+  rejectedAt                  DateTime?
+  transferredFrom             String?
+  transferNotes               String?
+  lastOverdueReminderSentAt   DateTime?        // chống spam: 1 email nhắc/ngày/assignee/task
+  reports                     AssigneeReport[]
+  task                        Task             @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user                        User             @relation(fields: [userId], references: [id], onDelete: Restrict)
 
   @@unique([taskId, userId])
   @@index([userId, status])
@@ -211,7 +214,7 @@ model AssigneeReport {
   content     String
   version     Int                @default(1)
   submittedAt DateTime           @default(now())
-  assignee    TaskAssignee       @relation(fields: [assigneeId], references: [id])
+  assignee    TaskAssignee       @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
   attachments ReportAttachment[]
 
   @@unique([assigneeId, version])
@@ -226,7 +229,7 @@ model TaskAttachment {
   fileSize   Int
   uploadedBy String
   createdAt  DateTime @default(now())
-  task       Task     @relation(fields: [taskId], references: [id])
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
 model ReportAttachment {
@@ -236,7 +239,7 @@ model ReportAttachment {
   filePath  String
   fileSize  Int
   createdAt DateTime       @default(now())
-  report    AssigneeReport @relation(fields: [reportId], references: [id])
+  report    AssigneeReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
@@ -248,8 +251,8 @@ model Comment {
   isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [authorId], references: [id])
-  task      Task     @relation(fields: [taskId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([taskId, createdAt])
 }
@@ -264,8 +267,8 @@ model ExtensionRequest {
   responseNote  String?
   respondedAt   DateTime?
   createdAt     DateTime        @default(now())
-  requester     User            @relation("ExtensionRequester", fields: [requesterId], references: [id])
-  task          Task            @relation(fields: [taskId], references: [id])
+  requester     User            @relation("ExtensionRequester", fields: [requesterId], references: [id], onDelete: Restrict)
+  task          Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([taskId, status])
 }
@@ -279,8 +282,8 @@ model TaskAuditLog {
   newStatus     TaskStatus?
   details       Json?
   createdAt     DateTime    @default(now())
-  performedBy   User        @relation("AuditPerformer", fields: [performedById], references: [id])
-  task          Task?       @relation(fields: [taskId], references: [id])
+  performedBy   User        @relation("AuditPerformer", fields: [performedById], references: [id], onDelete: Restrict)
+  task          Task?       @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
   @@index([taskId, createdAt(sort: Desc)])
   @@index([performedById, createdAt(sort: Desc)])
@@ -315,8 +318,8 @@ model Notification {
   message   String
   isRead    Boolean          @default(false)
   createdAt DateTime         @default(now())
-  task      Task?            @relation(fields: [taskId], references: [id])
-  user      User             @relation(fields: [userId], references: [id])
+  task      Task?            @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
   @@index([userId, createdAt(sort: Desc)])
@@ -390,7 +393,7 @@ model UserProfile {
   department  String?
   phone       String?
   position    String?
-  timezone    String   @default("Asia/Ho_Chi_Minh")
+  timezone    String   @default("Asia/Bangkok")
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -427,14 +430,31 @@ model TaskTag {
   @@index([tagId])
 }
 
+model ReportTemplate {
+  id         String    @id @default(cuid())
+  title      String
+  content    String
+  category   String?
+  isActive   Boolean   @default(true)
+  taskTypeId String?
+  createdBy  String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  taskType   TaskType? @relation(fields: [taskTypeId], references: [id], onDelete: SetNull)
+
+  @@index([isActive, taskTypeId])
+}
+
 model OverdueReminderConfig {
-  id         String   @id @default("singleton")
-  enabled    Boolean  @default(false)
-  sendDays   Int[]    @default([1,2,3,4,5])
-  sendHour   Int      @default(9)
-  sendMinute Int      @default(0)
-  updatedAt  DateTime @updatedAt
-  updatedBy  String?
+  id                   String   @id @default("singleton")
+  enabled              Boolean  @default(false)
+  sendDays             Int[]    @default([1,2,3,4,5])
+  sendHour             Int      @default(9)
+  sendMinute           Int      @default(0)
+  digestCategories     String[] @default(["PENDING_APPROVAL","PENDING_REVIEW","IN_PROGRESS","WAITING_ACKNOWLEDGE"])
+  individualEmailTypes String[] @default(["OVERDUE","PENDING_ACK","UPCOMING"])
+  updatedAt            DateTime @updatedAt
+  updatedBy            String?
 }
 
 model DigestConfig {
@@ -505,6 +525,7 @@ enum TaskAction {
   FORCE_MODE_TOGGLED
   COMMENT_ADDED
   STATUS_CHANGED
+  REPORT_SUPPLEMENTED
 }
 
 enum UserAction {
@@ -522,6 +543,9 @@ enum UserAction {
   RESET_PASSWORD
   CHANGE_SETTINGS
   REVOKE_SESSION
+  PASSWORD_CHANGED_SELF
+  PASSWORD_RESET_REQUESTED
+  PASSWORD_RESET_COMPLETED
   // Security events (Phase 2)
   RATE_LIMIT_EXCEEDED
   ACCOUNT_LOCKED

@@ -53,6 +53,17 @@ export async function transfer(
     throw new WorkflowError('USER_NOT_FOUND', 'Người nhận chuyển giao không tồn tại');
   }
 
+  // Cấm vòng lặp transfer: nếu người nhận đã từng transfer task này đi (TRANSFERRED) → từ chối
+  const prevTransfer = task.assignees.find(
+    (a) => a.userId === data.newAssigneeId && a.status === 'TRANSFERRED',
+  );
+  if (prevTransfer) {
+    throw new WorkflowError(
+      'TRANSFER_LOOP',
+      'Không thể chuyển giao cho người đã từng chuyển giao task này (vòng lặp)',
+    );
+  }
+
   await prisma.$transaction(async (tx) => {
     await tx.taskAssignee.update({
       where: { id: assignee.id },
@@ -92,7 +103,7 @@ export async function transfer(
         action: 'TRANSFERRED',
         oldStatus: task.status,
         newStatus: task.status,
-        details: { transferTo: data.newAssigneeId, notes: data.notes } as never,
+        details: { transferTo: data.newAssigneeId, transferToName: newUser.displayName, notes: data.notes } as never,
       },
     });
   });
@@ -143,12 +154,17 @@ export async function rejectTask(
       data: { status: 'REJECTED', rejectedAt: new Date(), transferNotes: data.reason ?? null },
     });
 
-    // Phục hồi người transfer gốc
+    // Phục hồi người transfer gốc (S10: chỉ khi user vẫn còn active)
     if (transferSourceId) {
       const sourceAssignee = await tx.taskAssignee.findUnique({
         where: { taskId_userId: { taskId, userId: transferSourceId } },
       });
-      if (sourceAssignee && sourceAssignee.status === 'TRANSFERRED') {
+      const sourceUser = transferSourceId
+        ? await tx.user.findUnique({ where: { id: transferSourceId }, select: { id: true, displayName: true, isActive: true } })
+        : null;
+
+      if (sourceAssignee && sourceAssignee.status === 'TRANSFERRED' && sourceUser?.isActive) {
+        const restoredUser = sourceUser;
         await tx.taskAssignee.update({
           where: { id: sourceAssignee.id },
           data: { status: 'IN_PROGRESS', transferNotes: null },
@@ -161,9 +177,10 @@ export async function rejectTask(
             oldStatus: task.status,
             newStatus: task.status,
             details: {
-              note: 'Người nhận từ chối — phục hồi người chuyển giao gốc',
-              rejectedBy: currentUser.id,
+              isRestore: true,
+              rejectedByName: assignee.user.displayName,
               restoredTo: transferSourceId,
+              restoredToName: restoredUser?.displayName ?? '',
             } as never,
           },
         });
@@ -182,21 +199,26 @@ export async function rejectTask(
     });
   });
 
-  // Notify người gốc nếu bị trả lại
+  // Notify người gốc nếu bị trả lại (chỉ khi user vẫn active)
   if (transferSourceId) {
-    const ref = formatTaskRef(task.taskCode, task.title);
-    const rejName = assignee.user.displayName;
-    await createNotification(
-      transferSourceId,
-      taskId,
-      'TRANSFER_RECEIVED',
-      `Công việc được trả lại: ${ref}`,
-      `${rejName} đã từ chối — công việc đã quay lại bạn`,
-    );
+    const sourceActive = await prisma.user.findUnique({ where: { id: transferSourceId }, select: { isActive: true } });
+    if (sourceActive?.isActive) {
+      const ref = formatTaskRef(task.taskCode, task.title);
+      const rejName = assignee.user.displayName;
+      await createNotification(
+        transferSourceId,
+        taskId,
+        'TRANSFER_RECEIVED',
+        `Công việc được trả lại: ${ref}`,
+        `${rejName} đã từ chối — công việc đã quay lại bạn`,
+      );
+    } else {
+      await checkAllFailed(taskId, task.creatorId);
+    }
   } else {
     // Không có source → check allFailed
     await checkAllFailed(taskId, task.creatorId);
-}
+  }
 }
 // ── Reassign ──────────────────────────────────────────────────────────────────
 
@@ -205,11 +227,22 @@ export async function reassign(
   data: ReassignData,
   currentUser: SessionUser,
 ): Promise<void> {
-  if (!['BOSS', 'ADMIN'].includes(currentUser.role.name)) {
-    throw new WorkflowError('FORBIDDEN', 'Chỉ Boss/Admin mới có thể giao lại');
-  }
-
   const task = await getTaskOrThrow(taskId);
+
+  const isPrivileged = ['BOSS', 'ADMIN'].includes(currentUser.role.name);
+  const isCreator    = task.creatorId === currentUser.id;
+
+  // APPROVAL: chỉ Boss/Admin mới reassign được
+  // DIRECT: creator hoặc Boss/Admin đều có thể reassign
+  if (task.workflowMode === 'NEED_APPROVAL') {
+    if (!isPrivileged) {
+      throw new WorkflowError('FORBIDDEN', 'Trong quy trình phê duyệt, chỉ Boss/Admin mới có thể giao lại');
+    }
+  } else {
+    if (!isPrivileged && !isCreator) {
+      throw new WorkflowError('FORBIDDEN', 'Chỉ người tạo hoặc Boss/Admin mới có thể giao lại');
+    }
+  }
 
   if (!task.allFailed) {
     throw new WorkflowError(

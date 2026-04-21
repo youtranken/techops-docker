@@ -15,7 +15,6 @@ export async function queryAvgTimeByTaskType(
     ...(filters.dateTo && { lte: filters.dateTo }),
   };
   const where = {
-    isDeleted: false,
     status: 'COMPLETED' as const,
     completedAt: { not: null as null },
     ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter }),

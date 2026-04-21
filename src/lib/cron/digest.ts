@@ -3,8 +3,12 @@ import { prisma } from '@/lib/prisma';
 import { collectDigestData } from '@/modules/settings/services/digest-data.service';
 import { buildDigestHtml, hasAnyData } from '@/modules/settings/services/digest-email.template';
 import { sendEmail } from '@/lib/email';
-import dayjs from '@/lib/date'; // đã config Asia/Ho_Chi_Minh
+import dayjs from '@/lib/date'; // đã config Asia/Bangkok (VN và TH cùng UTC+7)
 import type { DigestContentType } from '@/modules/settings/types';
+import { getRedis } from '@/lib/redis';
+
+const LOCK_KEY = 'lock:cron:digest';
+const LOCK_TTL = 300; // giây — 5 phút để gửi email xong trước khi lock hết hạn
 
 async function shouldSendToday(config: {
   sendWeekly: boolean; sendMonthly: boolean; sendDays?: unknown;
@@ -26,6 +30,13 @@ async function shouldSendToday(config: {
 export function startDigestCron(): void {
   // Run every minute to check hour:minute match
   cron.schedule('* * * * *', async () => {
+    const redis = getRedis();
+    let acquired = false;
+    try {
+      acquired = !!(await redis.set(LOCK_KEY, '1', 'EX', LOCK_TTL, 'NX'));
+    } catch { /* Redis down — skip */ }
+    if (!acquired) return;
+
     try {
       const config = await prisma.digestConfig.findUnique({ where: { id: 'singleton' } });
       if (!config?.enabled) return;
@@ -78,6 +89,8 @@ export function startDigestCron(): void {
       console.log(`✅ Digest sent to ${sent} recipient(s)`);
     } catch (err) {
       console.error('❌ Digest cron error:', err);
+    } finally {
+      try { await redis.del(LOCK_KEY); } catch { /* ignore */ }
     }
   });
 

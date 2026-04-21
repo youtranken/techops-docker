@@ -52,7 +52,6 @@ class TaskAuditLogService {
       const task = await prisma.task.findFirst({
         where: {
           id: taskId,
-          isDeleted: false,
           OR: [
             { creatorId: currentUser.id },
             { assignees: { some: { userId: currentUser.id } } },

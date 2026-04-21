@@ -13,7 +13,6 @@ export async function queryKpiOverview(filters: AnalyticsFilters): Promise<KpiDa
     ...(filters.dateTo && { lte: filters.dateTo }),
   };
   const where = {
-    isDeleted: false,
     ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter }),
   };
 
@@ -49,7 +48,8 @@ export async function queryKpiOverview(filters: AnalyticsFilters): Promise<KpiDa
       where: {
         ...where,
         status: { notIn: ['COMPLETED', 'CANCELLED'] },
-        scheduleEnd: { lt: new Date() },
+        // Overdue khi deadline TRƯỚC hôm nay (deadline cùng ngày KHÔNG tính)
+        scheduleEnd: { lt: dayjs().startOf('day').toDate() },
       },
     }),
   ]);

@@ -17,39 +17,31 @@ function normalizeViName(s: string): string {
     .trim();
 }
 
+type ActiveUser = { id: string; displayName: string };
+
 /**
- * Tìm user theo tên IT Support với 3 mức:
- * 1. Exact match (nếu API trả đúng tên có dấu)
- * 2. Case-insensitive exact (hạn chế lỗi hoa thường)
- * 3. Accent-normalized JS comparison (xử lý "Le Minh" vs "Lê Minh")
+ * Tìm user theo tên IT Support với 3 mức.
+ * S14: nhận activeUsers đã cache từ ngoài thay vì query lại mỗi lần.
  */
-async function findUserByItSupport(itSupport: string) {
+async function findUserByItSupport(itSupport: string, cachedUsers: ActiveUser[]) {
+  // M7: treat empty string same as null — not assignable
+  if (!itSupport.trim()) return null;
+
   // 1. Exact match
-  const exact = await prisma.user.findFirst({
-    where: { displayName: itSupport, isActive: true },
-  });
-  if (exact) return exact;
+  const exact = cachedUsers.find((u) => u.displayName === itSupport);
+  if (exact) return prisma.user.findUnique({ where: { id: exact.id } });
 
-  // 2. Case-insensitive exact (Prisma mode: insensitive)
-  const caseInsensitive = await prisma.user.findFirst({
-    where: { displayName: { equals: itSupport, mode: 'insensitive' }, isActive: true },
-  });
-  if (caseInsensitive) return caseInsensitive;
+  // 2. Case-insensitive exact
+  const lower = itSupport.toLowerCase();
+  const caseInsensitive = cachedUsers.find((u) => u.displayName.toLowerCase() === lower);
+  if (caseInsensitive) return prisma.user.findUnique({ where: { id: caseInsensitive.id } });
 
-  // 3. Accent-normalized: load tất cả active users, so sánh sau khi strip dấu
+  // 3. Accent-normalized comparison
   const normalizedQuery = normalizeViName(itSupport);
   if (!normalizedQuery) return null;
 
-  const activeUsers = await prisma.user.findMany({
-    where: { isActive: true },
-    select: { id: true, displayName: true },
-  });
-  const matched = activeUsers.find(
-    (u) => normalizeViName(u.displayName) === normalizedQuery,
-  );
-  if (matched) {
-    return prisma.user.findUnique({ where: { id: matched.id } });
-  }
+  const matched = cachedUsers.find((u) => normalizeViName(u.displayName) === normalizedQuery);
+  if (matched) return prisma.user.findUnique({ where: { id: matched.id } });
 
   return null;
 }
@@ -63,6 +55,12 @@ class TicketProcessorService {
    */
   async processTickets(tickets: HelpdeskTicket[], skipExisting = true): Promise<SyncResult> {
     const result: SyncResult = { synced: 0, pending: 0, skipped: 0, fetchedCount: tickets.length, errors: [] };
+
+    // S14: load active users once — reused for every ticket's findUserByItSupport call
+    const cachedActiveUsers = await prisma.user.findMany({
+      where: { isActive: true },
+      select: { id: true, displayName: true },
+    });
 
     for (const ticket of tickets) {
       let hdId = '';
@@ -110,7 +108,7 @@ class TicketProcessorService {
               result.pending++;
             }
           } else {
-            const assignee = await findUserByItSupport(ticket.itSupport);
+            const assignee = await findUserByItSupport(ticket.itSupport, cachedActiveUsers);
             if (!assignee) {
               console.warn(`[HelpdeskSync] IT Support "${ticket.itSupport}" không tìm thấy → UNASSIGNED`);
               await ticketTaskCreatorService.createPendingTask(ticket, hdId);

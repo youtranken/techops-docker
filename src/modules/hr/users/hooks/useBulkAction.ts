@@ -3,11 +3,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-export type BulkActionType = 'deactivate' | 'activate';
+export type BulkActionType = 'deactivate' | 'activate' | 'changeRole' | 'forceChangePassword';
 
 export interface BulkActionPayload {
   action: BulkActionType;
   userIds: string[];
+  roleId?: string;
 }
 
 async function executeBulkAction(payload: BulkActionPayload): Promise<{ affected: number }> {
@@ -23,6 +24,13 @@ async function executeBulkAction(payload: BulkActionPayload): Promise<{ affected
   return body.data as { affected: number };
 }
 
+const ACTION_LABELS: Record<BulkActionType, string> = {
+  deactivate: 'Vô hiệu hóa',
+  activate: 'Kích hoạt lại',
+  changeRole: 'Đổi vai trò',
+  forceChangePassword: 'Bắt buộc đổi mật khẩu',
+};
+
 export function useBulkAction(onSuccess?: () => void) {
   const queryClient = useQueryClient();
 
@@ -30,7 +38,7 @@ export function useBulkAction(onSuccess?: () => void) {
     mutationFn: executeBulkAction,
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['hr', 'users'] });
-      const label = variables.action === 'deactivate' ? 'Vô hiệu hóa' : 'Kích hoạt lại';
+      const label = ACTION_LABELS[variables.action] ?? 'Thao tác';
       toast.success(`${label} ${data.affected} người dùng thành công`);
       onSuccess?.();
     },

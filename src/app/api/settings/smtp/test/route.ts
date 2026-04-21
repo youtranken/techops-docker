@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/auth-utils';
 import { smtpService } from '@/modules/settings/services/smtp.service';
+import { decryptSecret } from '@/lib/crypto';
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
 
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
       host: config.host,
       port: config.port,
       secure: config.secure,
-      auth: { user: config.user, pass: config.password },
+      auth: { user: config.user, pass: decryptSecret(config.password) },
     });
 
     await transporter.sendMail({

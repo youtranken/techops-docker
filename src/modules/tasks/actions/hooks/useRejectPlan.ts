@@ -16,7 +16,7 @@ export function useRejectPlan() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Từ chối kế hoạch thất bại');
+        throw new Error(body.error?.message ?? 'Từ chối công việc thất bại');
       }
     },
     onSuccess: (_data, { taskId }) => {

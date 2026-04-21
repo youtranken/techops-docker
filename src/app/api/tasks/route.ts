@@ -5,6 +5,7 @@ import { taskQueryService } from '@/modules/tasks/services/task-query.service';
 import { taskService } from '@/modules/tasks/services/task.service';
 import { createTaskSchema } from '@/modules/tasks/validators/create-task.schema';
 import type { TaskStatus } from '@prisma/client';
+import type { TaskSortField, TaskSortOrder } from '@/modules/tasks/services/task-query.service';
 
 export async function GET(req: NextRequest) {
   const user = await requireAuth();
@@ -23,6 +24,9 @@ export async function GET(req: NextRequest) {
     page: searchParams.get('page') ? Number(searchParams.get('page')) : undefined,
     limit: searchParams.get('limit') ? Number(searchParams.get('limit')) : undefined,
     source: (rawSource === 'helpdesk' || rawSource === 'techops') ? rawSource as 'helpdesk' | 'techops' : undefined,
+    sortField: (['createdAt', 'scheduleEnd', 'title', 'status'].includes(searchParams.get('sortField') ?? '')
+      ? searchParams.get('sortField') as TaskSortField : undefined),
+    sortOrder: (searchParams.get('sortOrder') === 'asc' ? 'asc' : searchParams.get('sortOrder') === 'desc' ? 'desc' : undefined) as TaskSortOrder | undefined,
   };
 
   const result = await taskQueryService.list(filters, user);

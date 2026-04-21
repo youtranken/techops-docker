@@ -14,7 +14,7 @@ interface SessionUser {
 export const taskDetailService = {
   async getById(id: string, currentUser: SessionUser): Promise<TaskDetail | null> {
     const task = await prisma.task.findUnique({
-      where: { id, isDeleted: false },
+      where: { id },
       include: {
         priority: { select: { id: true, name: true, color: true, level: true } },
         type: { select: { id: true, name: true, color: true, icon: true } },

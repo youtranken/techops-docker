@@ -14,6 +14,7 @@ export { acknowledge } from './workflow/acknowledge.service';
 export { approvePlan, rejectPlan, approveReview, rejectReview } from './workflow/approval.service';
 export { complete, cancel } from './workflow/lifecycle.service';
 export { transfer, rejectTask, reassign } from './workflow/assignment.service';
+export { restoreCancelled } from './workflow/restore.service';
 
 // Re-export shared types for consumers that import from this module
 export type { SessionUser, CompleteData, RejectData, TransferData, ReassignData } from './workflow/_shared';
@@ -24,6 +25,7 @@ import { acknowledge } from './workflow/acknowledge.service';
 import { approvePlan, rejectPlan, approveReview, rejectReview } from './workflow/approval.service';
 import { complete, cancel } from './workflow/lifecycle.service';
 import { transfer, rejectTask, reassign } from './workflow/assignment.service';
+import { restoreCancelled } from './workflow/restore.service';
 
 export const taskWorkflowService = {
   acknowledge,
@@ -36,4 +38,5 @@ export const taskWorkflowService = {
   transfer,
   rejectTask,
   reassign,
+  restoreCancelled,
 };

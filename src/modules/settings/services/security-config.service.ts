@@ -32,7 +32,7 @@ class SecurityConfigService {
    */
   async update(config: Partial<SecurityConfig>): Promise<SecurityConfig> {
     const current = await this.get();
-    
+
     // Deep merge với config hiện tại
     const merged: SecurityConfig = {
       rateLimit: { ...current.rateLimit, ...config.rateLimit },

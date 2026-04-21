@@ -49,7 +49,25 @@ export async function PATCH(req: NextRequest) {
       { status: 400 },
     );
   }
-  const config = await digestConfigService.upsert(parsed.data, user.id);
-  await logUserActivity({ userId: user.id, action: 'CHANGE_SETTINGS', metadata: { setting: 'digest_config', enabled: parsed.data.enabled } });
+  const d = parsed.data;
+  // US4.9: Chặn lưu nếu enabled=true nhưng không có lịch nào
+  if (d.enabled) {
+    const hasSchedule = d.sendDays.length > 0 || d.sendWeekly || d.sendMonthly;
+    if (!hasSchedule) {
+      return NextResponse.json(
+        { error: { code: 'VALIDATION_FAILED', message: 'Digest đang bật nhưng chưa chọn lịch gửi (ngày trong tuần, hàng tuần hoặc hàng tháng). Cron sẽ không chạy.' } },
+        { status: 400 },
+      );
+    }
+    if (d.contentTypes.length === 0) {
+      return NextResponse.json(
+        { error: { code: 'VALIDATION_FAILED', message: 'Digest đang bật nhưng chưa chọn loại nội dung nào để gửi.' } },
+        { status: 400 },
+      );
+    }
+  }
+
+  const config = await digestConfigService.upsert(d, user.id);
+  await logUserActivity({ userId: user.id, action: 'CHANGE_SETTINGS', metadata: { setting: 'digest_config', enabled: d.enabled } });
   return NextResponse.json(config);
 }

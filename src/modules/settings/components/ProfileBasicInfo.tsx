@@ -11,8 +11,8 @@ import { ROLE_LABELS } from '@/lib/constants';
 import type { UserProfileData } from '../types';
 
 const TIMEZONES = [
-  { value: 'Asia/Ho_Chi_Minh', label: 'GMT+7 — Hồ Chí Minh' },
-  { value: 'Asia/Bangkok',     label: 'GMT+7 — Bangkok' },
+  { value: 'Asia/Bangkok',     label: 'GMT+7 — Việt Nam / Bangkok' },
+  { value: 'Asia/Ho_Chi_Minh', label: 'GMT+7 — Hồ Chí Minh (legacy)' },
   { value: 'Asia/Singapore',   label: 'GMT+8 — Singapore' },
   { value: 'Asia/Tokyo',       label: 'GMT+9 — Tokyo' },
   { value: 'UTC',              label: 'UTC' },
@@ -26,7 +26,7 @@ export function ProfileBasicInfo({ profile }: Props) {
     displayName: profile.displayName,
     position:   profile.profile?.position    ?? '',
     department: profile.profile?.department  ?? '',
-    timezone:   profile.profile?.timezone    ?? 'Asia/Ho_Chi_Minh',
+    timezone:   profile.profile?.timezone    ?? 'Asia/Bangkok',
     bio:        profile.profile?.bio         ?? '',
   });
   const [dirty, setDirty] = useState(false);
@@ -89,7 +89,7 @@ export function ProfileBasicInfo({ profile }: Props) {
             {update.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Pencil className="h-3.5 w-3.5" />}
             Lưu thay đổi
           </Button>
-          <Button size="sm" variant="ghost" onClick={() => { setForm({ displayName: profile.displayName, position: profile.profile?.position ?? '', department: profile.profile?.department ?? '', timezone: profile.profile?.timezone ?? 'Asia/Ho_Chi_Minh', bio: profile.profile?.bio ?? '' }); setDirty(false); }}>Hủy</Button>
+          <Button size="sm" variant="ghost" onClick={() => { setForm({ displayName: profile.displayName, position: profile.profile?.position ?? '', department: profile.profile?.department ?? '', timezone: profile.profile?.timezone ?? 'Asia/Bangkok', bio: profile.profile?.bio ?? '' }); setDirty(false); }}>Hủy</Button>
         </div>
       )}
     </div>

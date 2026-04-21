@@ -3,10 +3,12 @@ import { requireRole } from '@/lib/auth-utils';
 import { userService } from '@/modules/hr/services/user.service';
 import { z } from 'zod';
 
-const bulkActionSchema = z.object({
-  action: z.enum(['deactivate', 'activate']),
-  userIds: z.array(z.string().cuid()).min(1),
-});
+const bulkActionSchema = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('deactivate'), userIds: z.array(z.string().cuid()).min(1) }),
+  z.object({ action: z.literal('activate'), userIds: z.array(z.string().cuid()).min(1) }),
+  z.object({ action: z.literal('changeRole'), userIds: z.array(z.string().cuid()).min(1), roleId: z.string().cuid() }),
+  z.object({ action: z.literal('forceChangePassword'), userIds: z.array(z.string().cuid()).min(1) }),
+]);
 
 export async function POST(req: NextRequest) {
   const actor = await requireRole(['ADMIN', 'BOSS']);
@@ -25,10 +27,21 @@ export async function POST(req: NextRequest) {
   const { action, userIds } = parsed.data;
 
   try {
-    if (action === 'deactivate') {
-      await userService.bulkDeactivate(userIds, actor.id);
-    } else {
-      await userService.bulkActivate(userIds, actor.id);
+    switch (action) {
+      case 'deactivate':
+        await userService.bulkDeactivate(userIds, actor.id);
+        break;
+      case 'activate':
+        await userService.bulkActivate(userIds, actor.id);
+        break;
+      case 'changeRole': {
+        const { roleId } = parsed.data as { action: 'changeRole'; userIds: string[]; roleId: string };
+        await userService.bulkChangeRole(userIds, roleId, actor.id);
+        break;
+      }
+      case 'forceChangePassword':
+        await userService.bulkSetMustChangePassword(userIds, actor.id);
+        break;
     }
     return NextResponse.json({ data: { affected: userIds.length } });
   } catch {

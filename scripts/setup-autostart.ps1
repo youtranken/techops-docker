@@ -4,9 +4,12 @@
 # Chạy script này 1 lần với quyền Administrator
 # ==============================================================================
 
-$composeDir  = "E:\techops-docker"
+# Dynamic path — chạy script từ folder dự án thực tế
+$scriptDir = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+$composeDir  = $scriptDir
 $taskName    = "TechOps-Docker-AutoStart"
-$logFile     = "E:\techops-docker\autostart.log"
+$logFile     = Join-Path $composeDir "autostart.log"
+$scriptPath  = Join-Path $composeDir "autostart-docker.ps1"
 
 # Xóa task cũ nếu có
 if (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue) {
@@ -14,37 +17,11 @@ if (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue) {
     Write-Host "Da xoa task cu: $taskName"
 }
 
-# Script thực thi — chờ Docker sẵn sàng rồi mới compose up
-$scriptContent = @"
-`$log = "$logFile"
-`$compose = "$composeDir"
-
-Add-Content `$log "`n[`$(Get-Date)] Windows khoi dong, dang cho Docker..."
-
-# Cho Docker Engine khoi dong (toi da 120 giay)
-`$timeout = 120
-`$elapsed = 0
-while (`$elapsed -lt `$timeout) {
-    `$status = docker info 2>`$null
-    if (`$LASTEXITCODE -eq 0) { break }
-    Start-Sleep -Seconds 5
-    `$elapsed += 5
-}
-
-if (`$LASTEXITCODE -ne 0) {
-    Add-Content `$log "[`$(Get-Date)] LOI: Docker chua san sang sau `$timeout giay"
+# Verify autostart-docker.ps1 ton tai
+if (-not (Test-Path $scriptPath)) {
+    Write-Host "LOI: Khong tim thay $scriptPath" -ForegroundColor Red
     exit 1
 }
-
-Add-Content `$log "[`$(Get-Date)] Docker san sang. Dang chay compose up..."
-Set-Location `$compose
-docker compose up -d 2>&1 | Add-Content `$log
-Add-Content `$log "[`$(Get-Date)] Hoan tat."
-"@
-
-$scriptPath = "E:\techops-docker\autostart-docker.ps1"
-Set-Content -Path $scriptPath -Value $scriptContent -Encoding UTF8
-Write-Host "Da tao script: $scriptPath"
 
 # Action: chạy PowerShell script
 $action = New-ScheduledTaskAction `

@@ -7,7 +7,7 @@ export async function queryRecentComments(baseFilter: Prisma.TaskWhereInput): Pr
   const rows = await prisma.comment.findMany({
     where: {
       isDeleted: false,
-      task: { ...baseFilter, isDeleted: false },
+      task: { ...baseFilter },
     },
     orderBy: { createdAt: 'desc' },
     take: 60,

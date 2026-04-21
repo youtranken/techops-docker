@@ -8,6 +8,9 @@ RUN --mount=type=cache,target=/var/cache/apk \
     apk add libc6-compat openssl
 WORKDIR /app
 
+# Bắt buộc: tắt download Chromium của puppeteer (~150MB) — không cần ở production
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
 COPY package*.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
@@ -26,13 +29,12 @@ COPY prisma ./prisma
 RUN npx prisma generate
 
 COPY . .
-RUN --mount=type=cache,target=/app/.next/cache \
-    npm run build
+RUN npm run build
 
 # ─── Stage 3: Production Runner ───────────────────────────────────────────────
 FROM node:20-alpine AS runner
 RUN --mount=type=cache,target=/var/cache/apk \
-    apk add libc6-compat openssl
+    apk add libc6-compat openssl postgresql-client wget
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -69,5 +71,9 @@ RUN sed -i 's/\r//' /usr/local/bin/docker-entrypoint.sh \
 
 USER nextjs
 EXPOSE 3000
+
+# D6: Healthcheck dùng wget (Alpine-friendly) — endpoint /api/health đã có
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD wget -qO- http://localhost:3000/api/health > /dev/null 2>&1 || exit 1
 
 CMD ["/usr/local/bin/docker-entrypoint.sh"]

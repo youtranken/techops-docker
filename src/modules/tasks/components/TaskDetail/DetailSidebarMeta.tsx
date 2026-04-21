@@ -35,6 +35,7 @@ export function DetailSidebarMeta({ task }: Props) {
       <div className="space-y-3">
         <MetaField label="Người tạo">{task.creator.displayName}</MetaField>
         <MetaField label="Loại công việc">{task.type.name}</MetaField>
+        <MetaField label="Ngày tạo">{formatDateShort(task.createdAt)}</MetaField>
         {task.scheduleStart && (
           <MetaField label="Ngày bắt đầu">{formatDateShort(task.scheduleStart)}</MetaField>
         )}

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useMemo, Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   FileText, CheckCircle, Clock, Hourglass,
   AlertCircle, ShieldCheck,
@@ -19,6 +20,8 @@ import { MonthlyOverviewChart } from '@/modules/analytics/components/MonthlyOver
 import { TaskTypeTimeChart } from '@/modules/analytics/components/TaskTypeTimeChart';
 import { FunnelChart } from '@/modules/analytics/components/FunnelChart';
 import { DateRangeFilter, type DateRange, type Preset } from '@/modules/analytics/components/DateRangeFilter';
+import { DrillDownModal } from '@/modules/analytics/components/DrillDownModal';
+import type { DrillDownType } from '@/app/api/analytics/drilldown/route';
 import { Button } from '@/components/ui/button';
 import dayjs from 'dayjs';
 
@@ -38,18 +41,59 @@ function getDefaultRange(): DateRange {
 
 const CONTENT_ID = 'analytics-content';
 
-export default function AnalyticsPage() {
-  const [range, setRange] = useState<DateRange>(getDefaultRange);
-  const [preset, setPreset] = useState<Preset>('month');
-  const [year, setYear] = useState(CURRENT_YEAR);
+function AnalyticsContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read filter state from URL, fallback to defaults
+  const defaultRange = getDefaultRange();
+  const range: DateRange = {
+    dateFrom: searchParams.get('dateFrom') ?? defaultRange.dateFrom,
+    dateTo: searchParams.get('dateTo') ?? defaultRange.dateTo,
+  };
+  const preset = (searchParams.get('preset') as Preset) ?? 'month';
+  const year = Number(searchParams.get('year') ?? CURRENT_YEAR);
+
+  const updateParams = useCallback((updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([k, v]) => params.set(k, v));
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [router, searchParams]);
+
+  function setRange(r: DateRange) {
+    updateParams({ dateFrom: r.dateFrom, dateTo: r.dateTo });
+  }
+  function setPreset(p: Preset) {
+    updateParams({ preset: p });
+  }
+  function setYear(y: number) {
+    updateParams({ year: String(y) });
+  }
   const { exportPdf, isExporting } = useExportPdf();
+
+  // Drill-down state
+  const [drillDown, setDrillDown] = useState<{ type: DrillDownType; title: string } | null>(null);
+  function openDrillDown(type: DrillDownType, title: string) { setDrillDown({ type, title }); }
 
   const filters = {
     dateFrom: range.dateFrom || undefined,
     dateTo: range.dateTo || undefined,
   };
 
+  // Compute previous period (same duration, shifted back)
+  const prevFilters = useMemo(() => {
+    if (!range.dateFrom || !range.dateTo) return undefined;
+    const from = dayjs(range.dateFrom);
+    const to = dayjs(range.dateTo);
+    const duration = to.diff(from, 'day') + 1;
+    return {
+      dateFrom: from.subtract(duration, 'day').format('YYYY-MM-DD'),
+      dateTo: from.subtract(1, 'day').format('YYYY-MM-DD'),
+    };
+  }, [range.dateFrom, range.dateTo]);
+
   const { data: kpi, isLoading: kpiLoading } = useKpiOverview(filters);
+  const { data: prevKpi } = useKpiOverview(prevFilters ?? {});
   const { data: performance = [] } = useUserPerformance(filters);
   const { data: monthly = [] } = useMonthlyOverview(year);
   const { data: taskTypes = [] } = useTaskTypeTime(filters);
@@ -104,12 +148,26 @@ export default function AnalyticsPage() {
           </div>
         ) : kpi ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <KpiCard title="Tổng Công Việc" value={kpi.totalTasksCreated} icon={FileText} color="blue" />
-            <KpiCard title="Hoàn Thành" value={kpi.totalCompleted} icon={CheckCircle} color="green" subtitle={`Tỉ lệ: ${kpi.totalTasksCreated > 0 ? (kpi.totalCompleted / kpi.totalTasksCreated * 100).toFixed(1) : '0'}%`} progress={kpi.totalTasksCreated > 0 ? parseFloat((kpi.totalCompleted / kpi.totalTasksCreated * 100).toFixed(1)) : 0} />
-            <KpiCard title="Đang Thực Hiện" value={kpi.tasksByStatus['IN_PROGRESS'] ?? 0} icon={Clock} color="orange" />
-            <KpiCard title="Chờ Review" value={(kpi.tasksByStatus['PENDING_REVIEW'] ?? 0) + (kpi.tasksByStatus['WAITING_ACKNOWLEDGE'] ?? 0)} icon={Hourglass} color="purple" />
-            <KpiCard title="Quá Hạn" value={kpi.totalOverdue} icon={AlertCircle} color={kpi.totalOverdue > 0 ? 'red' : 'green'} />
-            <KpiCard title="Gia Hạn" value={kpi.extensionCount} icon={ShieldCheck} color="orange" subtitle={kpi.extensionRate > 20 ? '⚠️ Vượt ngưỡng 20%' : undefined} />
+            <KpiCard title="Tổng Công Việc" value={kpi.totalTasksCreated} icon={FileText} color="blue"
+              delta={prevKpi ? kpi.totalTasksCreated - prevKpi.totalTasksCreated : undefined}
+              onClick={() => openDrillDown('total', 'Tổng Công Việc')} />
+            <KpiCard title="Hoàn Thành" value={kpi.totalCompleted} icon={CheckCircle} color="green"
+              subtitle={`Tỉ lệ: ${kpi.totalTasksCreated > 0 ? (kpi.totalCompleted / kpi.totalTasksCreated * 100).toFixed(1) : '0'}%`}
+              progress={kpi.totalTasksCreated > 0 ? parseFloat((kpi.totalCompleted / kpi.totalTasksCreated * 100).toFixed(1)) : 0}
+              delta={prevKpi ? kpi.totalCompleted - prevKpi.totalCompleted : undefined}
+              onClick={() => openDrillDown('completed', 'Công Việc Hoàn Thành')} />
+            <KpiCard title="Đang Thực Hiện" value={kpi.tasksByStatus['IN_PROGRESS'] ?? 0} icon={Clock} color="orange"
+              delta={prevKpi ? (kpi.tasksByStatus['IN_PROGRESS'] ?? 0) - (prevKpi.tasksByStatus['IN_PROGRESS'] ?? 0) : undefined}
+              onClick={() => openDrillDown('in_progress', 'Đang Thực Hiện')} />
+            <KpiCard title="Chờ Review" value={(kpi.tasksByStatus['PENDING_REVIEW'] ?? 0) + (kpi.tasksByStatus['WAITING_ACKNOWLEDGE'] ?? 0)} icon={Hourglass} color="purple"
+              delta={prevKpi ? ((kpi.tasksByStatus['PENDING_REVIEW'] ?? 0) + (kpi.tasksByStatus['WAITING_ACKNOWLEDGE'] ?? 0)) - ((prevKpi.tasksByStatus['PENDING_REVIEW'] ?? 0) + (prevKpi.tasksByStatus['WAITING_ACKNOWLEDGE'] ?? 0)) : undefined}
+              onClick={() => openDrillDown('pending_review', 'Chờ Review / Xác Nhận')} />
+            <KpiCard title="Quá Hạn" value={kpi.totalOverdue} icon={AlertCircle} color={kpi.totalOverdue > 0 ? 'red' : 'green'}
+              delta={prevKpi ? kpi.totalOverdue - prevKpi.totalOverdue : undefined}
+              onClick={() => openDrillDown('overdue', 'Công Việc Quá Hạn')} />
+            <KpiCard title="Gia Hạn" value={kpi.extensionCount} icon={ShieldCheck} color="orange"
+              subtitle={kpi.extensionRate > 20 ? '⚠️ Vượt ngưỡng 20%' : undefined}
+              delta={prevKpi ? kpi.extensionCount - prevKpi.extensionCount : undefined} />
           </div>
         ) : null}
 
@@ -133,7 +191,7 @@ export default function AnalyticsPage() {
         {/* Performance — full row */}
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Hiệu Suất Nhân Viên</h3>
-          <PerformanceTable data={performance} />
+          <PerformanceTable data={performance} dateFrom={range.dateFrom} dateTo={range.dateTo} />
         </div>
 
         {/* Task Type Time + Funnel + Flow — 3 cột */}
@@ -153,6 +211,24 @@ export default function AnalyticsPage() {
         </div>
 
       </div>
+
+      {/* Drill-down modal */}
+      <DrillDownModal
+        open={drillDown !== null}
+        onClose={() => setDrillDown(null)}
+        type={drillDown?.type ?? 'total'}
+        title={drillDown?.title ?? ''}
+        dateFrom={range.dateFrom}
+        dateTo={range.dateTo}
+      />
     </div>
+  );
+}
+
+export default function AnalyticsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Đang tải...</div>}>
+      <AnalyticsContent />
+    </Suspense>
   );
 }

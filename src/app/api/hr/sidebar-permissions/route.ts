@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
       skip,
       take: limit,
     }),
-    prisma.user.count({ where: { isActive: true } }),
+    prisma.user.count({ where: { isActive: true, role: { name: 'EMPLOYEE' } } }),
   ]);
 
   const data = users.map((u) => ({

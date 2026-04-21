@@ -12,7 +12,7 @@ function pad(n: number) { return String(n).padStart(2, '0'); }
 
 function formatLastRun(lastRunAt: string | null) {
   if (!lastRunAt) return null;
-  return new Date(lastRunAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+  return new Date(lastRunAt).toLocaleString('vi-VN', { timeZone: 'Asia/Bangkok' });
 }
 
 function TimeSlotInputs({

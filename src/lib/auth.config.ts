@@ -27,6 +27,7 @@ export const authConfig = {
       session.user.username = token.username as string;
       session.user.displayName = token.displayName as string;
       session.user.role = token.role as { id: string; name: string };
+      session.user.mustChangePassword = token.mustChangePassword as boolean | undefined;
       return session;
     },
   },

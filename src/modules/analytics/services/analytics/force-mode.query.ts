@@ -3,8 +3,8 @@ import type { ForceModeStat } from './types';
 
 export async function queryForceModeStat(): Promise<ForceModeStat> {
   const [total, forced] = await Promise.all([
-    prisma.task.count({ where: { isDeleted: false } }),
-    prisma.task.count({ where: { isDeleted: false, isForceMode: true } }),
+    prisma.task.count(),
+    prisma.task.count({ where: { isForceMode: true } }),
   ]);
 
   return {

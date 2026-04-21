@@ -13,7 +13,6 @@ export async function queryCardStats(
 
   const monthFilter: Prisma.TaskWhereInput = {
     ...baseFilter,
-    isDeleted: false,
     createdAt: { gte: monthStart },
   };
 
@@ -32,29 +31,28 @@ export async function queryCardStats(
     tasksByPriorityGroups,
     priorities,
   ] = await Promise.all([
-    prisma.task.count({ where: { ...baseFilter, isDeleted: false } }),
+    prisma.task.count({ where: { ...baseFilter, status: { notIn: ['CANCELLED'] } } }),
 
-    prisma.task.count({ where: { ...baseFilter, isDeleted: false, status: 'COMPLETED' } }),
+    prisma.task.count({ where: { ...baseFilter, status: 'COMPLETED' } }),
 
     prisma.task.count({
       where: {
         ...baseFilter,
-        isDeleted: false,
         scheduleEnd: { lt: now },
         status: { notIn: ['COMPLETED', 'CANCELLED'] },
       },
     }),
 
     prisma.task.count({
-      where: { ...baseFilter, isDeleted: false, status: 'COMPLETED', completedAt: { not: null } },
+      where: { ...baseFilter, status: 'COMPLETED', completedAt: { not: null } },
     }),
 
     isBoss
-      ? prisma.task.count({ where: { isDeleted: false, status: 'PENDING_APPROVAL' } })
+      ? prisma.task.count({ where: { status: 'PENDING_APPROVAL' } })
       : Promise.resolve(0),
 
     isBoss
-      ? prisma.task.count({ where: { isDeleted: false, status: 'PENDING_REVIEW' } })
+      ? prisma.task.count({ where: { status: 'PENDING_REVIEW' } })
       : Promise.resolve(0),
 
     isBoss
@@ -64,7 +62,6 @@ export async function queryCardStats(
     !isBoss
       ? prisma.task.count({
           where: {
-            isDeleted: false,
             status: 'IN_PROGRESS',
             assignees: { some: { userId: user.id, status: 'IN_PROGRESS' } },
           },
@@ -74,7 +71,6 @@ export async function queryCardStats(
     !isBoss
       ? prisma.task.count({
           where: {
-            isDeleted: false,
             status: 'WAITING_ACKNOWLEDGE',
             assignees: { some: { userId: user.id } },
           },
@@ -122,17 +118,17 @@ export async function queryCardStats(
   const slaRaw = isEmployee
     ? await prisma.$queryRaw<{ cnt: bigint }[]>`
         SELECT COUNT(*)::int AS cnt FROM "Task"
-        WHERE "isDeleted" = false AND status = 'COMPLETED'
+        WHERE status = 'COMPLETED'
           AND "completedAt" IS NOT NULL
-          AND "completedAt" < "scheduleEnd"::date + INTERVAL '1 day'
+          AND "completedAt"::date <= "scheduleEnd"::date
           AND ("creatorId" = ${user.id} OR id IN (
             SELECT "taskId" FROM "TaskAssignee" WHERE "userId" = ${user.id}
           ))`
     : await prisma.$queryRaw<{ cnt: bigint }[]>`
         SELECT COUNT(*)::int AS cnt FROM "Task"
-        WHERE "isDeleted" = false AND status = 'COMPLETED'
+        WHERE status = 'COMPLETED'
           AND "completedAt" IS NOT NULL
-          AND "completedAt" < "scheduleEnd"::date + INTERVAL '1 day'`;
+          AND "completedAt"::date <= "scheduleEnd"::date`;
 
   const slaOnTime = Number(slaRaw[0]?.cnt ?? 0);
 

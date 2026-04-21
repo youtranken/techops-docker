@@ -1,6 +1,6 @@
 'use client';
 
-import { User, Calendar, Tag, Link2, Info } from 'lucide-react';
+import { User, Calendar, Tag, Link2, Info, CalendarDays } from 'lucide-react';
 import type { TaskDetail } from '../../services/task-query.service';
 import { MetaCell } from '../TaskDetail/MetaCell';
 import { formatDateShort } from './taskQuickView.utils';
@@ -30,6 +30,10 @@ export function QuickViewMeta({ task }: QuickViewMetaProps) {
         <MetaCell
           icon={Tag} iconBg="bg-violet-50 dark:bg-violet-900/30" iconColor="text-violet-500 dark:text-violet-400"
           label="Loại CV" value={task.type.name}
+        />
+        <MetaCell
+          icon={CalendarDays} iconBg="bg-sky-50 dark:bg-sky-900/30" iconColor="text-sky-500 dark:text-sky-400"
+          label="Ngày tạo" value={formatDateShort(task.createdAt)}
         />
         <MetaCell
           icon={Calendar} iconBg="bg-slate-100 dark:bg-slate-700/60" iconColor="text-slate-500 dark:text-slate-400"

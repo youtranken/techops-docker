@@ -35,7 +35,7 @@ const ACTION_LABELS: Record<string, string> = {
   TASK_UPDATED: 'Cập nhật',
   TASK_CANCELLED: 'Huỷ task',
   PLAN_APPROVED: 'Duyệt công việc',
-  PLAN_REJECTED: 'Từ chối kế hoạch',
+  PLAN_REJECTED: 'Từ chối công việc',
   ACKNOWLEDGED: 'Tiếp nhận',
   REJECTED: 'Từ chối',
   TRANSFERRED: 'Chuyển giao',

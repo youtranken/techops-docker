@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { getRedis } from '@/lib/redis';
 import { normalizeIp, lookupIpInfo } from '@/lib/ip-utils';
 import {
   checkLoginLockout,
@@ -10,6 +11,36 @@ import {
   getRateLimitIdentifier,
 } from '@/lib/rate-limit';
 import { isSessionExpired } from '@/lib/session-config';
+
+const USER_ACTIVE_TTL = 30; // giây — cache isActive 30s, phù hợp với SLA deactivate
+
+async function checkUserActive(userId: string): Promise<boolean> {
+  const cacheKey = `user:active:${userId}`;
+  // S2: fail-closed — DB là nguồn tin cậy. Redis chỉ là cache, lỗi cache vẫn query DB.
+  // Nếu DB cũng lỗi → return false (kết thúc phiên) thay vì cho phép user bị deactivate
+  // tiếp tục dùng app khi infra glitch.
+
+  // Try cache trước (best-effort, lỗi thì skip)
+  try {
+    const cached = await getRedis().get(cacheKey);
+    if (cached !== null) return cached === 'true';
+  } catch {
+    // Cache lỗi → vẫn query DB
+  }
+
+  // Query DB (nguồn tin cậy)
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { isActive: true } });
+    const active = user?.isActive ?? false;
+    // Best-effort write cache (lỗi thì bỏ qua)
+    try { await getRedis().setex(cacheKey, USER_ACTIVE_TTL, active ? 'true' : 'false'); } catch { /* ignore */ }
+    return active;
+  } catch (err) {
+    // DB lỗi → fail-closed: an toàn hơn cho phép user deactivated tiếp tục dùng
+    console.error('[checkUserActive] DB error → fail-closed:', err);
+    return false;
+  }
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -37,8 +68,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
 
         if (!user || !user.isActive) {
-          // Record failed attempt (user not found or inactive)
           await recordFailedLogin(identifier);
+          // Không biết userId → chỉ log console (không thể lưu DB do FK constraint)
+          console.warn(`[auth] LOGIN_FAILED ip=${identifier} reason=${!user ? 'USER_NOT_FOUND' : 'USER_INACTIVE'} username=${credentials.username}`);
           return null;
         }
 
@@ -47,10 +79,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           user.password
         );
         if (!isValid) {
-          // Record failed attempt (wrong password)
           const result = await recordFailedLogin(identifier);
+          // Log vào DB — biết userId nên lưu được
+          prisma.userActivityLog.create({
+            data: {
+              userId: user.id,
+              action: 'LOGIN_FAILED',
+              ipAddress: identifier,
+              metadata: {
+                reason: 'WRONG_PASSWORD',
+                locked: result.locked,
+                attemptsRemaining: result.attemptsRemaining,
+              },
+            },
+          }).catch(() => {});
           if (result.locked) {
-            console.warn(`[auth] IP ${identifier} locked out after failed attempts`);
+            console.warn(`[auth] IP ${identifier} LOCKED OUT after failed attempts`);
           }
           return null;
         }
@@ -100,6 +144,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           displayName: user.displayName,
           email: user.email,
           role: { id: user.role.id, name: user.role.name },
+          mustChangePassword: user.mustChangePassword,
         };
       },
     }),
@@ -111,6 +156,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.username = (user as { username?: string }).username;
         token.displayName = (user as { displayName?: string }).displayName;
         token.role = (user as { role?: unknown }).role;
+        token.mustChangePassword = (user as { mustChangePassword?: boolean }).mustChangePassword;
         // Store issue time for dynamic session expiry check
         token.iat = Math.floor(Date.now() / 1000);
       }
@@ -124,7 +170,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return { expired: true };
         }
       }
-      
+
+      // Check isActive với Redis cache 30s (ngắt phiên khi user bị deactivate)
+      if (typeof token.id === 'string') {
+        const active = await checkUserActive(token.id);
+        if (!active) return { expired: true };
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -137,6 +189,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.username = token.username as string;
       session.user.displayName = token.displayName as string;
       session.user.role = token.role as { id: string; name: string };
+      session.user.mustChangePassword = token.mustChangePassword as boolean | undefined;
       return session;
     },
   },

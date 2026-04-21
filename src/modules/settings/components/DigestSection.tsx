@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, BarChart3, Mail } from 'lucide-react';
+import { Loader2, BarChart3, Mail, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -102,6 +102,20 @@ export function DigestSection() {
             form.enabled ? 'translate-x-6' : 'translate-x-1')} />
         </button>
       </div>
+
+      {/* US4.9: Cảnh báo khi enabled nhưng config không hợp lệ */}
+      {form.enabled && form.sendDays.length === 0 && !form.sendWeekly && !form.sendMonthly && (
+        <div className="flex items-start gap-2 rounded-lg border border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/30 p-3 text-sm text-yellow-800 dark:text-yellow-300">
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>Báo cáo định kỳ đang bật nhưng chưa chọn lịch gửi — cron sẽ không chạy. Chọn ít nhất một ngày trong tuần, hàng tuần hoặc hàng tháng.</span>
+        </div>
+      )}
+      {form.enabled && form.contentTypes.length === 0 && (
+        <div className="flex items-start gap-2 rounded-lg border border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/30 p-3 text-sm text-yellow-800 dark:text-yellow-300">
+          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>Báo cáo định kỳ đang bật nhưng chưa chọn loại nội dung nào — email sẽ trống. Chọn ít nhất một loại nội dung.</span>
+        </div>
+      )}
 
       {/* Tabs + content */}
       {form.enabled && (

@@ -40,11 +40,18 @@ export async function POST(req: NextRequest) {
   const baseUrl = (process.env.AUTH_URL ?? 'http://localhost:3000').replace(/\/$/,'');
   const html = buildDigestHtml(data, contentTypes, subject, greeting, 'Gửi thử', date, baseUrl);
 
-  await sendEmail({
+  const emailResult = await sendEmail({
     to: parsed.data.email,
     subject: `[Thử nghiệm] ${subject.replace('{date}', date)}`,
     html,
   });
+
+  if (!emailResult.success) {
+    return NextResponse.json(
+      { error: { code: 'EMAIL_FAILED', message: 'Không thể gửi email. Vui lòng kiểm tra cấu hình SMTP.' } },
+      { status: 500 },
+    );
+  }
 
   return NextResponse.json({ message: `Đã gửi email thử đến ${parsed.data.email}` });
 }

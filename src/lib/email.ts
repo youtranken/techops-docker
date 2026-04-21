@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { prisma } from '@/lib/prisma';
+import { decryptSecret } from '@/lib/crypto';
 
 export interface EmailOptions {
   to: string;
@@ -21,7 +22,7 @@ async function getTransporter() {
         host: dbConfig.host,
         port: dbConfig.port,
         secure: dbConfig.secure,
-        auth: { user: dbConfig.user, pass: dbConfig.password },
+        auth: { user: dbConfig.user, pass: decryptSecret(dbConfig.password) },
       }),
       from: `"${dbConfig.fromName}" <${dbConfig.fromEmail}>`,
     };
@@ -42,7 +43,7 @@ async function getTransporter() {
   };
 }
 
-export async function sendEmail(options: EmailOptions): Promise<void> {
+export async function sendEmail(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
   try {
     const { transporter, from } = await getTransporter();
     await transporter.sendMail({
@@ -52,8 +53,11 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
       html: options.html,
     });
     console.log('✅ Email sent successfully');
+    return { success: true };
   } catch (error) {
-    console.error('❌ Failed to send email:', error instanceof Error ? error.message : 'Unknown error');
+    const msg = error instanceof Error ? error.message : 'Unknown error';
+    console.error('❌ Failed to send email:', msg);
+    return { success: false, error: msg };
   }
 }
 

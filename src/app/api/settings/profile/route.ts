@@ -19,6 +19,7 @@ export async function GET() {
   const user = await requireAuth();
   if (user instanceof NextResponse) return user;
   const profile = await profileService.get(user.id);
+  if (!profile) return NextResponse.json({ error: { code: 'NOT_FOUND', message: 'Profile không tồn tại' } }, { status: 404 });
   return NextResponse.json(profile);
 }
 

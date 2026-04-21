@@ -35,21 +35,28 @@ export async function approvePlan(taskId: string, currentUser: SessionUser): Pro
     );
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.task.update({
-      where: { id: taskId },
-      data: { status: 'WAITING_ACKNOWLEDGE' },
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Optimistic lock: nếu status đã đổi (race condition), Prisma ném P2025
+      await tx.task.update({
+        where: { id: taskId, status: 'PENDING_APPROVAL' },
+        data: { status: 'WAITING_ACKNOWLEDGE' },
+      });
+      await tx.taskAuditLog.create({
+        data: {
+          taskId,
+          performedById: currentUser.id,
+          action: 'PLAN_APPROVED',
+          oldStatus: 'PENDING_APPROVAL',
+          newStatus: 'WAITING_ACKNOWLEDGE',
+        },
+      });
     });
-    await tx.taskAuditLog.create({
-      data: {
-        taskId,
-        performedById: currentUser.id,
-        action: 'PLAN_APPROVED',
-        oldStatus: 'PENDING_APPROVAL',
-        newStatus: 'WAITING_ACKNOWLEDGE',
-      },
-    });
-  });
+  } catch (err: unknown) {
+    const e = err as { code?: string };
+    if (e.code === 'P2025') throw new WorkflowError('INVALID_STATUS', 'Trạng thái đã thay đổi, vui lòng thử lại');
+    throw err;
+  }
 
   const ref = formatTaskRef(task.taskCode, task.title);
   const bossName = task.creator.displayName;
@@ -84,26 +91,32 @@ export async function rejectPlan(
     );
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.task.update({
-      where: { id: taskId },
-      data: { status: 'CANCELLED' },
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.task.update({
+        where: { id: taskId, status: 'PENDING_APPROVAL' },
+        data: { status: 'CANCELLED' },
+      });
+      await tx.taskAssignee.updateMany({
+        where: { taskId },
+        data: { status: 'REJECTED', rejectedAt: new Date(), transferNotes: data.reason ?? null },
+      });
+      await tx.taskAuditLog.create({
+        data: {
+          taskId,
+          performedById: currentUser.id,
+          action: 'PLAN_REJECTED',
+          oldStatus: 'PENDING_APPROVAL',
+          newStatus: 'CANCELLED',
+          details: data.reason ? { reason: data.reason } as never : undefined,
+        },
+      });
     });
-    await tx.taskAssignee.updateMany({
-      where: { taskId },
-      data: { status: 'REJECTED', rejectedAt: new Date(), transferNotes: data.reason ?? null },
-    });
-    await tx.taskAuditLog.create({
-      data: {
-        taskId,
-        performedById: currentUser.id,
-        action: 'PLAN_REJECTED',
-        oldStatus: 'PENDING_APPROVAL',
-        newStatus: 'CANCELLED',
-        details: data.reason ? { reason: data.reason } as never : undefined,
-      },
-    });
-  });
+  } catch (err: unknown) {
+    const e = err as { code?: string };
+    if (e.code === 'P2025') throw new WorkflowError('INVALID_STATUS', 'Trạng thái đã thay đổi, vui lòng thử lại');
+    throw err;
+  }
 
   const ref = formatTaskRef(task.taskCode, task.title);
   // Notify creator
@@ -146,21 +159,27 @@ export async function approveReview(taskId: string, currentUser: SessionUser): P
 
   const now = new Date();
 
-  await prisma.$transaction(async (tx) => {
-    await tx.task.update({
-      where: { id: taskId },
-      data: { status: 'COMPLETED', completedAt: now },
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.task.update({
+        where: { id: taskId, status: 'PENDING_REVIEW' },
+        data: { status: 'COMPLETED', completedAt: now },
+      });
+      await tx.taskAuditLog.create({
+        data: {
+          taskId,
+          performedById: currentUser.id,
+          action: 'REVIEW_APPROVED',
+          oldStatus: 'PENDING_REVIEW',
+          newStatus: 'COMPLETED',
+        },
+      });
     });
-    await tx.taskAuditLog.create({
-      data: {
-        taskId,
-        performedById: currentUser.id,
-        action: 'REVIEW_APPROVED',
-        oldStatus: 'PENDING_REVIEW',
-        newStatus: 'COMPLETED',
-      },
-    });
-  });
+  } catch (err: unknown) {
+    const e = err as { code?: string };
+    if (e.code === 'P2025') throw new WorkflowError('INVALID_STATUS', 'Trạng thái đã thay đổi, vui lòng thử lại');
+    throw err;
+  }
 
   const ref = formatTaskRef(task.taskCode, task.title);
   const approverName = await prisma.user.findUnique({ where: { id: currentUser.id }, select: { displayName: true } }).then((u) => u?.displayName ?? 'Boss');

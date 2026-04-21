@@ -8,10 +8,7 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
     environment:
-      DATABASE_URL: postgresql://techops:lN7gE%&^=Minh@db:5432/techops_db
-      REDIS_URL: redis://redis:6379
-      AUTH_SECRET: rfyf2emqBfSpLm0+4MW8egmLm1UWgBbs6s2rGAuLxZ0=
-      TZ: Asia/Ho_Chi_Minh
+      TZ: Asia/Bangkok
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: 1
       PRISMA_QUERY_ENGINE_LIBRARY: /app/node_modules/.prisma/client/libquery_engine-linux-musl-openssl-3.0.x.so.node
@@ -43,10 +40,10 @@ services:
     image: postgres:16-alpine
     container_name: techops-db
     environment:
-      POSTGRES_USER: techops
-      POSTGRES_PASSWORD: lN7gE%&^=Minh
-      POSTGRES_DB: techops_db
-      TZ: Asia/Ho_Chi_Minh
+      POSTGRES_USER: ${POSTGRES_USER:-techops}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-techops_db}
+      TZ: Asia/Bangkok
     volumes:
       - pgdata:/var/lib/postgresql/data
     expose:
@@ -70,7 +67,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: techops-redis
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy volatile-lru
     volumes:
       - redisdata:/data
     expose:

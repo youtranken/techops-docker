@@ -9,6 +9,7 @@ export function useTaskListModals() {
   const [rejectTaskId,     setRejectTaskId]     = useState<string | null>(null);
   const [rejectReviewId,   setRejectReviewId]   = useState<string | null>(null);
   const [cancelTaskId,     setCancelTaskId]     = useState<string | null>(null);
+  const [restoreTaskId,    setRestoreTaskId]    = useState<string | null>(null);
   const [rejectPlanTaskId, setRejectPlanTaskId] = useState<string | null>(null);
   const [extensionTaskId,  setExtensionTaskId]  = useState<string | null>(null);
   const [approveExtState,  setApproveExtState]  = useState<{ taskId: string; extId: string } | null>(null);
@@ -22,6 +23,7 @@ export function useTaskListModals() {
     rejectTaskId,     setRejectTaskId,
     rejectReviewId,   setRejectReviewId,
     cancelTaskId,     setCancelTaskId,
+    restoreTaskId,    setRestoreTaskId,
     rejectPlanTaskId, setRejectPlanTaskId,
     extensionTaskId,  setExtensionTaskId,
     approveExtState,  setApproveExtState,

@@ -7,7 +7,6 @@ export const mockTask = {
   workflowMode: "IMMEDIATE",
   isForceMode: false,
   allFailed: false,
-  isDeleted: false,
   scheduleStart: new Date().toISOString(),
   scheduleEnd: new Date(Date.now() + 86400000).toISOString(),
   createdAt: new Date().toISOString(),

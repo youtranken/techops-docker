@@ -24,19 +24,19 @@ export const ALWAYS_VISIBLE_MENUS = ['logs', 'analytics', 'helpdesk', 'hr'];
  * Simple navigation items (not dropdowns)
  */
 export const SIMPLE_MENU_ITEMS = [
-  { 
-    label: 'Dashboard', 
-    icon: LayoutDashboard, 
-    href: '/', 
-    roles: ['ALL'], 
-    key: 'dashboard' 
+  {
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    href: '/',
+    roles: ['ALL'],
+    key: 'dashboard'
   },
-  { 
-    label: 'Tasks', 
-    icon: CheckSquare, 
-    href: '/tasks', 
-    roles: ['ALL'], 
-    key: 'tasks' 
+  {
+    label: 'Tasks',
+    icon: CheckSquare,
+    href: '/tasks',
+    roles: ['ALL'],
+    key: 'tasks'
   },
   { 
     label: 'Logs', 
@@ -70,9 +70,10 @@ export const HR_PERMISSIONS_ITEMS = [
  * Settings menu groups
  */
 export const SETTINGS_SYSTEM_ITEMS = [
-  { label: 'Mức ưu tiên',    href: '/settings/priorities', icon: Flag,       feat: 'priorities' },
-  { label: 'Loại công việc', href: '/settings/task-types',  icon: ListChecks, feat: 'task_types' },
-  { label: 'Profile',        href: '/settings/profile',     icon: User,       feat: 'profile' },
+  { label: 'Mức ưu tiên',    href: '/settings/priorities',           icon: Flag,       feat: 'priorities' },
+  { label: 'Loại công việc', href: '/settings/task-types',           icon: ListChecks, feat: 'task_types' },
+  { label: 'Mẫu hoàn thành', href: '/settings/completion-templates', icon: FileText,   feat: 'completion_templates' },
+  { label: 'Profile',        href: '/settings/profile',              icon: User,       feat: 'profile' },
 ];
 
 export const SETTINGS_ACCOUNT_ITEM = {

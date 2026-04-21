@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth-utils';
+import { requireMenuPermission } from '@/lib/auth-utils';
 import { pdfService, type PdfMode } from '@/modules/analytics/services/pdf.service';
 
 export async function GET(req: Request) {
-  const user = await requireRole(['ADMIN', 'BOSS']);
+  const user = await requireMenuPermission('analytics');
   if (user instanceof NextResponse) return user;
 
   const { searchParams } = new URL(req.url);

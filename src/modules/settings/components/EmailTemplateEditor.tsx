@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { sanitizeHtml } from '@/lib/sanitize';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -42,7 +41,7 @@ export function EmailTemplateEditor({ template, onClose }: Props) {
         <Input value={subject} onChange={(e) => setSubject(e.target.value)}
           placeholder="[TechOps] Tiêu đề email..." />
         <p className="text-[11px] text-muted-foreground">
-          Biến: {'{{taskTitle}}'}, {'{{userName}}'}, {'{{deadline}}'}, {'{{taskUrl}}'}
+          Biến: {'{{taskTitle}}'}, {'{{userName}}'}, {'{{deadline}}'}, {'{{createdAt}}'}, {'{{taskUrl}}'}
         </p>
       </div>
 
@@ -63,9 +62,9 @@ export function EmailTemplateEditor({ template, onClose }: Props) {
       {/* Preview */}
       {body && (
         <details className="text-sm">
-          <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">Preview HTML (sanitized)</summary>
+          <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">Preview HTML</summary>
           <div className="mt-2 p-3 rounded-lg border bg-white dark:bg-gray-900 text-sm overflow-auto max-h-48"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(body, true) }} />
+            dangerouslySetInnerHTML={{ __html: body }} />
         </details>
       )}
 

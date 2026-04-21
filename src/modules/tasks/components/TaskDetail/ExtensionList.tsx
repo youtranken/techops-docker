@@ -48,7 +48,7 @@ export function ExtensionList({
       <div className="rounded-lg border bg-white dark:bg-gray-900 p-4 space-y-3">
         <p className="text-sm font-semibold flex items-center gap-2">
           <CalendarClock className="h-4 w-4" />
-          Yêu cầu gia hạn ({extensions.length}/3)
+          Yêu cầu gia hạn ({extensions.length}/5)
         </p>
         <Separator />
         <div className="space-y-3">

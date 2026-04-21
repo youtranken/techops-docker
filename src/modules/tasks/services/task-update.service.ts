@@ -16,7 +16,7 @@ function fmtD(d: Date) {
 
 export async function updateTask(id: string, data: UpdateTaskInput, currentUser: SessionUser) {
   const existing = await prisma.task.findUnique({
-    where: { id, isDeleted: false },
+    where: { id },
     include: {
       assignees: { select: { id: true, userId: true, status: true } },
       priority:  { select: { id: true, name: true } },
@@ -26,14 +26,24 @@ export async function updateTask(id: string, data: UpdateTaskInput, currentUser:
 
   if (!existing) throw new Error('TASK_NOT_FOUND');
 
-  const role      = currentUser.role.name;
-  const status    = existing.status;
-  const isCreator = existing.creatorId === currentUser.id;
+  const role         = currentUser.role.name;
+  const status       = existing.status;
+  const isCreator    = existing.creatorId === currentUser.id;
+  const workflowMode = existing.workflowMode; // 'IMMEDIATE' | 'NEED_APPROVAL'
+  const isAssignee   = existing.assignees.some(
+    (a) => a.userId === currentUser.id && !(['REJECTED', 'TRANSFERRED'] as AssigneeStatus[]).includes(a.status),
+  );
 
+  // Boss/Admin: edit khi PENDING_APPROVAL, WAITING_ACKNOWLEDGE, IN_PROGRESS, PENDING_REVIEW
+  // Employee — Direct (IMMEDIATE):   creator ở WAITING_ACKNOWLEDGE hoặc IN_PROGRESS; assignee ở IN_PROGRESS
+  // Employee — Approval (NEED_APPROVAL): chỉ creator ở PENDING_APPROVAL (plan bị lock sau khi Boss duyệt)
   const canEdit =
     (role === 'BOSS' || role === 'ADMIN')
-      ? ['PENDING_APPROVAL', 'WAITING_ACKNOWLEDGE', 'IN_PROGRESS'].includes(status)
-      : isCreator && ['PENDING_APPROVAL', 'WAITING_ACKNOWLEDGE'].includes(status);
+      ? ['PENDING_APPROVAL', 'WAITING_ACKNOWLEDGE', 'IN_PROGRESS', 'PENDING_REVIEW'].includes(status)
+      : workflowMode === 'IMMEDIATE'
+          ? (isCreator || isAssignee) && status === 'IN_PROGRESS'
+            || isCreator && status === 'WAITING_ACKNOWLEDGE'
+          : isCreator && status === 'PENDING_APPROVAL';
 
   if (!canEdit) throw new Error('PERMISSION_DENIED');
 
@@ -44,8 +54,20 @@ export async function updateTask(id: string, data: UpdateTaskInput, currentUser:
   if (data.typeId       !== undefined) updateData.type         = { connect: { id: data.typeId } };
   if (data.scheduleStart !== undefined) updateData.scheduleStart = new Date(data.scheduleStart);
   if (data.scheduleEnd   !== undefined) updateData.scheduleEnd   = new Date(data.scheduleEnd);
+
+  // G4: Force Mode chỉ áp dụng khi workflow = NEED_APPROVAL
+  // - Bật Force Mode trên DIRECT → throw
+  // - Đổi flow APPROVAL→DIRECT mà đang bật Force Mode → auto tắt
+  const effectiveMode = (data.workflowMode ?? workflowMode);
   if (data.isForceMode  !== undefined && (role === 'BOSS' || role === 'ADMIN')) {
-    updateData.isForceMode = data.isForceMode;
+    if (effectiveMode === 'NEED_APPROVAL') {
+      updateData.isForceMode = data.isForceMode;
+    } else if (data.isForceMode === true) {
+      throw new Error('FORCE_MODE_REQUIRES_APPROVAL');
+    }
+  }
+  if (effectiveMode === 'IMMEDIATE' && existing.isForceMode && updateData.isForceMode === undefined) {
+    updateData.isForceMode = false;
   }
 
   const changes: FieldChange[] = [];
@@ -99,14 +121,61 @@ export async function updateTask(id: string, data: UpdateTaskInput, currentUser:
 
   let statusTransition: TaskStatus | null = null;
 
-  if (data.workflowMode !== undefined) {
-    const empCanChange = isCreator && role !== 'BOSS' && role !== 'ADMIN' && status === 'PENDING_APPROVAL';
-    if (empCanChange) {
-      updateData.workflowMode = data.workflowMode;
-      if (data.workflowMode === 'IMMEDIATE') {
-        statusTransition       = 'WAITING_ACKNOWLEDGE';
-        updateData.status      = 'WAITING_ACKNOWLEDGE';
+  // G1 + G2: Đổi workflowMode (DIRECT ↔ APPROVAL)
+  if (data.workflowMode !== undefined && data.workflowMode !== workflowMode) {
+    const isPrivileged = role === 'BOSS' || role === 'ADMIN';
+    const fromMode = workflowMode;
+    const toMode   = data.workflowMode;
+    const noOneAcked = existing.assignees.every(
+      (a) => ['PENDING', 'REJECTED', 'TRANSFERRED'].includes(a.status),
+    );
+
+    // Quyết định cho phép đổi:
+    let canChangeMode = false;
+    if (isPrivileged) {
+      // Q2: cấm Boss đổi APPROVAL → DIRECT khi đang PENDING_REVIEW
+      if (status === 'PENDING_REVIEW' && toMode === 'IMMEDIATE') {
+        throw new Error('FLOW_SWITCH_FORBIDDEN_PENDING_REVIEW');
       }
+      if (['PENDING_APPROVAL', 'WAITING_ACKNOWLEDGE', 'IN_PROGRESS', 'PENDING_REVIEW'].includes(status)) {
+        canChangeMode = true;
+      }
+    } else if (isCreator) {
+      // EMP creator chỉ đổi khi:
+      // (a) APPROVAL → DIRECT ở PENDING_APPROVAL (Boss chưa duyệt)
+      // (b) DIRECT → APPROVAL ở WAITING_ACKNOWLEDGE và chưa ai ack
+      if (fromMode === 'NEED_APPROVAL' && toMode === 'IMMEDIATE' && status === 'PENDING_APPROVAL') {
+        canChangeMode = true;
+      } else if (fromMode === 'IMMEDIATE' && toMode === 'NEED_APPROVAL' && status === 'WAITING_ACKNOWLEDGE' && noOneAcked) {
+        canChangeMode = true;
+      }
+    }
+
+    if (!canChangeMode) {
+      throw new Error('FLOW_SWITCH_NOT_ALLOWED');
+    }
+
+    updateData.workflowMode = toMode;
+
+    // Status transition theo from/to + role:
+    if (toMode === 'IMMEDIATE') {
+      // → DIRECT: Force Mode tự tắt (G4)
+      if (status === 'PENDING_APPROVAL') {
+        statusTransition  = 'WAITING_ACKNOWLEDGE';
+        updateData.status = 'WAITING_ACKNOWLEDGE';
+      }
+      // WAITING_ACKNOWLEDGE / IN_PROGRESS: giữ nguyên status
+      if (existing.isForceMode && updateData.isForceMode === undefined) {
+        updateData.isForceMode = false;
+      }
+    } else {
+      // → APPROVAL
+      if (!isPrivileged && status === 'WAITING_ACKNOWLEDGE') {
+        // EMP đổi → cần Boss duyệt lại plan
+        statusTransition  = 'PENDING_APPROVAL';
+        updateData.status = 'PENDING_APPROVAL';
+      }
+      // Boss/Admin: giữ nguyên status (Q1=X) — Boss tự duyệt, không cần PENDING_APPROVAL
     }
   }
 
@@ -140,18 +209,27 @@ export async function updateTask(id: string, data: UpdateTaskInput, currentUser:
     if (data.assigneeIds) {
       const currentAssignees    = existing.assignees;
       const currentAssigneeIds  = currentAssignees.map((a) => a.userId);
-      const toAdd    = data.assigneeIds.filter((uid) => !currentAssigneeIds.includes(uid));
+      const validIds2 = data.assigneeIds.filter(Boolean);
+      const toAdd    = validIds2.filter((uid) => !currentAssigneeIds.includes(uid));
       const toRemove = currentAssigneeIds.filter(
-        (uid) => !data.assigneeIds!.includes(uid) && uid !== existing.creatorId,
+        (uid) => !validIds2.includes(uid) && uid !== existing.creatorId,
       );
       const toReset  = currentAssignees.filter(
-        (a) => a.status === 'REJECTED' && data.assigneeIds!.includes(a.userId),
+        (a) => a.status === 'REJECTED' && validIds2.includes(a.userId),
       );
 
       if (toRemove.length > 0) {
+        // Remove PENDING assignees entirely (never acknowledged)
         await tx.taskAssignee.deleteMany({
           where: { taskId: id, userId: { in: toRemove }, status: 'PENDING' },
         });
+        // M5: Boss/Admin can also remove IN_PROGRESS assignees
+        if (role === 'BOSS' || role === 'ADMIN') {
+          await tx.taskAssignee.updateMany({
+            where: { taskId: id, userId: { in: toRemove }, status: 'IN_PROGRESS' },
+            data: { status: 'REJECTED' as AssigneeStatus },
+          });
+        }
       }
 
       for (const a of toReset) {
@@ -210,7 +288,7 @@ export async function updateTask(id: string, data: UpdateTaskInput, currentUser:
       await createNotification(uid, id, 'TASK_ASSIGNED', 'Công việc được xác nhận', 'Công việc đã được chuyển sang chế độ trực tiếp, vui lòng tiếp nhận.');
     }
   } else if (statusTransition === 'PENDING_APPROVAL') {
-    await notifyBosses(id, 'PLAN_APPROVAL_REQUESTED', 'Yêu cầu duyệt kế hoạch', 'Một công việc vừa được chuyển sang chế độ cần duyệt.');
+    await notifyBosses(id, 'PLAN_APPROVAL_REQUESTED', 'Yêu cầu duyệt công việc', 'Một công việc vừa được chuyển sang chế độ cần duyệt.');
   }
 
   return updated;

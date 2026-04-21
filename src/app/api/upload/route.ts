@@ -34,7 +34,6 @@ export async function POST(req: NextRequest) {
         const task = await prisma.task.findFirst({
           where: {
             id: taskId,
-            isDeleted: false,
             OR: [{ creatorId: user.id }, { assignees: { some: { userId: user.id } } }],
           },
           select: { id: true },

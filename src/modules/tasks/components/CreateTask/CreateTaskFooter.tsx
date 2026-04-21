@@ -1,9 +1,11 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, ImagePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AttachmentChips } from './AttachmentChips';
+import { usePasteImage } from './usePasteImage';
+import { PasteImageModal } from './PasteImageModal';
 
 const ACCEPTED_TYPES: Record<string, string> = {
   'application/pdf': 'PDF',
@@ -28,6 +30,17 @@ export function CreateTaskFooter({
 }: CreateTaskFooterProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [pastedImage, setPastedImage] = useState<File | null>(null);
+
+  // Listen clipboard paste image (Win+Shift+S → Ctrl+V workflow)
+  usePasteImage(true, (img) => {
+    if (files.length >= MAX_FILE_COUNT) {
+      setFileError(`Tối đa ${MAX_FILE_COUNT} file đính kèm`);
+      return;
+    }
+    setFileError(null);
+    setPastedImage(img);
+  });
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = Array.from(e.target.files ?? []);
@@ -51,6 +64,16 @@ export function CreateTaskFooter({
     onFilesChange([...files, ...selected]);
   }
 
+  function handlePasteConfirm(resized: File) {
+    if (files.length >= MAX_FILE_COUNT) {
+      setFileError(`Tối đa ${MAX_FILE_COUNT} file đính kèm`);
+      setPastedImage(null);
+      return;
+    }
+    onFilesChange([...files, resized]);
+    setPastedImage(null);
+  }
+
   function removeFile(index: number) {
     onFilesChange(files.filter((_, i) => i !== index));
     setFileError(null);
@@ -61,17 +84,23 @@ export function CreateTaskFooter({
       <AttachmentChips files={files} onRemove={removeFile} error={fileError} />
 
       <div className="flex items-center justify-between px-5 py-3">
-        {/* Left: attach */}
-<button
-          type="button"
-          onClick={() => { setFileError(null); fileInputRef.current?.click(); }}
-          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 transition-colors"
-        >
-          <Paperclip className="w-4 h-4" />
-          <span>Đính kèm</span>
-          <span className="text-[11px] text-slate-400">PDF / JPG / PNG, tối đa {MAX_FILE_COUNT} file, {MAX_SIZE_MB}MB/file</span>
-          {files.length > 0 && <span className="text-[11px] bg-indigo-100 text-indigo-600 font-medium rounded-full px-1.5 py-0.5">{files.length}</span>}
-        </button>
+        {/* Left: attach + paste hint */}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => { setFileError(null); fileInputRef.current?.click(); }}
+            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 transition-colors"
+          >
+            <Paperclip className="w-4 h-4" />
+            <span>Đính kèm</span>
+            <span className="text-[11px] text-slate-400">PDF / JPG / PNG, tối đa {MAX_FILE_COUNT} file, {MAX_SIZE_MB}MB/file</span>
+            {files.length > 0 && <span className="text-[11px] bg-indigo-100 text-indigo-600 font-medium rounded-full px-1.5 py-0.5">{files.length}</span>}
+          </button>
+          <span className="hidden md:flex items-center gap-1 text-[11px] text-slate-400 border-l border-slate-200 pl-3">
+            <ImagePlus className="w-3.5 h-3.5" />
+            Tip: <kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">Win</kbd>+<kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">Shift</kbd>+<kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">S</kbd> rồi <kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">Ctrl</kbd>+<kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">V</kbd>
+          </span>
+        </div>
         <input
           ref={fileInputRef}
           type="file"
@@ -94,6 +123,12 @@ export function CreateTaskFooter({
           </Button>
         </div>
       </div>
+
+      <PasteImageModal
+        file={pastedImage}
+        onConfirm={handlePasteConfirm}
+        onCancel={() => setPastedImage(null)}
+      />
     </div>
   );
 }

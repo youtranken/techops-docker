@@ -2,7 +2,7 @@
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Pencil, UserX, UserCheck, Trash2, KeyRound, History } from 'lucide-react';
+import { MoreHorizontal, Pencil, UserX, UserCheck, Trash2, KeyRound, History, Mail } from 'lucide-react';
 import type { UserWithRoleAndTasks } from '../types';
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
   hrFeatures: string[];
   onEdit: (u: UserWithRoleAndTasks) => void;
   onChangePassword: (u: UserWithRoleAndTasks) => void;
+  onSendResetLink: (u: UserWithRoleAndTasks) => void;
   onViewHistory: (u: UserWithRoleAndTasks) => void;
   onDeactivate: (id: string) => void;
   onActivate: (id: string) => void;
@@ -18,8 +19,9 @@ interface Props {
   deactivating: boolean;
   activating: boolean;
   deleting: boolean;
+  sendingResetLink?: boolean;
 }
-export function UserActionsMenu({ user, hrFeatures, onEdit, onChangePassword, onViewHistory, onDeactivate, onActivate, onDelete, deactivating, activating, deleting }: Props) {
+export function UserActionsMenu({ user, hrFeatures, onEdit, onChangePassword, onSendResetLink, onViewHistory, onDeactivate, onActivate, onDelete, deactivating, activating, deleting, sendingResetLink }: Props) {
   const canEdit       = hrFeatures.includes('edit');
   const canDeactivate = hrFeatures.includes('deactivate');
   const canDelete     = hrFeatures.includes('delete');
@@ -47,6 +49,11 @@ export function UserActionsMenu({ user, hrFeatures, onEdit, onChangePassword, on
         {canChangePass && (
           <DropdownMenuItem onClick={() => onChangePassword(user)}>
             <KeyRound className="mr-2 h-4 w-4" />Đổi mật khẩu
+          </DropdownMenuItem>
+        )}
+        {canChangePass && user.email && (
+          <DropdownMenuItem onClick={() => onSendResetLink(user)} disabled={sendingResetLink}>
+            <Mail className="mr-2 h-4 w-4" />Gửi link reset mật khẩu
           </DropdownMenuItem>
         )}
         {hasAnyManage && <DropdownMenuSeparator />}
