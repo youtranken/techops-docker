@@ -31,6 +31,18 @@ export async function requireSettingsFeature(featureKey?: string): Promise<void>
 }
 
 /**
+ * Boolean check cho API routes — KHÔNG redirect, trả về true/false để route tự handle 403.
+ * - ADMIN/BOSS: luôn được phép.
+ * - EMPLOYEE: phải có featureKey trong featurePermissions['settings'].
+ */
+export async function canAccessSettingsFeature(userId: string, role: string, featureKey: string): Promise<boolean> {
+  if (role === 'ADMIN' || role === 'BOSS') return true;
+  const perm = await sidebarPermissionService.getForUser(userId);
+  const features = perm?.featurePermissions?.['settings'] ?? [];
+  return features.includes(featureKey);
+}
+
+/**
  * Server-side guard cho bất kỳ menu nào trong sidebar.
  * - ADMIN/BOSS: luôn được phép.
  * - EMPLOYEE: phải có menuKey trong visibleMenus.

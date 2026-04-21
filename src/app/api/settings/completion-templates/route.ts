@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-utils';
+import { canAccessSettingsFeature } from '@/lib/settings-guard';
 import { rateLimitApi, getRateLimitIdentifier } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
@@ -35,7 +36,9 @@ export async function POST(req: NextRequest) {
   const user = await requireAuth();
   if (user instanceof NextResponse) return user;
 
-  if (!['ADMIN', 'BOSS'].includes(user.role.name)) {
+  // Employee có permission 'completion_templates' (cấp qua HR) cũng được phép, không chỉ ADMIN/BOSS
+  const allowed = await canAccessSettingsFeature(user.id, user.role.name, 'completion_templates');
+  if (!allowed) {
     return NextResponse.json({ error: { code: 'FORBIDDEN', message: 'Không có quyền' } }, { status: 403 });
   }
 
