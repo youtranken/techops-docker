@@ -12,10 +12,13 @@ services:
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: 1
       PRISMA_QUERY_ENGINE_LIBRARY: /app/node_modules/.prisma/client/libquery_engine-linux-musl-openssl-3.0.x.so.node
+      # it.pmh.com.vn:8000 không gửi kèm intermediate cert → Node fetch lỗi UNABLE_TO_VERIFY_LEAF_SIGNATURE
+      NODE_EXTRA_CA_CERTS: /app/certs/entrust-ov-tls-issuing-rsa-ca2.pem
     volumes:
       - ./uploads:/app/uploads
       - ./public:/app/public:ro
       - ./logs:/app/logs
+      - ./certs:/app/certs:ro
     env_file:
       - .env
     extra_hosts:

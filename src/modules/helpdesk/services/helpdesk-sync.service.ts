@@ -29,13 +29,21 @@ class HelpdeskSyncService {
 
     console.log(`[HelpdeskSync] Fetching from: ${apiUrl}`);
 
-    const res = await fetch(apiUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      signal: AbortSignal.timeout(15_000),
-    });
+    let res: Response;
+    try {
+      res = await fetch(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(15_000),
+      });
+    } catch (err) {
+      // "fetch failed" không nói gì — lấy lỗi gốc (SSL, DNS, timeout...) để hiển thị
+      const cause = (err as { cause?: { code?: string; message?: string } }).cause;
+      const detail = cause?.code ?? cause?.message ?? (err instanceof Error ? err.message : String(err));
+      throw new Error(`Không kết nối được Helpdesk API: ${detail}`);
+    }
 
     if (!res.ok) {
       throw new Error(`API lỗi HTTP ${res.status}: ${res.statusText}`);
