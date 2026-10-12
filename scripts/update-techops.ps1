@@ -18,7 +18,8 @@ function Fail($msg) { Write-Host "!! $msg" -ForegroundColor Red; exit 1 }
 function Git { & git @args; if ($LASTEXITCODE -ne 0) { Fail "git $($args -join ' ') thất bại" } }
 
 Step '[1/6] Kiểm repo sạch'
-$dirty = git status --porcelain
+# Chỉ xét file đã theo dõi: uploads/, logs/ … là dữ liệu chạy thật (untracked) — git pull không đụng tới
+$dirty = git status --porcelain --untracked-files=no
 if ($dirty) { Write-Host $dirty; Fail "Có thay đổi chưa commit trong $Root — dừng (không sửa tay trên Prod). Xem: git status" }
 
 Step '[2/6] Lấy thông tin từ GitHub'

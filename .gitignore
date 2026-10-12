@@ -42,3 +42,8 @@ backups/
 
 # Playwright output
 e2e/.results/
+
+# Dữ liệu chạy thật trên máy chạy app (không đưa lên git)
+/uploads/
+/logs/
+/backups/
