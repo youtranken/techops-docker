@@ -4,9 +4,10 @@ import { ListTodo, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TaskRowCard, type TaskRowCardProps } from '../TaskCard/TaskRowCard';
 import { useTaskPermissions } from '../../actions/hooks/useTaskPermissions';
+import { isTrackingRole } from '../../hooks/useTaskTracking';
 import type { TaskListItem } from '../../services/task-query.service';
 
-type TaskRowHandlers = Omit<TaskRowCardProps, 'task' | 'permissions'>;
+type TaskRowHandlers = Omit<TaskRowCardProps, 'task' | 'permissions' | 'canStar'>;
 
 interface TaskListGridProps extends TaskRowHandlers {
   tasks: TaskListItem[];
@@ -24,7 +25,7 @@ function TaskRowCardWrapper({
   ...props
 }: Omit<TaskRowHandlers, never> & { task: TaskListItem; currentUserId: string; role: string }) {
   const permissions = useTaskPermissions(task, currentUserId, role);
-  return <TaskRowCard task={task} permissions={permissions} {...props} />;
+  return <TaskRowCard task={task} permissions={permissions} canStar={isTrackingRole(role)} {...props} />;
 }
 
 export function TaskListGrid({

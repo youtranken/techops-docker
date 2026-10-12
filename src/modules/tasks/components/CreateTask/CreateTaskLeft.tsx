@@ -5,6 +5,7 @@ import type { CreateTaskInput } from '../../validators/create-task.schema';
 import { TitleInput } from './TitleInput';
 import { RichTextarea } from './RichTextarea';
 import { ForceModeToggle } from './ForceModeToggle';
+import { ImportantToggle } from './ImportantToggle';
 import { FieldError } from './FieldError';
 
 interface CreateTaskLeftProps {
@@ -12,6 +13,7 @@ interface CreateTaskLeftProps {
   errors: FieldErrors<CreateTaskInput>;
   setValue: UseFormSetValue<CreateTaskInput>;
   isForceMode: boolean;
+  isImportant: boolean;
   isBossOrAdmin: boolean;
   richContent: string;
   onRichContentChange: (html: string) => void;
@@ -23,6 +25,7 @@ export function CreateTaskLeft({
   errors,
   setValue,
   isForceMode,
+  isImportant,
   isBossOrAdmin,
   richContent,
   onRichContentChange,
@@ -52,6 +55,11 @@ export function CreateTaskLeft({
         />
         <FieldError message={errors.content?.message} />
       </div>
+
+      {/* ★ Quan trọng — chỉ Boss/Admin */}
+      {isBossOrAdmin && (
+        <ImportantToggle checked={isImportant} onCheckedChange={(v) => setValue('isImportant', v)} />
+      )}
 
       {/* Force Mode */}
       {isBossOrAdmin && (

@@ -3,6 +3,7 @@ import type { PaginatedResult } from '@/lib/types/pagination';
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@/lib/types/pagination';
 import type { TaskStatus, Prisma } from '@prisma/client';
 import { taskDetailService } from './task-detail.service';
+import { taskTrackingService, isTrackingRole, activeOrUnseen } from './task-tracking.service';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,8 +23,13 @@ export interface TaskListFilters {
   source?: 'helpdesk' | 'techops';
   sortField?: TaskSortField;
   sortOrder?: TaskSortOrder;
-  /** Ẩn task đã kết thúc (COMPLETED, CANCELLED) — bỏ qua khi đã chọn `status` cụ thể */
+  /** Ẩn task đã kết thúc (COMPLETED, CANCELLED) — bỏ qua khi đã chọn `status` cụ thể.
+   *  Boss/Admin: vẫn hiện task Hoàn thành mà mình chưa xem. */
   hideCompleted?: boolean;
+  /** Chỉ task ★ (Boss/Admin) */
+  important?: boolean;
+  /** Chỉ task Hoàn thành mà Boss/Admin hiện tại chưa xem */
+  unseenOnly?: boolean;
 }
 
 export interface TaskListItem {
@@ -50,6 +56,10 @@ export interface TaskListItem {
   hdNguonNhap: string | null;
   hdCode: string | null;
   hasMention?: boolean;
+  /** ★ — luôn false với nhân viên */
+  isImportant: boolean;
+  /** Boss/Admin: task Hoàn thành mà user hiện tại chưa xem */
+  isUnseen: boolean;
 }
 
 export interface TaskDetail extends TaskListItem {
@@ -132,6 +142,40 @@ const taskInclude = {
   },
 } satisfies Prisma.TaskInclude;
 
+const SMART_ORDER: Prisma.TaskOrderByWithRelationInput[] = [
+  { isImportant: 'desc' },
+  { priority: { level: 'desc' } },
+  { createdAt: 'desc' },
+];
+
+/**
+ * Phân trang 2 nhóm: [task chưa xem] rồi [phần còn lại], mỗi nhóm xếp ★ → ưu tiên → mới nhất.
+ * Prisma không orderBy được theo điều kiện "chưa xem" nên ghép 2 query theo cửa sổ skip/limit.
+ */
+async function listSmartSorted(where: Prisma.TaskWhereInput, unseenIds: string[], skip: number, limit: number) {
+  const unseenWhere: Prisma.TaskWhereInput = { AND: [where, { id: { in: unseenIds } }] };
+  const restWhere: Prisma.TaskWhereInput = { AND: [where, { id: { notIn: unseenIds } }] };
+  const [unseenTotal, restTotal] = await Promise.all([
+    prisma.task.count({ where: unseenWhere }),
+    prisma.task.count({ where: restWhere }),
+  ]);
+
+  const data = [];
+  if (skip < unseenTotal) {
+    data.push(...await prisma.task.findMany({
+      where: unseenWhere, include: taskInclude, orderBy: SMART_ORDER, skip, take: limit,
+    }));
+  }
+  const remaining = limit - data.length;
+  if (remaining > 0) {
+    data.push(...await prisma.task.findMany({
+      where: restWhere, include: taskInclude, orderBy: SMART_ORDER,
+      skip: Math.max(0, skip - unseenTotal), take: remaining,
+    }));
+  }
+  return { data, total: unseenTotal + restTotal };
+}
+
 // ─── Service ─────────────────────────────────────────────────────────────────
 
 export const taskQueryService = {
@@ -144,6 +188,8 @@ export const taskQueryService = {
     const skip = (page - 1) * limit;
 
     const isPrivileged = ['ADMIN', 'BOSS'].includes(currentUser.role.name);
+    const tracking = isTrackingRole(currentUser.role.name);
+    const unseenIds = tracking ? await taskTrackingService.getUnseenTaskIds(currentUser) : [];
 
     // Row-level security (RLS)
     // - BOSS/ADMIN: thấy tất cả
@@ -166,7 +212,7 @@ export const taskQueryService = {
     // Filters
     const filterWhere: Prisma.TaskWhereInput = {
       ...(filters.status && { status: filters.status }),
-      ...(!filters.status && filters.hideCompleted && { status: { notIn: ['COMPLETED', 'CANCELLED'] } }),
+      ...(!tracking && !filters.status && filters.hideCompleted && { status: { notIn: ['COMPLETED', 'CANCELLED'] } }),
       ...(filters.priorityId && { priorityId: filters.priorityId }),
       ...(filters.typeId && { typeId: filters.typeId }),
       ...(filters.assigneeId && {
@@ -184,18 +230,30 @@ export const taskQueryService = {
       ...(filters.source === 'techops' && { OR: [{ hdNguonNhap: null }, { hdNguonNhap: { not: 'helpdesk' } }] }),
     };
 
-    const where: Prisma.TaskWhereInput = { AND: [rlsWhere, filterWhere] };
+    // V2 — Boss/Admin: ★ + "Hoàn thành – chưa xem" (để riêng trong AND, tránh đè OR của search/source)
+    const trackingWhere: Prisma.TaskWhereInput[] = [];
+    if (tracking) {
+      if (!filters.status && filters.hideCompleted) trackingWhere.push(activeOrUnseen(unseenIds));
+      if (filters.important)  trackingWhere.push({ isImportant: true });
+      if (filters.unseenOnly) trackingWhere.push({ id: { in: unseenIds } });
+    }
 
-    const [data, total] = await Promise.all([
-      prisma.task.findMany({
-        where,
-        include: taskInclude,
-        orderBy: { [filters.sortField ?? 'createdAt']: filters.sortOrder ?? 'desc' },
-        skip,
-        take: limit,
-      }),
-      prisma.task.count({ where }),
-    ]);
+    const where: Prisma.TaskWhereInput = { AND: [rlsWhere, filterWhere, ...trackingWhere] };
+
+    // Sort mặc định của Boss/Admin (không chọn sortField): chưa xem → ★ → mức ưu tiên → mới nhất
+    const smartSort = tracking && !filters.sortField;
+    const { data, total } = smartSort
+      ? await listSmartSorted(where, unseenIds, skip, limit)
+      : await Promise.all([
+          prisma.task.findMany({
+            where,
+            include: taskInclude,
+            orderBy: { [filters.sortField ?? 'createdAt']: filters.sortOrder ?? 'desc' },
+            skip,
+            take: limit,
+          }),
+          prisma.task.count({ where }),
+        ]).then(([data, total]) => ({ data, total }));
 
     // Detect mention: task có comment có nội dung chứa @displayName của current user
     const taskIds = data.map((t) => t.id);
@@ -211,9 +269,12 @@ export const taskQueryService = {
         }).then((rows: { taskId: string }[]) => new Set(rows.map((r) => r.taskId)))
       : new Set<string>();
 
+    const unseenSet = new Set(unseenIds);
     const dataWithMention = data.map((t) => ({
       ...t,
       hasMention: mentionedTaskIds.has(t.id),
+      isImportant: tracking ? t.isImportant : false,
+      isUnseen: unseenSet.has(t.id),
     }));
 
     return {

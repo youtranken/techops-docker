@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
@@ -12,6 +12,7 @@ import { HRMenu } from './sidebar/HRMenu';
 import { SettingsMenu } from './sidebar/SettingsMenu';
 import { AnalyticsMenu } from './sidebar/AnalyticsMenu';
 import { CollapseToggle } from './sidebar/CollapseToggle';
+import { TaskTrackingMenu } from './sidebar/TaskTrackingMenu';
 
 // Config
 import { ALWAYS_VISIBLE_MENUS, SIMPLE_MENU_ITEMS } from './sidebar/config';
@@ -99,12 +100,19 @@ export function Sidebar({ userRole, collapsed, onToggle }: SidebarProps) {
       <nav className="flex-1 overflow-y-auto py-4 space-y-1 px-2">
         {/* Simple menu items */}
         {visibleSimple.map((item) => (
-          <SidebarMenuItem
-            key={item.href}
-            item={item}
-            isActive={isActive(item.href)}
-            collapsed={collapsed}
-          />
+          <Fragment key={item.href}>
+            <SidebarMenuItem
+              item={item}
+              isActive={isActive(item.href)}
+              collapsed={collapsed}
+            />
+            {/* V2: mục con ★ Quan trọng / Hoàn thành – chưa xem — chỉ Boss/Admin */}
+            {item.key === 'tasks' && isPrivileged && (
+              <Suspense fallback={null}>
+                <TaskTrackingMenu collapsed={collapsed} />
+              </Suspense>
+            )}
+          </Fragment>
         ))}
 
         {/* Analytics dropdown */}

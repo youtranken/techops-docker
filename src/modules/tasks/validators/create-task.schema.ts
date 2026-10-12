@@ -11,6 +11,8 @@ export const createTaskSchema = z
     workflowMode: z.enum(['IMMEDIATE', 'NEED_APPROVAL']),
     assigneeIds:  z.array(z.string().cuid()).min(1, 'Phải chọn ít nhất 1 người thực hiện'),
     isForceMode:  z.boolean(),
+    /** ★ Quan trọng — chỉ Boss/Admin; nhân viên gửi lên sẽ bị server bỏ qua */
+    isImportant:  z.boolean().optional(),
   })
   .refine(
     (d) => !d.scheduleEnd || !d.scheduleStart || new Date(d.scheduleEnd) >= new Date(d.scheduleStart),

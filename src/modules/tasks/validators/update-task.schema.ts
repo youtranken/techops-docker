@@ -10,6 +10,7 @@ export const updateTaskSchema = z
     scheduleEnd: z.string().min(1).optional(),
     assigneeIds: z.array(z.string().cuid()).min(1).optional(),
     isForceMode: z.boolean().optional(),
+    isImportant: z.boolean().optional(),
     workflowMode: z.enum(['IMMEDIATE', 'NEED_APPROVAL']).optional(),
     attachmentsToAdd: z.array(z.object({
       fileName: z.string(),

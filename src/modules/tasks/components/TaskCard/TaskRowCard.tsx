@@ -9,6 +9,7 @@ import { TaskCardAssignees } from './TaskCardAssignees';
 import { TaskCardMeta } from './TaskCardMeta';
 import { TaskCardMenu } from './TaskCardMenu';
 import { useTaskCardActions } from '../../hooks/useTaskCardActions';
+import { ImportantStarButton } from './ImportantStarButton';
 import type { TaskRowCardProps } from './TaskRowCard.types';
 
 export type { TaskRowCardProps };
@@ -16,6 +17,7 @@ export type { TaskRowCardProps };
 export function TaskRowCard({
   task,
   permissions,
+  canStar = false,
   onOpenQuickView,
   onEdit,
   onOpenComplete,
@@ -32,7 +34,10 @@ export function TaskRowCard({
 
   return (
     <div
-      className="group relative flex flex-col rounded-xl border border-slate-200 bg-white dark:bg-slate-800/60 dark:border-slate-700 shadow-sm hover:shadow-lg hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-all duration-200 cursor-pointer h-full overflow-hidden"
+      className={cn(
+        'group relative flex flex-col rounded-xl border border-slate-200 bg-white dark:bg-slate-800/60 dark:border-slate-700 shadow-sm hover:shadow-lg hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-all duration-200 cursor-pointer h-full overflow-hidden',
+        task.isUnseen && 'ring-2 ring-emerald-300 dark:ring-emerald-600/60',
+      )}
       style={{
         background: `linear-gradient(135deg, ${task.priority.color}08 0%, transparent 35%)`,
       }}
@@ -72,6 +77,13 @@ export function TaskRowCard({
               </span>
             )}
           </div>
+          <div className="flex items-start gap-0.5">
+          <ImportantStarButton
+            taskId={task.id}
+            isImportant={task.isImportant}
+            canToggle={canStar}
+            className="opacity-0 group-hover:opacity-100 focus:opacity-100"
+          />
           <TaskCardMenu
             task={task} permissions={permissions}
             onOpenQuickView={onOpenQuickView} onEdit={onEdit}
@@ -81,11 +93,17 @@ export function TaskRowCard({
             onOpenExtension={onOpenExtension} onOpenApproveExtension={onOpenApproveExtension}
             onAcknowledge={handleAcknowledge} onApprovePlan={handleApprovePlan} onApproveReview={handleApproveReview}
           />
+          </div>
         </div>
 
         {/* Row 2: Status badge + type pill */}
         <div className="flex items-center gap-1.5 mb-2.5 flex-wrap">
           <TaskStatusBadge status={task.status} />
+          {task.isUnseen && (
+            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500 text-white text-[10px] font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-white" />Mới hoàn thành
+            </span>
+          )}
           <span className="flex items-center gap-1 text-[10px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/60 border border-slate-200/80 dark:border-slate-600/50 px-1.5 py-0.5 rounded truncate max-w-[120px]">
             {(() => { const I = (LucideIcons as unknown as Record<string, React.ComponentType<{className?:string}>>)[task.type.icon]; return I ? <I className="w-3 h-3 shrink-0" /> : null; })()}
             {task.type.name}

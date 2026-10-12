@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ListTodo, Plus, ArrowUpDown } from 'lucide-react';
+import { ListTodo, Plus, ArrowUpDown, Star, CheckCheck } from 'lucide-react';
+import { toast } from 'sonner';
+import { isTrackingRole, useMarkAllSeen } from '../../hooks/useTaskTracking';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTaskList } from '../../hooks/useTaskList';
 import { usePriorities } from '@/modules/settings/hooks/usePriorities';
@@ -32,6 +34,18 @@ const SORT_OPTIONS: { value: string; label: string }[] = [
   { value: 'title:desc', label: 'Tên Z → A' },
   { value: 'status:asc', label: 'Trạng thái' },
 ];
+
+// V2 — Boss/Admin: sort mặc định = chưa xem → ★ → mức ưu tiên (server xử lý khi không gửi sortField)
+const SMART_SORT = 'smart';
+const SMART_SORT_OPTION = { value: SMART_SORT, label: 'Mặc định (chưa xem → ★ → ưu tiên)' };
+
+// V2 — các mục con dưới Tasks ở sidebar (chỉ Boss/Admin)
+type TaskView = '' | 'important' | 'unseen';
+const VIEW_HEADER: Record<TaskView, { title: string; Icon: typeof ListTodo }> = {
+  '':        { title: 'Công việc',             Icon: ListTodo },
+  important: { title: 'Task quan trọng',       Icon: Star },
+  unseen:    { title: 'Hoàn thành – chưa xem', Icon: CheckCheck },
+};
 
 export function TaskListClient() {
   const { data: session } = useSession();
@@ -63,14 +77,19 @@ export function TaskListClient() {
   const dateTo     = getParam('dateTo');
   const page       = Number(getParam('page', '1'))  || 1;
   const limit      = Number(getParam('limit', '20')) || 20;
-  const sortKey    = getParam('sort', 'createdAt:desc');
+  const tracking   = isTrackingRole(role);
+  const rawView    = getParam('view');
+  const view: TaskView = tracking && (rawView === 'important' || rawView === 'unseen') ? rawView : '';
+  const sortKey    = getParam('sort', tracking ? SMART_SORT : 'createdAt:desc');
+  const isSmartSort = tracking && sortKey === SMART_SORT;
+  const sortOptions = tracking ? [SMART_SORT_OPTION, ...SORT_OPTIONS] : SORT_OPTIONS;
 
   const VALID_SORT_FIELDS: TaskSortField[] = ['createdAt', 'scheduleEnd', 'title', 'status'];
   const VALID_SORT_ORDERS: TaskSortOrder[] = ['asc', 'desc'];
   const [rawSortField, rawSortOrder] = sortKey.split(':');
   const sortField = (VALID_SORT_FIELDS.includes(rawSortField as TaskSortField) ? rawSortField : 'createdAt') as TaskSortField;
   const sortOrder = (VALID_SORT_ORDERS.includes(rawSortOrder as TaskSortOrder) ? rawSortOrder : 'desc') as TaskSortOrder;
-  const normalizedSortKey = `${sortField}:${sortOrder}` as const;
+  const normalizedSortKey = isSmartSort ? SMART_SORT : `${sortField}:${sortOrder}`;
 
   function setSearch(v: string)     { updateParams({ search: v || undefined, page: undefined }); }
   function setStatus(v: string)     { updateParams({ status: v || undefined, page: undefined }); }
@@ -81,7 +100,7 @@ export function TaskListClient() {
   function setDateFrom(v: string)   { updateParams({ dateFrom: v || undefined, datePreset: undefined, page: undefined }); }
   function setDateTo(v: string)     { updateParams({ dateTo: v || undefined, datePreset: undefined, page: undefined }); }
   function setPage(p: number)       { updateParams({ page: p > 1 ? String(p) : undefined }); }
-  function setSort(v: string)       { updateParams({ sort: v !== 'createdAt:desc' ? v : undefined, page: undefined }); }
+  function setSort(v: string)       { updateParams({ sort: v !== (tracking ? SMART_SORT : 'createdAt:desc') ? v : undefined, page: undefined }); }
 
   function resolveDates() {
     if (dateFrom || dateTo) return { dateFrom: dateFrom || undefined, dateTo: dateTo || undefined };
@@ -104,15 +123,21 @@ export function TaskListClient() {
     typeId:     typeId     || undefined,
     source:     (VALID_SOURCES.includes(source as typeof VALID_SOURCES[number]) ? source as typeof VALID_SOURCES[number] : undefined),
     ...resolveDates(),
-    sortField,
-    sortOrder,
-    // Mặc định (không chọn gì) = ẩn task Hoàn thành; 'all' = hiện tất cả
-    hideCompleted: !status,
+    sortField: isSmartSort ? undefined : sortField,
+    sortOrder: isSmartSort ? undefined : sortOrder,
+    // Mặc định (không chọn gì) = ẩn task Hoàn thành + Đã hủy; 'all' = hiện tất cả
+    // (Boss/Admin: vẫn hiện task Hoàn thành mình chưa xem — xử lý ở server)
+    hideCompleted: !status && view !== 'unseen',
+    important:  view === 'important' || undefined,
+    unseenOnly: view === 'unseen' || undefined,
     page,
     limit,
   });
   const { data: priorities = [] } = usePriorities();
   const { data: taskTypes  = [] } = useTaskTypes();
+
+  const markAllSeen = useMarkAllSeen();
+  const { title: viewTitle, Icon: ViewIcon } = VIEW_HEADER[view];
 
   const tasks      = data?.data       ?? [];
   const pagination = data?.pagination;
@@ -126,9 +151,9 @@ export function TaskListClient() {
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <ListTodo className="h-6 w-6 text-muted-foreground" />
+          <ViewIcon className={`h-6 w-6 ${view === 'important' ? 'text-amber-500 fill-amber-400' : view === 'unseen' ? 'text-emerald-500' : 'text-muted-foreground'}`} />
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Công việc</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{viewTitle}</h1>
             <p className="text-sm text-muted-foreground">
               {pagination ? (
                 <span>
@@ -141,6 +166,19 @@ export function TaskListClient() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {view === 'unseen' && tasks.length > 0 && (
+            <Button
+              variant="outline"
+              className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+              disabled={markAllSeen.isPending}
+              onClick={() => markAllSeen.mutate(undefined, {
+                onSuccess: (r: { count?: number }) => toast.success(`Đã đánh dấu đã xem ${r.count ?? 0} công việc`),
+                onError: (e) => toast.error(e.message),
+              })}
+            >
+              <CheckCheck className="h-4 w-4" />Đánh dấu đã xem tất cả
+            </Button>
+          )}
           {/* Sort dropdown */}
           <Select value={normalizedSortKey} onValueChange={setSort}>
             <SelectTrigger className="h-9 w-48 text-sm gap-1.5">
@@ -148,7 +186,7 @@ export function TaskListClient() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {SORT_OPTIONS.map((opt) => (
+              {sortOptions.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
               ))}
             </SelectContent>
@@ -163,6 +201,7 @@ export function TaskListClient() {
       <TaskListFilters
         search={search}
         status={status}
+        statusLocked={view === 'unseen' ? 'Hoàn thành' : undefined}
         priorityId={priorityId}
         typeId={typeId}
         source={source}

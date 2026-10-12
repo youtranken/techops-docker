@@ -208,3 +208,38 @@ describe('updateTask — canEdit permission', () => {
     });
   });
 });
+
+describe('updateTask — ★ isImportant (V2: chỉ Boss/Admin)', () => {
+  function captureUpdate() {
+    const txTaskUpdate = vi.fn().mockResolvedValue({ id: 'task-1' });
+    vi.mocked(prisma.$transaction).mockImplementationOnce(((fn: (tx: unknown) => Promise<unknown>) =>
+      fn({
+        task: { update: txTaskUpdate },
+        extensionRequest: { findMany: vi.fn().mockResolvedValue([]), updateMany: vi.fn().mockResolvedValue({}) },
+        taskAssignee: { deleteMany: vi.fn(), update: vi.fn(), createMany: vi.fn() },
+        taskAttachment: { deleteMany: vi.fn(), createMany: vi.fn() },
+        taskAuditLog: { create: vi.fn().mockResolvedValue({}) },
+        notification: { createMany: vi.fn().mockResolvedValue({}) },
+      })) as never);
+    return txTaskUpdate;
+  }
+
+  beforeEach(() => vi.clearAllMocks());
+
+  it('Boss bật ★ khi sửa → update có isImportant=true', async () => {
+    vi.mocked(prisma.task.findUnique).mockResolvedValue(makeExistingTask({ isImportant: false }) as never);
+    const upd = captureUpdate();
+    await updateTask('task-1', { isImportant: true }, bossUser);
+    expect(upd).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ isImportant: true }) }));
+  });
+
+  it('Creator EMPLOYEE gửi isImportant → bị bỏ qua', async () => {
+    vi.mocked(prisma.task.findUnique).mockResolvedValue(
+      makeExistingTask({ workflowMode: 'IMMEDIATE', status: 'IN_PROGRESS', isImportant: false }) as never,
+    );
+    const upd = captureUpdate();
+    await updateTask('task-1', { title: 'X', isImportant: true }, creatorUser);
+    const data = upd.mock.calls[0]?.[0]?.data ?? {};
+    expect(data).not.toHaveProperty('isImportant');
+  });
+});

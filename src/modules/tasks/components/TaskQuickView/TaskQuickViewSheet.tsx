@@ -10,6 +10,7 @@ import { QuickViewComments } from './QuickViewComments';
 import { QuickViewActions } from './QuickViewActions';
 import { QuickViewLoading, QuickViewError } from './QuickViewSkeleton';
 import { useQuickViewData } from './useQuickViewData';
+import { useMarkSeenOnOpen } from '../../hooks/useTaskTracking';
 
 interface TaskQuickViewSheetProps {
   open: boolean;
@@ -24,6 +25,9 @@ export function TaskQuickViewSheet({
 }: TaskQuickViewSheetProps) {
   const { task, isLoading, isError, permissions, currentAssigneeIds } =
     useQuickViewData(taskId, currentUserId, role);
+
+  // V2: Boss/Admin mở xem nhanh task Hoàn thành → tính là đã xem
+  useMarkSeenOnOpen(open ? task : null, role);
 
   function handleClose() { onOpenChange(false); }
 

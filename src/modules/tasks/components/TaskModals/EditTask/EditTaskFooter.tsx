@@ -75,6 +75,11 @@ export function EditTaskFooter({
   }
 
   function toggleExisting(id: string) {
+    // Khôi phục file cũ đã đánh dấu xoá cũng tính vào giới hạn số file
+    if (removedIds.includes(id) && keptCount >= MAX_FILE_COUNT) {
+      setFileError(`Tối đa ${MAX_FILE_COUNT} file đính kèm`);
+      return;
+    }
     onRemoveExisting(id);
     setFileError(null);
   }

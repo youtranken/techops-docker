@@ -20,6 +20,7 @@ export function useUpdateTask() {
     onSuccess: (_data, { id }) => {
       qc.invalidateQueries({ queryKey: ['tasks'] });
       qc.invalidateQueries({ queryKey: ['task', id] });
+      qc.invalidateQueries({ queryKey: ['task-counters'] });
     },
   });
 }

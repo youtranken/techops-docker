@@ -88,6 +88,7 @@ model User {
   sidebarPermission SidebarPermission?
   createdTasks      Task[]                 @relation("TaskCreator")
   assignments       TaskAssignee[]
+  taskCompletionViews TaskCompletionView[]
   auditLogs         TaskAuditLog[]         @relation("AuditPerformer")
   role              Role                   @relation(fields: [roleId], references: [id])
   activityLogs      UserActivityLog[]
@@ -154,6 +155,7 @@ model Task {
   status        TaskStatus         @default(DRAFT)
   workflowMode  WorkflowMode
   isForceMode   Boolean            @default(false)
+  isImportant   Boolean            @default(false) // ★ Boss/Admin đánh dấu — dùng chung
   allFailed     Boolean            @default(false)
   completedAt   DateTime?
   statusBeforeCancel TaskStatus?
@@ -178,14 +180,29 @@ model Task {
   attachments   TaskAttachment[]
   auditLogs     TaskAuditLog[]
   tags          TaskTag[]
+  completionViews TaskCompletionView[]
 
   @@index([status, createdAt(sort: Desc)])
+  @@index([isImportant, status])
   @@index([creatorId, status])
   @@index([priorityId, status])
   @@index([hdId])
   @@index([hdCode])
   @@index([taskCode])
   @@index([scheduleEnd, status]) // Performance: deadline queries
+}
+
+/// Boss/Admin đã xem task Hoàn thành chưa — riêng từng người.
+/// "Chưa xem" = status COMPLETED và không có dòng nào với seenAt >= Task.completedAt.
+model TaskCompletionView {
+  taskId String
+  userId String
+  seenAt DateTime @default(now())
+  task   Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+  @@index([userId])
 }
 
 model TaskAssignee {

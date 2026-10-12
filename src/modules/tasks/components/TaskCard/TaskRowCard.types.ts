@@ -4,6 +4,8 @@ import type { TaskPermissions } from '../../actions/hooks/useTaskPermissions';
 export interface TaskRowCardProps {
   task: TaskListItem;
   permissions: TaskPermissions;
+  /** V2: Boss/Admin được bật/tắt ★ (nhân viên không thấy ★) */
+  canStar?: boolean;
   onOpenQuickView: (taskId: string) => void;
   onEdit: (taskId: string) => void;
   onOpenComplete: (taskId: string) => void;

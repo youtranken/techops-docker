@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { RichTextarea } from '../../CreateTask/RichTextarea';
 import { EditForceModeToggle } from './EditForceModeToggle';
+import { ImportantToggle } from '../../CreateTask/ImportantToggle';
 import type { UseFormRegister, FieldErrors, UseFormSetValue } from 'react-hook-form';
 import type { UpdateTaskInput } from '../../../validators/update-task.schema';
 
@@ -12,6 +13,7 @@ interface EditTaskLeftProps {
   errors: FieldErrors<UpdateTaskInput>;
   setValue: UseFormSetValue<UpdateTaskInput>;
   isForceMode: boolean | undefined;
+  isImportant: boolean | undefined;
   isBossOrAdmin: boolean;
   richContent: string;
   onRichContentChange: (html: string) => void;
@@ -20,7 +22,7 @@ interface EditTaskLeftProps {
 
 export function EditTaskLeft({
   register, errors, setValue,
-  isForceMode, isBossOrAdmin,
+  isForceMode, isImportant, isBossOrAdmin,
   richContent, onRichContentChange,
   serverError,
 }: EditTaskLeftProps) {
@@ -70,6 +72,11 @@ export function EditTaskLeft({
         />
         {errors.content && <p className="text-xs text-red-500">{errors.content.message}</p>}
       </div>
+
+      {/* ★ Quan trọng — chỉ Boss/Admin */}
+      {isBossOrAdmin && (
+        <ImportantToggle checked={!!isImportant} onCheckedChange={(v) => setValue('isImportant', v)} />
+      )}
 
       {/* Force Mode */}
       {isBossOrAdmin && (

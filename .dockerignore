@@ -13,3 +13,7 @@ logs
 .idea
 .obsidian
 .trash
+
+# E2E (Playwright) — không đưa vào image
+e2e
+playwright.config.ts

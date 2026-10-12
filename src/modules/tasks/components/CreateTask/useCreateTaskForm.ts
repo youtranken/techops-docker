@@ -33,6 +33,7 @@ const form = useForm<CreateTaskInput>({
     defaultValues: {
       workflowMode:  'IMMEDIATE',
       isForceMode:   false,
+      isImportant:   false,
       assigneeIds:   [],
       scheduleStart: today(),
     },
@@ -66,6 +67,7 @@ const form = useForm<CreateTaskInput>({
       scheduleEnd:   '',
       workflowMode:  'IMMEDIATE',
       isForceMode:   false,
+      isImportant:   false,
       assigneeIds:   [],
     });
     setAssigneeIds(currentUserId ? [currentUserId] : []);

@@ -69,6 +69,10 @@ export async function updateTask(id: string, data: UpdateTaskInput, currentUser:
   if (effectiveMode === 'IMMEDIATE' && existing.isForceMode && updateData.isForceMode === undefined) {
     updateData.isForceMode = false;
   }
+  // ★ Quan trọng: chỉ Boss/Admin; người khác gửi lên thì bỏ qua
+  if (data.isImportant !== undefined && (role === 'BOSS' || role === 'ADMIN')) {
+    updateData.isImportant = data.isImportant;
+  }
 
   const changes: FieldChange[] = [];
 
@@ -92,6 +96,9 @@ export async function updateTask(id: string, data: UpdateTaskInput, currentUser:
 
   if (data.isForceMode !== undefined && data.isForceMode !== existing.isForceMode)
     changes.push({ field: 'Force Mode', oldValue: existing.isForceMode ? 'Bật' : 'Tắt', newValue: data.isForceMode ? 'Bật' : 'Tắt' });
+
+  if (updateData.isImportant !== undefined && updateData.isImportant !== existing.isImportant)
+    changes.push({ field: 'Quan trọng', oldValue: existing.isImportant ? '★' : '', newValue: updateData.isImportant ? '★' : '' });
 
   if (data.workflowMode !== undefined && data.workflowMode !== existing.workflowMode)
     changes.push({ field: 'Quy trình', oldValue: existing.workflowMode === 'IMMEDIATE' ? 'Trực tiếp' : 'Phê duyệt', newValue: data.workflowMode === 'IMMEDIATE' ? 'Trực tiếp' : 'Phê duyệt' });

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useTaskPermissions } from '../../actions/hooks/useTaskPermissions';
+import { useMarkSeenOnOpen } from '../../hooks/useTaskTracking';
 import { DetailHero } from './DetailHero';
 import { DetailTimeline } from './DetailTimeline';
 import { DetailTabPanel } from './DetailTabPanel';
@@ -24,6 +25,9 @@ export function TaskDetailClient({ task }: Props) {
 
   const [editTaskId, setEditTaskId] = useState<string | null>(null);
 
+  // V2: Boss/Admin mở task Hoàn thành → tính là đã xem
+  useMarkSeenOnOpen(task, roleName);
+
   return (
     <div className="-m-6 h-full flex">
 
@@ -34,6 +38,7 @@ export function TaskDetailClient({ task }: Props) {
           permissions={permissions}
           currentAssigneeIds={currentAssigneeIds}
           currentUserId={currentUserId}
+          roleName={roleName}
           onBack={() => router.push('/tasks')}
           onEdit={() => setEditTaskId(task.id)}
         />

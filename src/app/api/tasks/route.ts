@@ -28,6 +28,8 @@ export async function GET(req: NextRequest) {
       ? searchParams.get('sortField') as TaskSortField : undefined),
     sortOrder: (searchParams.get('sortOrder') === 'asc' ? 'asc' : searchParams.get('sortOrder') === 'desc' ? 'desc' : undefined) as TaskSortOrder | undefined,
     hideCompleted: searchParams.get('hideCompleted') === 'true',
+    important: searchParams.get('important') === 'true',
+    unseenOnly: searchParams.get('unseenOnly') === 'true',
   };
 
   const result = await taskQueryService.list(filters, user);

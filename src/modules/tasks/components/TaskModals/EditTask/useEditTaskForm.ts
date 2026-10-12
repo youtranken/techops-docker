@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { omitUnchangedImportant } from './edit-payload';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useSession } from 'next-auth/react';
 import { useUpdateTask } from '../../../hooks/useUpdateTask';
@@ -52,6 +53,7 @@ export function useEditTaskForm(task: TaskDetail, onClose: () => void) {
       scheduleStart: new Date(task.scheduleStart).toISOString().slice(0, 10),
       scheduleEnd:   new Date(task.scheduleEnd).toISOString().slice(0, 10),
       isForceMode:   task.isForceMode,
+      isImportant:   task.isImportant,
       workflowMode:  task.workflowMode as 'IMMEDIATE' | 'NEED_APPROVAL',
     },
   });
@@ -86,7 +88,7 @@ export function useEditTaskForm(task: TaskDetail, onClose: () => void) {
       await updateTask.mutateAsync({
         id: task.id,
         data: {
-          ...values,
+          ...omitUnchangedImportant(values, task.isImportant),
           assigneeIds: finalIds,
           content,
           attachmentsToAdd: attachmentsToAdd.length ? attachmentsToAdd : undefined,

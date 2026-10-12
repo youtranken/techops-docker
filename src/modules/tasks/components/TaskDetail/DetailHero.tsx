@@ -5,12 +5,16 @@ import { TaskStatusBadge } from '../TaskCard/TaskStatusBadge';
 import { TaskActionPanel } from '../../actions/components/buttons/TaskActionPanel';
 import type { TaskDetail } from '../../services/task-query.service';
 import type { TaskPermissions } from '../../actions/hooks/useTaskPermissions';
+import { ImportantStarButton } from '../TaskCard/ImportantStarButton';
+import { isTrackingRole } from '../../hooks/useTaskTracking';
+import { DetailContent } from './DetailContent';
 
 interface Props {
   task: TaskDetail;
   permissions: TaskPermissions;
   currentAssigneeIds: string[];
   currentUserId: string;
+  roleName: string;
   onBack: () => void;
   onEdit: () => void;
 }
@@ -25,7 +29,7 @@ const WORKFLOW_CLASS: Record<string, string> = {
   NEED_APPROVAL: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
 };
 
-export function DetailHero({ task, permissions, currentAssigneeIds, currentUserId, onBack, onEdit }: Props) {
+export function DetailHero({ task, permissions, currentAssigneeIds, currentUserId, roleName, onBack, onEdit }: Props) {
   const hasActions =
     permissions.canAcknowledge || permissions.canComplete ||
     permissions.canApprovePlan || permissions.canRejectPlan ||
@@ -54,7 +58,10 @@ export function DetailHero({ task, permissions, currentAssigneeIds, currentUserI
         <p className="font-mono text-xs font-black text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/60 px-1.5 py-0.5 rounded inline-block mb-1">#{task.taskCode}</p>
       )}
       {/* Title */}
-      <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3 leading-snug">{task.title}</h1>
+      <div className="flex items-start gap-1.5 mb-3">
+        <ImportantStarButton taskId={task.id} isImportant={task.isImportant} canToggle={isTrackingRole(roleName)} size="md" className="mt-0.5" />
+        <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100 leading-snug">{task.title}</h1>
+      </div>
 
       {/* Badges */}
       <div className="flex flex-wrap gap-1.5 mb-3">
@@ -84,15 +91,9 @@ export function DetailHero({ task, permissions, currentAssigneeIds, currentUserI
         </div>
       )}
 
-      {/* Content — scrollable se nếu dài */}
+      {/* Content — thu gọn, dài thì có "Xem toàn bộ" */}
       {task.content ? (
-        <div
-          className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-h-36 overflow-y-auto pr-1
-            [&_b]:font-semibold [&_strong]:font-semibold [&_i]:italic [&_em]:italic [&_u]:underline
-            [&_ul]:list-disc [&_ul]:ml-5 [&_ul]:my-1 [&_ol]:list-decimal [&_ol]:ml-5 [&_ol]:my-1
-            [&_li]:my-0.5 [&_p]:mb-1"
-          dangerouslySetInnerHTML={{ __html: task.content }}
-        />
+        <DetailContent html={task.content} />
       ) : (
         <p className="text-sm text-slate-400 dark:text-slate-500 italic">Không có mô tả</p>
       )}

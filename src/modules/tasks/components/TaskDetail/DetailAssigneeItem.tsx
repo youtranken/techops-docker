@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, FileText, ExternalLink, Image, Download } from 'lucide-react';
+import { ChevronDown, ChevronRight, FileText, ExternalLink, Image, Download, Maximize2 } from 'lucide-react';
 import { UserAvatar } from '@/shared/ui/UserAvatar';
 import { ASSIGNEE_STATUS_LABEL } from '../TaskQuickView/taskQuickView.constants';
 import type { TaskDetail } from '../../services/task-query.service';
+import { ReportDialog } from './ReportDialog';
 
 type Assignee = TaskDetail['assignees'][number];
 interface Props { assignee: Assignee; compact?: boolean }
@@ -28,6 +29,7 @@ const STATUS_BADGE: Record<string, string> = {
 export function DetailAssigneeItem({ assignee: a, compact }: Props) {
   const hasReports = a.reports.length > 0;
   const [open, setOpen] = useState(false);
+  const [viewReport, setViewReport] = useState<Assignee['reports'][number] | null>(null);
 
   /* ── Compact chip (dùng trong row ngang) ── */
   if (compact) {
@@ -68,7 +70,17 @@ export function DetailAssigneeItem({ assignee: a, compact }: Props) {
                 <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded">v{r.version}</span>
                 <span className="text-[10px] text-slate-400 dark:text-slate-500">{formatDate(r.submittedAt)}</span>
               </div>
-              <p className="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap line-clamp-3">{r.content}</p>
+              <button
+                type="button"
+                onClick={() => setViewReport(r)}
+                title="Xem đầy đủ báo cáo"
+                className="group/report block w-full text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+              >
+                <p className="px-3 pt-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap line-clamp-3 group-hover/report:text-slate-900 dark:group-hover/report:text-slate-200">{r.content}</p>
+                <span className="px-3 pb-2 pt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 group-hover/report:underline">
+                  <Maximize2 className="w-3 h-3" />Xem đầy đủ báo cáo
+                </span>
+              </button>
               {r.attachments.length > 0 && (
                 <div className="border-t border-slate-100 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-700">
                   {r.attachments.map((f) => {
@@ -101,6 +113,13 @@ export function DetailAssigneeItem({ assignee: a, compact }: Props) {
           ))}
         </div>
       )}
+      <ReportDialog
+        report={viewReport}
+        authorName={a.user.displayName}
+        onClose={() => setViewReport(null)}
+        formatDate={formatDate}
+        formatSize={formatSize}
+      />
     </div>
   );
 }

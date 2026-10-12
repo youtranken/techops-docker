@@ -31,6 +31,7 @@ export function CreateTaskSheet({ open, onClose }: CreateTaskSheetProps) {
   } = useCreateTaskForm(onClose);
 
   const isForceMode   = watch('isForceMode');
+  const isImportant   = watch('isImportant') ?? false;
   const scheduleStart = watch('scheduleStart');
 
   return (
@@ -54,6 +55,7 @@ export function CreateTaskSheet({ open, onClose }: CreateTaskSheetProps) {
             errors={errors}
             setValue={setValue}
             isForceMode={isForceMode}
+            isImportant={isImportant}
             isBossOrAdmin={isBossOrAdmin}
             richContent={richContent}
             onRichContentChange={setRichContent}

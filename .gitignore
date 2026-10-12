@@ -39,3 +39,6 @@ backups/
 
 # ─── Editor / AI tools ───────────────────────────────────────────────────────
 .claude/
+
+# Playwright output
+e2e/.results/

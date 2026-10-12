@@ -35,6 +35,7 @@ export function EditTaskSheet({ task, open, onClose }: EditTaskSheetProps) {
   } = useEditTaskForm(task, onClose);
 
   const isForceMode   = watch('isForceMode');
+  const isImportant   = watch('isImportant');
   const scheduleStart = watch('scheduleStart');
 
   // Workflow mode editable only for non-boss when task is PENDING_APPROVAL
@@ -64,6 +65,7 @@ export function EditTaskSheet({ task, open, onClose }: EditTaskSheetProps) {
             errors={errors}
             setValue={setValue}
             isForceMode={isForceMode}
+            isImportant={isImportant}
             isBossOrAdmin={isBossOrAdmin}
             richContent={richContent}
             onRichContentChange={setRichContent}

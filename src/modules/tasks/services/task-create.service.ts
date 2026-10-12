@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import type { TaskStatus, Prisma } from '@prisma/client';
 import { createNotification, notifyBosses } from './workflow/_shared';
+import { isTrackingRole } from './task-tracking.service';
 import type { CreateTaskInput, CreateTaskAttachment } from '../validators/create-task.schema';
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
@@ -108,6 +109,8 @@ export async function createTask(data: CreateTaskInput & { attachments?: CreateT
         workflowMode:  data.workflowMode,
         // G4: Force Mode chỉ áp dụng cho APPROVAL flow
         isForceMode:   data.workflowMode === 'NEED_APPROVAL' ? (data.isForceMode ?? false) : false,
+        // ★ chỉ Boss/Admin được đánh dấu
+        isImportant:   isTrackingRole(currentUser.role.name) ? (data.isImportant ?? false) : false,
         status:        taskStatus,
         creatorId:     currentUser.id,
       },

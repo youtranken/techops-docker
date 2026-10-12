@@ -174,3 +174,34 @@ describe('createTask — resolveInitialStatus', () => {
     });
   });
 });
+
+describe('createTask — ★ isImportant (V2: chỉ Boss/Admin)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    taskCreateMock.mockImplementation(async ({ data }: { data: { status: string } }) => ({
+      id: 'task-1', taskCode: '26-0001', title: 'Task test', status: data.status,
+    }));
+    taskFindFirstMock.mockResolvedValue(null);
+  });
+
+  it.each([['BOSS', bossUser], ['ADMIN', adminUser]] as const)('%s tạo với ★ → isImportant=true', async (_r, user) => {
+    await createTask(baseInput({ assigneeIds: ['user-2'], isImportant: true }), user);
+    expect(taskCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ isImportant: true }) }),
+    );
+  });
+
+  it('EMPLOYEE gửi isImportant=true → bị bỏ qua (false)', async () => {
+    await createTask(baseInput({ assigneeIds: ['user-2'], isImportant: true }), empUser);
+    expect(taskCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ isImportant: false }) }),
+    );
+  });
+
+  it('không gửi isImportant → false', async () => {
+    await createTask(baseInput({ assigneeIds: ['user-2'] }), bossUser);
+    expect(taskCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ isImportant: false }) }),
+    );
+  });
+});

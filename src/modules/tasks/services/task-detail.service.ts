@@ -100,6 +100,7 @@ export const taskDetailService = {
       if (isAssignee && !isCreator && task.status === 'PENDING_APPROVAL') return null;
     }
 
-    return task as unknown as TaskDetail;
+    // V2: ★ chỉ Boss/Admin thấy; trạng thái "chưa xem" được ghi khi mở trang (POST /seen) nên không cần ở đây
+    return { ...task, isImportant: isPrivileged ? task.isImportant : false, isUnseen: false } as unknown as TaskDetail;
   },
 };

@@ -16,6 +16,8 @@ const ALL_STATUSES = (Object.entries(STATUS_CONFIG) as [TaskStatus, { label: str
 interface TaskListFiltersProps {
   search: string;
   status: string;
+  /** Khoá ô trạng thái, chỉ hiển thị nhãn (vd mục "Hoàn thành – chưa xem") */
+  statusLocked?: string;
   priorityId: string;
   typeId: string;
   source: string;
@@ -35,7 +37,7 @@ interface TaskListFiltersProps {
 }
 
 export function TaskListFilters({
-  search, status, priorityId, typeId, source,
+  search, status, statusLocked, priorityId, typeId, source,
   datePreset, dateFrom, dateTo,
   priorities, taskTypes,
   onSearchChange, onStatusChange, onPriorityChange, onTypeChange,
@@ -53,6 +55,12 @@ export function TaskListFilters({
         />
       </div>
 
+      {statusLocked ? (
+        <Select value="locked" disabled>
+          <SelectTrigger className="w-[170px]"><SelectValue /></SelectTrigger>
+          <SelectContent><SelectItem value="locked">{statusLocked}</SelectItem></SelectContent>
+        </Select>
+      ) : (
       <Select value={status || 'active'} onValueChange={onStatusChange}>
         <SelectTrigger className="w-[170px]"><SelectValue placeholder="Trạng thái" /></SelectTrigger>
         <SelectContent>
@@ -63,6 +71,7 @@ export function TaskListFilters({
           ))}
         </SelectContent>
       </Select>
+      )}
 
       <Select value={priorityId || 'all'} onValueChange={onPriorityChange}>
         <SelectTrigger className="w-[150px]"><SelectValue placeholder="Ưu tiên" /></SelectTrigger>
