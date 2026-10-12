@@ -4,6 +4,7 @@ import { CheckCircle2, Eye } from 'lucide-react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import type { HelpdeskPendingItem } from '@/modules/helpdesk/types';
+import { isCompletedTrangThai } from '@/modules/helpdesk/config/ticket-status';
 import { UuTienBadge, TrangThaiBadge } from './StatusBadge';
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
@@ -32,7 +33,7 @@ interface HelpdeskTicketRowProps {
 
 export function HelpdeskTicketRow({ item, onAssign, onDelete, onViewDetail, isSelected, onToggleSelect }: HelpdeskTicketRowProps) {
   const isPushed = item.status === 'PUSHED';
-  const isCompleted = item.trangThai === 'Completed';
+  const isCompleted = isCompletedTrangThai(item.trangThai);
   const isNeedsAttention = isCompleted && !item.itSupport && item.status === 'UNASSIGNED';
 
   return (

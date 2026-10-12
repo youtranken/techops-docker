@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const createTaskSchema = z
   .object({
     title:        z.string().min(1, 'Tiêu đề không được trống').max(150, 'Tiêu đề tối đa 150 ký tự'),
-    content:      z.string().min(1, 'Nội dung không được trống').max(3000, 'Nội dung tối đa 3000 ký tự'),
+    content:      z.string().min(1, 'Nội dung không được trống').max(5000, 'Nội dung tối đa 5000 ký tự'),
     priorityId:   z.string().min(1, 'Vui lòng chọn mức ưu tiên'),   
     typeId:       z.string().min(1, 'Vui lòng chọn loại công việc'),
     scheduleStart: z.string().min(1, 'Ngày bắt đầu không hợp lệ'),

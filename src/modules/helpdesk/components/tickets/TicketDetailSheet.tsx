@@ -2,6 +2,7 @@
 
 import { X, CheckCircle2, Clock } from 'lucide-react';
 import type { HelpdeskPendingItem } from '@/modules/helpdesk/types';
+import { isCompletedTrangThai } from '@/modules/helpdesk/config/ticket-status';
 import { UuTienBadge, TrangThaiBadge } from './StatusBadge';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -42,7 +43,7 @@ export function TicketDetailSheet({ item, open, onClose }: TicketDetailSheetProp
   if (!open || !item) return null;
 
   const isPushed    = item.status === 'PUSHED';
-  const isCompleted = item.trangThai === 'Completed';
+  const isCompleted = isCompletedTrangThai(item.trangThai);
 
   return (
     <>

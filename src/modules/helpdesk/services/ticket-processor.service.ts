@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import type { HelpdeskTicket, SyncResult } from '../types';
 import { ticketTaskCreatorService, extractHdId } from './ticket-task-creator.service';
+import { isCompletedTrangThai } from '../config/ticket-status';
 
 // ─── Helper ────────────────────────────────────────────────────────────────────────────────
 
@@ -50,7 +51,7 @@ async function findUserByItSupport(itSupport: string, cachedUsers: ActiveUser[])
 class TicketProcessorService {
   /**
    * Xử lý danh sách tickets — skip trùng (chỉ khi skipExisting=true), tạo Task hoặc Pending.
-   * Chỉ ticket có trangThai = 'Completed' mới được tạo Task tự động.
+   * Chỉ ticket có trangThai hoàn thành ('Completed' / 'Hoàn thành') mới được tạo Task tự động.
    * Các trạng thái khác chỉ upsert vào helpdeskPendingTask để hiển thị trong Danh sách ticket.
    */
   async processTickets(tickets: HelpdeskTicket[], skipExisting = true): Promise<SyncResult> {
@@ -75,7 +76,7 @@ class TicketProcessorService {
           if (existingByCode || existingTask) { result.skipped++; continue; }
         }
 
-        const isCompleted = ticket.trangThai.trim().toLowerCase() === 'completed';
+        const isCompleted = isCompletedTrangThai(ticket.trangThai);
 
         if (!isCompleted) {
           await ticketTaskCreatorService.createPendingTask(ticket, hdId);

@@ -3,6 +3,8 @@
  * Prevents uploading malicious files disguised with fake MIME types.
  */
 
+const ZIP = [0x50, 0x4b, 0x03, 0x04];                         // "PK\x03\x04" (ZIP)
+
 // Magic bytes signatures for common file types
 const MAGIC_BYTES: Record<string, { bytes: number[]; offset?: number }[]> = {
   // PDF
@@ -28,7 +30,34 @@ const MAGIC_BYTES: Record<string, { bytes: number[]; offset?: number }[]> = {
   
   // PNG
   'image/png': [{ bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] }], // PNG\r\n\x1a\n
+
+  // Office 2007+ (OOXML) = ZIP container
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':   [{ bytes: ZIP }], // .docx
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':         [{ bytes: ZIP }], // .xlsx
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': [{ bytes: ZIP }], // .pptx
 };
+
+/** Extension → MIME chuẩn. Dùng khi browser gửi file.type rỗng/octet-stream (hay gặp với file Office trên Windows). */
+export const EXTENSION_MIME: Record<string, string> = {
+  '.pdf':  'application/pdf',
+  '.jpg':  'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png':  'image/png',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+};
+
+/**
+ * MIME được phép đính kèm vào task: PDF, ảnh, Word/Excel/PowerPoint 2007+.
+ * Cố ý KHÔNG nhận .doc/.xls/.ppt đời cũ (có thể chứa macro).
+ */
+export const TASK_ATTACHMENT_TYPES = new Set([
+  'application/pdf', 'image/jpeg', 'image/jpg', 'image/png',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+]);
 
 export interface FileValidationResult {
   valid: boolean;
@@ -89,7 +118,10 @@ export async function validateFile(
   file: File,
   allowedTypes: Set<string>
 ): Promise<FileValidationResult> {
+  // Ưu tiên MIME suy ra từ extension (browser có thể gửi type rỗng / octet-stream / sai)
+  const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+  const declaredType = EXTENSION_MIME[ext] ?? file.type;
   // Read first 16 bytes for magic bytes check
   const headerBuffer = Buffer.from(await file.slice(0, 16).arrayBuffer());
-  return validateFileMagicBytes(headerBuffer, file.type, allowedTypes);
+  return validateFileMagicBytes(headerBuffer, declaredType, allowedTypes);
 }

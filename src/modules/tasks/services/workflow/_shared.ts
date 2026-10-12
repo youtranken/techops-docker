@@ -91,23 +91,6 @@ export async function createAuditLog(
   });
 }
 
-// Critical types — luôn gửi email kể cả Admin chưa setup prefs (fallback default)
-const DEFAULT_EMAIL_TYPES = new Set([
-  'TASK_ASSIGNED',
-  'TRANSFER_RECEIVED',
-  'PLAN_APPROVAL_REQUESTED',
-  'TASK_APPROVED',
-  'TASK_REJECTED',
-  'REVIEW_REQUIRED',
-  'REVISION_REQUIRED',
-  'EXTENSION_REQUESTED',
-  'EXTENSION_APPROVED',
-  'EXTENSION_REJECTED',
-  'TASK_COMPLETED',
-  'DEADLINE_REMINDER',
-  'ALL_FAILED',
-]);
-
 export async function createNotification(
   userId: string,
   taskId: string,
@@ -129,18 +112,16 @@ export async function createNotification(
       where: { user: { role: { name: 'ADMIN' }, isActive: true } },
       select: { emailEnabled: true },
     });
-    const masterEnabled = adminPrefs?.emailEnabled ?? true; // Default true nếu chưa setup
+    const masterEnabled = adminPrefs?.emailEnabled ?? false;
 
     if (masterEnabled) {
-      // System policy = union of emailTypes từ Admin + Boss prefs.
-      // Nếu prefs rỗng (chưa setup) → dùng DEFAULT_EMAIL_TYPES để critical actions luôn gửi.
+      // System policy = union of emailTypes from all Admin + Boss
       const allPrefs = await prisma.userNotificationPrefs.findMany({
         where: { user: { role: { name: { in: ['ADMIN', 'BOSS'] } }, isActive: true } },
         select: { emailTypes: true },
       });
       const systemTypes = new Set(allPrefs.flatMap((p) => p.emailTypes as string[]));
-      const effective = systemTypes.size > 0 ? systemTypes : DEFAULT_EMAIL_TYPES;
-      shouldEmail = effective.has(type);
+      shouldEmail = systemTypes.has(type);
     }
   }
 

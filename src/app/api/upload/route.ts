@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-utils';
-import { validateFile } from '@/lib/file-validation';
+import { validateFile, TASK_ATTACHMENT_TYPES } from '@/lib/file-validation';
 import { rateLimitApi, getRateLimitIdentifier } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
@@ -44,8 +44,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']);
-    const validation = await validateFile(file, ALLOWED_TYPES);
+    const validation = await validateFile(file, TASK_ATTACHMENT_TYPES);
     if (!validation.valid) {
       return NextResponse.json({ error: { code: 'INVALID_FILE', message: validation.error ?? 'File không hợp lệ' } }, { status: 400 });
     }

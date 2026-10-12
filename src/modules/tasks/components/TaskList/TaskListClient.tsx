@@ -106,6 +106,8 @@ export function TaskListClient() {
     ...resolveDates(),
     sortField,
     sortOrder,
+    // Mặc định (không chọn gì) = ẩn task Hoàn thành; 'all' = hiện tất cả
+    hideCompleted: !status,
     page,
     limit,
   });
@@ -170,7 +172,7 @@ export function TaskListClient() {
         priorities={priorities}
         taskTypes={taskTypes}
         onSearchChange={handleSearchChange}
-        onStatusChange={(v) => setStatus(v === 'all' ? '' : v)}
+        onStatusChange={(v) => setStatus(v === 'active' ? '' : v)}
         onPriorityChange={(v) => setPriorityId(v === 'all' ? '' : v)}
         onTypeChange={(v) => setTypeId(v === 'all' ? '' : v)}
         onSourceChange={(v) => setSource(v === 'all' ? '' : v)}

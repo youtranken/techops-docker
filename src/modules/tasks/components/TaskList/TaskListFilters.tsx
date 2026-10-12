@@ -53,9 +53,10 @@ export function TaskListFilters({
         />
       </div>
 
-      <Select value={status || 'all'} onValueChange={onStatusChange}>
+      <Select value={status || 'active'} onValueChange={onStatusChange}>
         <SelectTrigger className="w-[170px]"><SelectValue placeholder="Trạng thái" /></SelectTrigger>
         <SelectContent>
+          <SelectItem value="active">Chưa hoàn thành</SelectItem>
           <SelectItem value="all">Tất cả trạng thái</SelectItem>
           {ALL_STATUSES.map(([s, { label }]) => (
             <SelectItem key={s} value={s}>{label}</SelectItem>

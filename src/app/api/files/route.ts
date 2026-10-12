@@ -14,7 +14,13 @@ const MIME: Record<string, string> = {
   '.png':  'image/png',
   '.gif':  'image/gif',
   '.webp': 'image/webp',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 };
+
+// Chỉ PDF/ảnh mới mở inline trên browser; còn lại (Office…) luôn tải về
+const INLINE_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp']);
 
 /**
  * GET /api/files?path=<relative-path>
@@ -112,10 +118,12 @@ export async function GET(req: NextRequest) {
     const buffer      = await readFile(fullPath);
     const fileName    = path.basename(fullPath);
     const contentType = MIME[path.extname(fileName).toLowerCase()] ?? 'application/octet-stream';
+    const inline      = !forceDownload && INLINE_TYPES.has(contentType);
     return new NextResponse(buffer, {
       headers: {
         'Content-Type': contentType,
-        'Content-Disposition': `${forceDownload ? 'attachment' : 'inline'}; filename="${fileName}"`,
+        'Content-Disposition': `${inline ? 'inline' : 'attachment'}; filename="${fileName}"`,
+        'X-Content-Type-Options': 'nosniff',
         'Cache-Control': 'private, max-age=3600',
       },
     });

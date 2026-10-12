@@ -7,15 +7,9 @@ import { AttachmentChips } from './AttachmentChips';
 import { usePasteImage } from './usePasteImage';
 import { PasteImageModal } from './PasteImageModal';
 
-const ACCEPTED_TYPES: Record<string, string> = {
-  'application/pdf': 'PDF',
-  'image/jpeg':      'JPG',
-  'image/jpg':       'JPG',
-  'image/png':       'PNG',
-};
-const MAX_FILE_COUNT = 3;
-const MAX_SIZE_MB = 10;
-const MAX_SIZE = MAX_SIZE_MB * 1024 * 1024;
+import {
+  ACCEPTED_EXTENSIONS, ACCEPTED_LABEL, MAX_FILE_COUNT, MAX_SIZE_MB, validateNewAttachments,
+} from './attachment-rules';
 
 interface CreateTaskFooterProps {
   files: File[];
@@ -47,19 +41,10 @@ export function CreateTaskFooter({
     e.target.value = '';
     setFileError(null);
 
-    if (files.length + selected.length > MAX_FILE_COUNT) {
-      setFileError(`Tối đa ${MAX_FILE_COUNT} file đính kèm`);
+    const error = validateNewAttachments(selected, files.length);
+    if (error) {
+      setFileError(error);
       return;
-    }
-    for (const f of selected) {
-      if (!ACCEPTED_TYPES[f.type]) {
-        setFileError(`"${f.name}" không hợp lệ — chỉ chấp nhận PDF, JPG, PNG`);
-        return;
-      }
-      if (f.size > MAX_SIZE) {
-        setFileError(`"${f.name}" vượt quá ${MAX_SIZE_MB}MB`);
-        return;
-      }
     }
     onFilesChange([...files, ...selected]);
   }
@@ -93,7 +78,7 @@ export function CreateTaskFooter({
           >
             <Paperclip className="w-4 h-4" />
             <span>Đính kèm</span>
-            <span className="text-[11px] text-slate-400">PDF / JPG / PNG, tối đa {MAX_FILE_COUNT} file, {MAX_SIZE_MB}MB/file</span>
+            <span className="text-[11px] text-slate-400">{ACCEPTED_LABEL}, tối đa {MAX_FILE_COUNT} file, {MAX_SIZE_MB}MB/file</span>
             {files.length > 0 && <span className="text-[11px] bg-indigo-100 text-indigo-600 font-medium rounded-full px-1.5 py-0.5">{files.length}</span>}
           </button>
           <span className="hidden md:flex items-center gap-1 text-[11px] text-slate-400 border-l border-slate-200 pl-3">
@@ -105,7 +90,7 @@ export function CreateTaskFooter({
           ref={fileInputRef}
           type="file"
           multiple
-          accept=".pdf,.jpg,.jpeg,.png"
+          accept={ACCEPTED_EXTENSIONS.join(',')}
           className="hidden"
           onChange={handleFileChange}
         />

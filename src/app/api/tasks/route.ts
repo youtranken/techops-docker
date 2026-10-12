@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
     sortField: (['createdAt', 'scheduleEnd', 'title', 'status'].includes(searchParams.get('sortField') ?? '')
       ? searchParams.get('sortField') as TaskSortField : undefined),
     sortOrder: (searchParams.get('sortOrder') === 'asc' ? 'asc' : searchParams.get('sortOrder') === 'desc' ? 'desc' : undefined) as TaskSortOrder | undefined,
+    hideCompleted: searchParams.get('hideCompleted') === 'true',
   };
 
   const result = await taskQueryService.list(filters, user);

@@ -69,9 +69,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
           {/* Footer */}
           <p className="text-center text-xs text-stone-400 dark:text-stone-600 mt-10 leading-relaxed">
-            © 2026 Techops - IT PMH
+            © 2026 Techops - Lê Minh
             <br />
-            <span className="italic">Version 2.0</span>
+            <span className="italic">Version 1.0</span>
           </p>
         </div>
       </div>

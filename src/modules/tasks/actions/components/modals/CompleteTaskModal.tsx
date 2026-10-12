@@ -12,6 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Paperclip, X, FileText, CheckCircle2, ImagePlus } from 'lucide-react';
 import { usePasteImage } from '@/modules/tasks/components/CreateTask/usePasteImage';
 import { PasteImageModal } from '@/modules/tasks/components/CreateTask/PasteImageModal';
+import {
+  ACCEPTED_EXTENSIONS, ACCEPTED_LABEL, MAX_FILE_COUNT as MAX_FILES, MAX_SIZE_MB, validateNewAttachments,
+} from '@/modules/tasks/components/CreateTask/attachment-rules';
 
 interface FileEntry { fileName: string; filePath: string; fileSize: number; _file?: File }
 
@@ -25,8 +28,6 @@ interface CompleteTaskModalProps {
   isLoading?: boolean;
 }
 
-const MAX_FILES = 3;
-const MAX_SIZE = 10 * 1024 * 1024;
 
 export function CompleteTaskModal({ taskId, open, onClose, onConfirm, isLoading = false }: CompleteTaskModalProps) {
   const [report, setReport] = useState('');
@@ -86,22 +87,10 @@ export function CompleteTaskModal({ taskId, open, onClose, onConfirm, isLoading 
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = Array.from(e.target.files ?? []);
-    setFileError('');
-
-    for (const f of selected) {
-      if (!['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'].includes(f.type)) {
-        setFileError('Chỉ chấp nhận PDF, JPG, PNG');
-        return;
-      }
-      if (f.size > MAX_SIZE) {
-        setFileError(`File ${f.name} vượt quá 10MB`);
-        return;
-      }
-    }
-    if (files.length + selected.length > MAX_FILES) {
-      setFileError(`Tối đa ${MAX_FILES} file`);
-      return;
-    }
+    if (inputRef.current) inputRef.current.value = '';
+    const error = validateNewAttachments(selected, files.length);
+    setFileError(error ?? '');
+    if (error) return;
 
     const newEntries: FileEntry[] = selected.map((f) => ({
       fileName: f.name,
@@ -110,7 +99,6 @@ export function CompleteTaskModal({ taskId, open, onClose, onConfirm, isLoading 
       _file: f,
     }));
     setFiles((prev) => [...prev, ...newEntries]);
-    if (inputRef.current) inputRef.current.value = '';
   }
 
   function removeFile(idx: number) {
@@ -174,7 +162,7 @@ export function CompleteTaskModal({ taskId, open, onClose, onConfirm, isLoading 
           </div>
 
           <div className="space-y-2">
-            <Label>File đính kèm (PDF / JPG / PNG, tối đa {MAX_FILES} file, 10MB/file)</Label>
+            <Label>File đính kèm ({ACCEPTED_LABEL}, tối đa {MAX_FILES} file, {MAX_SIZE_MB}MB/file)</Label>
             <div className="space-y-1.5">
               {files.map((f, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm border rounded px-2 py-1">
@@ -189,7 +177,7 @@ export function CompleteTaskModal({ taskId, open, onClose, onConfirm, isLoading 
             </div>
             {files.length < MAX_FILES && (
               <div className="flex items-center gap-2 flex-wrap">
-                <input ref={inputRef} type="file" accept=".pdf,.jpg,.jpeg,.png" multiple className="hidden" onChange={handleFileChange} />
+                <input ref={inputRef} type="file" accept={ACCEPTED_EXTENSIONS.join(',')} multiple className="hidden" onChange={handleFileChange} />
                 <Button type="button" variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
                   <Paperclip className="h-4 w-4 mr-2" /> Đính kèm file
                 </Button>

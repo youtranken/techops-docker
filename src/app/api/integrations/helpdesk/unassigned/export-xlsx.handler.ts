@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs';
+import { isCompletedTrangThai } from '@/modules/helpdesk/config/ticket-status';
 import type { helpdeskPendingService } from '@/modules/helpdesk/services/helpdesk-pending.service';
 
 type PendingItem = Awaited<ReturnType<typeof helpdeskPendingService.list>>['data'][number];
@@ -72,7 +73,7 @@ export async function buildHelpdeskXlsx(items: PendingItem[]): Promise<ArrayBuff
       trangThai:     r.trangThai,
       itSupport:     r.itSupport ?? '',
       thoiGian:      formatDateVN(r.thoiGian),
-      ngayHoanThanh: r.trangThai === 'Completed' ? formatDateVN(r.ngayHoanThanh) : '',
+      ngayHoanThanh: isCompletedTrangThai(r.trangThai) ? formatDateVN(r.ngayHoanThanh) : '',
       statusLabel:   r.status === 'PUSHED' ? '✓ Đã tạo Task' : 'Chờ xử lý',
     });
 

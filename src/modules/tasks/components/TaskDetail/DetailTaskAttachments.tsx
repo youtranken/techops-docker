@@ -16,6 +16,8 @@ function FileIcon({ name }: { name: string }) {
   if (['pdf'].includes(ext))                        return <FileText className="w-5 h-5 text-red-500" />;
   if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return <Image className="w-5 h-5 text-blue-500" />;
   if (['sql', 'csv', 'xls', 'xlsx'].includes(ext)) return <FileText className="w-5 h-5 text-green-500" />;
+  if (['docx'].includes(ext))               return <FileText className="w-5 h-5 text-blue-600" />;
+  if (['pptx'].includes(ext))               return <FileText className="w-5 h-5 text-orange-500" />;
   return <File className="w-5 h-5 text-slate-400" />;
 }
 

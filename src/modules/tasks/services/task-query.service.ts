@@ -22,6 +22,8 @@ export interface TaskListFilters {
   source?: 'helpdesk' | 'techops';
   sortField?: TaskSortField;
   sortOrder?: TaskSortOrder;
+  /** Ẩn task đã kết thúc (COMPLETED, CANCELLED) — bỏ qua khi đã chọn `status` cụ thể */
+  hideCompleted?: boolean;
 }
 
 export interface TaskListItem {
@@ -164,6 +166,7 @@ export const taskQueryService = {
     // Filters
     const filterWhere: Prisma.TaskWhereInput = {
       ...(filters.status && { status: filters.status }),
+      ...(!filters.status && filters.hideCompleted && { status: { notIn: ['COMPLETED', 'CANCELLED'] } }),
       ...(filters.priorityId && { priorityId: filters.priorityId }),
       ...(filters.typeId && { typeId: filters.typeId }),
       ...(filters.assigneeId && {

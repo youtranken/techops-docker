@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireRole, validateSameOrigin } from '@/lib/auth-utils';
 import { ticketProcessorService } from '@/modules/helpdesk/services/ticket-processor.service';
 import { prisma } from '@/lib/prisma';
+import { COMPLETED_TRANG_THAI } from '@/modules/helpdesk/config/ticket-status';
 
 /**
  * POST /api/integrations/helpdesk/push-to-tasks
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
     // Lay tat ca ticket Completed co IT Support
     // Lay tat ca ticket Completed co IT Support (ca UNASSIGNED lan PUSHED)
     const pendingWithSupport = await prisma.helpdeskPendingTask.findMany({
-      where: { itSupport: { not: null }, trangThai: 'Completed' },
+      where: { itSupport: { not: null }, trangThai: { in: [...COMPLETED_TRANG_THAI] } },
     });
 
     let pushed = 0;
