@@ -15,7 +15,9 @@ Set-Location $Root
 
 function Step($msg) { Write-Host "==> $msg" -ForegroundColor Cyan }
 function Fail($msg) { Write-Host "!! $msg" -ForegroundColor Red; exit 1 }
-function Git { & git @args; if ($LASTEXITCODE -ne 0) { Fail "git $($args -join ' ') thất bại" } }
+# Không đặt tên hàm là 'Git': PowerShell không phân biệt hoa/thường nên mọi lệnh `git` sẽ gọi lại
+# chính hàm này -> đệ quy vô hạn (call depth overflow). Gọi thẳng git.exe.
+function Invoke-GitChecked { & git.exe @args; if ($LASTEXITCODE -ne 0) { Fail "git $($args -join ' ') thất bại" } }
 
 Step '[1/6] Kiểm repo sạch'
 # Chỉ xét file đã theo dõi: uploads/, logs/ … là dữ liệu chạy thật (untracked) — git pull không đụng tới
@@ -23,7 +25,7 @@ $dirty = git status --porcelain --untracked-files=no
 if ($dirty) { Write-Host $dirty; Fail "Có thay đổi chưa commit trong $Root — dừng (không sửa tay trên Prod). Xem: git status" }
 
 Step '[2/6] Lấy thông tin từ GitHub'
-Git fetch --quiet origin
+Invoke-GitChecked fetch --quiet origin
 $branch = (git rev-parse --abbrev-ref HEAD).Trim()
 $old = (git rev-parse HEAD).Trim()
 $new = (git rev-parse "origin/$branch").Trim()
@@ -59,7 +61,7 @@ Get-ChildItem $BackupRoot -Directory | Sort-Object Name -Descending | Select-Obj
   ForEach-Object { Remove-Item -Recurse -Force $_.FullName; Write-Host "    Xoá backup cũ: $($_.Name)" }
 
 Step '[4/6] git pull --ff-only'
-Git pull --ff-only --quiet origin $branch
+Invoke-GitChecked pull --ff-only --quiet origin $branch
 
 Step '[5/6] Build + recreate app'
 docker compose up -d --build app
