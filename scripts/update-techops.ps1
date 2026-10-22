@@ -76,7 +76,9 @@ for ($i = 1; $i -le 40; $i++) {
   if ($code -eq 200) { $ok = $true; Write-Host '    health OK (200)'; break }
   Write-Host "    ...chờ (HTTP $code) $i/40"; Start-Sleep -Seconds 3
 }
-docker logs techops-app 2>&1 | Select-String -Pattern 'migrat|Applying|error' | Select-Object -First 15
+# Gộp stderr trong cmd: PowerShell 5.1 + ErrorActionPreference=Stop coi mọi dòng stderr của lệnh ngoài
+# (vd 'npm notice') là lỗi và dừng script trước khi in XONG, dù deploy đã thành công.
+cmd /c "docker logs techops-app 2>&1" | Select-String -Pattern 'migrat|Applying|error' | Select-Object -First 15
 if (-not $ok) {
   Fail "Chưa đạt 200. Xem log: docker logs -f techops-app`n   Quay lại: powershell -ExecutionPolicy Bypass -File .\scripts\rollback-techops.ps1 -BackupDir $dir"
 }
