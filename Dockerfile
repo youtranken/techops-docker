@@ -3,7 +3,7 @@
 # ────────────────────────────────────────────────────────────────────────────────
 
 # ─── Stage 1: Production Dependencies ────────────────────────────────────────
-FROM node:20-alpine AS deps
+FROM node:22-alpine AS deps
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add libc6-compat openssl
 WORKDIR /app
@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
 
 # ─── Stage 2: Build (full deps including devDeps for build tools) ─────────────
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add libc6-compat openssl
 WORKDIR /app
@@ -32,7 +32,7 @@ COPY . .
 RUN npm run build
 
 # ─── Stage 3: Production Runner ───────────────────────────────────────────────
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 RUN --mount=type=cache,target=/var/cache/apk \
     apk add libc6-compat openssl postgresql-client wget
 WORKDIR /app
