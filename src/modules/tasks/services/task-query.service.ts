@@ -86,6 +86,7 @@ export interface TaskDetail extends TaskListItem {
       id: string;
       content: string;
       version: number;
+      minorVersion: number;
       submittedAt: Date;
       attachments: { id: string; fileName: string; filePath: string; fileSize: number }[];
     }[];

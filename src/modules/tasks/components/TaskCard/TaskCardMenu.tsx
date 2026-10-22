@@ -12,6 +12,7 @@ import {
   CalendarPlus,
   CalendarClock,
   ArchiveRestore,
+  FilePlus2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,6 +36,7 @@ interface TaskCardMenuProps {
   onOpenRejectReview: (taskId: string) => void;
   onOpenCancel: (taskId: string) => void;
   onOpenRestore: (taskId: string) => void;
+  onOpenSupplement: (taskId: string) => void;
   onOpenRejectPlan: (taskId: string) => void;
   onOpenExtension: (taskId: string) => void;
   onOpenApproveExtension: (taskId: string, extId: string) => void;
@@ -54,6 +56,7 @@ export function TaskCardMenu({
   onOpenRejectReview,
   onOpenCancel,
   onOpenRestore,
+  onOpenSupplement,
   onOpenRejectPlan,
   onOpenExtension,
   onOpenApproveExtension,
@@ -131,6 +134,12 @@ export function TaskCardMenu({
           {permissions.canRequestExtension && (
             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onOpenExtension(task.id); }} className="text-amber-600">
               <CalendarPlus className="mr-2 h-4 w-4" />Xin gia hạn
+            </DropdownMenuItem>
+          )}
+
+          {permissions.canSupplementReport && (
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onOpenSupplement(task.id); }} className="text-amber-600">
+              <FilePlus2 className="mr-2 h-4 w-4" />Bổ sung báo cáo
             </DropdownMenuItem>
           )}
 

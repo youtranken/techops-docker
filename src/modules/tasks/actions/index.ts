@@ -15,6 +15,7 @@ export * from './hooks/useTransferTask';
 export * from './hooks/useReassignTask';
 export * from './hooks/useCancelTask';
 export * from './hooks/useRestoreTask';
+export * from './hooks/useSupplementReport';
 export * from './hooks/useExtensions';
 
 // Components — buttons

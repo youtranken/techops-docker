@@ -7,7 +7,7 @@
 
 import {
   CheckCircle, XCircle, ThumbsUp, ThumbsDown, RotateCcw,
-  ArrowRightLeft, UserPlus, ClipboardCheck, Ban, CalendarPlus, ArchiveRestore,
+  ArrowRightLeft, UserPlus, ClipboardCheck, Ban, CalendarPlus, ArchiveRestore, FilePlus2,
 } from 'lucide-react';
 import { ActionButton } from './ActionButton';
 import type { TaskPermissions } from '../../hooks/useTaskPermissions';
@@ -69,6 +69,10 @@ export function TaskActionButtons({ permissions, onModal, isPending }: Props) {
       <ActionButton label="Xin gia hạn" icon={CalendarPlus} variant="warning"
         isVisible={permissions.canRequestExtension} isLoading={isPending.requestExtension}
         onClick={() => onModal('extension')} />
+
+      <ActionButton label="Bổ sung báo cáo" icon={FilePlus2} variant="warning"
+        isVisible={permissions.canSupplementReport} isLoading={isPending.supplementReport}
+        onClick={() => onModal('supplement')} />
     </div>
   );
 }

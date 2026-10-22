@@ -1,5 +1,18 @@
 export function logDetailText(metadata: Record<string, unknown> | null): string | null {
   if (!metadata) return null;
+
+  // LOGIN_FAILED: hiển thị lý do
+  const reason = metadata.reason as string | undefined;
+  if (reason === 'USER_NOT_FOUND') return 'Username không tồn tại';
+  if (reason === 'USER_INACTIVE')  return 'Tài khoản đã vô hiệu hoá';
+  if (reason === 'WRONG_PASSWORD') {
+    const remaining = metadata.attemptsRemaining;
+    const locked = metadata.locked;
+    if (locked) return 'Mật khẩu sai — IP đã bị khoá';
+    if (typeof remaining === 'number') return `Mật khẩu sai — còn ${remaining} lần`;
+    return 'Mật khẩu sai';
+  }
+
   const s = metadata.setting as string | undefined;
   if (!s) return null;
 

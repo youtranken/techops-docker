@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { Monitor, Smartphone, Tablet, Building2, Globe } from 'lucide-react';
+import { Monitor, Smartphone, Tablet, Building2, Globe, AlertTriangle } from 'lucide-react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import type { UserLogEntry } from '../../types';
 import { logDetailText } from './logDetailText';
@@ -46,7 +46,21 @@ export function UserLogRow({ log }: Props) {
         {format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })}
       </TableCell>
       <TableCell>
-        <p className="text-sm font-medium leading-none">{log.user.displayName}</p>
+        {log.user ? (
+          <p className="text-sm font-medium leading-none">{log.user.displayName}</p>
+        ) : (
+          <div className="flex items-center gap-1.5">
+            <AlertTriangle className="h-3.5 w-3.5 text-red-500 shrink-0" />
+            <div>
+              <p className="text-sm font-medium leading-none text-red-600">Unknown</p>
+              {typeof log.metadata?.attemptedUsername === 'string' && (
+                <p className="text-[10px] text-red-500 mt-0.5 font-mono">
+                  thử: {log.metadata.attemptedUsername}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </TableCell>
       <TableCell>
         <span className="text-sm text-foreground/80">

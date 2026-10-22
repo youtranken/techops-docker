@@ -25,6 +25,7 @@ export interface TaskPermissions {
   canApproveExtension: boolean;
   canReassign: boolean;
   canToggleForceMode: boolean;
+  canSupplementReport: boolean;
 
   isBoss: boolean;
   isAdmin: boolean;
@@ -44,7 +45,7 @@ export function useTaskPermissions(
   // Guard: task chưa load → trả về all-false
   if (!task) {
     return {
-      canEdit: false, canCancel: false, canRestore: false,
+      canEdit: false, canCancel: false, canRestore: false, canSupplementReport: false,
       canAcknowledge: false, canComplete: false, canTransfer: false,
       canRejectTask: false, canApprovePlan: false, canRejectPlan: false,
       canApproveReview: false, canRejectReview: false,
@@ -115,6 +116,13 @@ export function useTaskPermissions(
 
     canReassign:        has('REASSIGN'),
     canToggleForceMode: has('FORCE_MODE'),
+
+    // Bổ sung báo cáo: chỉ APPROVAL flow + status IN_PROGRESS/PENDING_REVIEW + assignee đã COMPLETED
+    canSupplementReport:
+      task.workflowMode === 'NEED_APPROVAL'
+      && ['IN_PROGRESS', 'PENDING_REVIEW'].includes(task.status)
+      && isAssignee
+      && assigneeStatus === 'COMPLETED',
 
     isBoss,
     isAdmin,

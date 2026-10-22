@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth';
+import { maskAttemptedUsername } from './login-log';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
@@ -67,10 +68,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           include: { role: true },
         });
 
+        // Lookup IP geo cho mọi LOGIN_FAILED — phát hiện brute-force ngoài/nội bộ
+        const rawIp = request.headers.get('x-forwarded-for')
+          || request.headers.get('x-real-ip')
+          || identifier;
+        const failedIp = normalizeIp(rawIp);
+        const failedUserAgent = request.headers.get('user-agent') || 'unknown';
+
         if (!user || !user.isActive) {
           await recordFailedLogin(identifier);
-          // Không biết userId → chỉ log console (không thể lưu DB do FK constraint)
-          console.warn(`[auth] LOGIN_FAILED ip=${identifier} reason=${!user ? 'USER_NOT_FOUND' : 'USER_INACTIVE'} username=${credentials.username}`);
+          // Log DB với userId=null nếu username không tồn tại (sau migration nullable)
+          try {
+            const ipInfo = await lookupIpInfo(failedIp);
+            await prisma.userActivityLog.create({
+              data: {
+                userId: user?.id ?? null,
+                action: 'LOGIN_FAILED',
+                ipAddress: failedIp,
+                ipType: ipInfo.ipType,
+                ispName: ipInfo.ispName,
+                city: ipInfo.city,
+                country: ipInfo.country,
+                userAgent: failedUserAgent,
+                metadata: {
+                  reason: !user ? 'USER_NOT_FOUND' : 'USER_INACTIVE',
+                  // Không tồn tại → che (có thể là mật khẩu gõ nhầm ô); tồn tại nhưng bị khoá → username thật
+                  attemptedUsername: user ? user.username : maskAttemptedUsername(credentials.username),
+                },
+              },
+            });
+          } catch (e) {
+            console.error('[auth] Failed to log LOGIN_FAILED (unknown user):', e);
+          }
           return null;
         }
 
@@ -80,19 +109,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
         if (!isValid) {
           const result = await recordFailedLogin(identifier);
-          // Log vào DB — biết userId nên lưu được
-          prisma.userActivityLog.create({
-            data: {
-              userId: user.id,
-              action: 'LOGIN_FAILED',
-              ipAddress: identifier,
-              metadata: {
-                reason: 'WRONG_PASSWORD',
-                locked: result.locked,
-                attemptsRemaining: result.attemptsRemaining,
+          try {
+            const ipInfo = await lookupIpInfo(failedIp);
+            await prisma.userActivityLog.create({
+              data: {
+                userId: user.id,
+                action: 'LOGIN_FAILED',
+                ipAddress: failedIp,
+                ipType: ipInfo.ipType,
+                ispName: ipInfo.ispName,
+                city: ipInfo.city,
+                country: ipInfo.country,
+                userAgent: failedUserAgent,
+                metadata: {
+                  reason: 'WRONG_PASSWORD',
+                  attemptedUsername: user.username,
+                  locked: result.locked,
+                  attemptsRemaining: result.attemptsRemaining,
+                },
               },
-            },
-          }).catch(() => {});
+            });
+          } catch (e) {
+            console.error('[auth] Failed to log LOGIN_FAILED (wrong password):', e);
+          }
           if (result.locked) {
             console.warn(`[auth] IP ${identifier} LOCKED OUT after failed attempts`);
           }

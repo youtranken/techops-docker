@@ -78,15 +78,20 @@ export async function complete(
   // Nếu T1 và T2 cùng chạy: một cái sẽ retry sau khi cái kia commit,
   // thấy đầy đủ các assignee COMPLETED và trigger status transition đúng.
   await prisma.$transaction(async (tx) => {
-    // Tạo báo cáo (version tăng dần, tránh race condition qua @@unique)
+    // Complete = tăng MAJOR version, reset minor về 0.
+    //  - Lần đầu: V1.0
+    //  - Sau Boss reject (REVISION_REQUIRED) → assignee submit lại: V2.0, V3.0...
+    //  - Báo cáo bổ sung (V1.1, V1.2...) đi qua endpoint /api/tasks/[id]/reports (supplement),
+    //    KHÔNG qua complete service này.
     const lastReport = await tx.assigneeReport.findFirst({
       where: { assigneeId: assignee.id },
-      orderBy: { version: 'desc' },
+      orderBy: [{ version: 'desc' }, { minorVersion: 'desc' }],
     });
     const version = (lastReport?.version ?? 0) + 1;
+    const minorVersion = 0;
 
     const report = await tx.assigneeReport.create({
-      data: { assigneeId: assignee.id, content: data.reportContent, version },
+      data: { assigneeId: assignee.id, content: data.reportContent, version, minorVersion },
     });
 
     if (data.files && data.files.length > 0) {
@@ -157,7 +162,7 @@ export async function complete(
           action: 'COMPLETED',
           oldStatus: task.status,
           newStatus: nextStatus,
-          details: { reportVersion: version } as never,
+          details: { reportVersion: `${version}.${minorVersion}` } as never,
         },
       });
     } else {
@@ -169,7 +174,7 @@ export async function complete(
           action: 'COMPLETED',
           oldStatus: task.status,
           newStatus: task.status,
-          details: { reportVersion: version, partial: true } as never,
+          details: { reportVersion: `${version}.${minorVersion}`, partial: true } as never,
         },
       });
     }

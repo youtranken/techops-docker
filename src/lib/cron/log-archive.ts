@@ -53,7 +53,9 @@ async function exportUserActivity(wb: ExcelJS.Workbook, from: Date, to: Date) {
     const meta = r.metadata as Record<string, unknown> | null;
     const row = ws.addRow({
       createdAt: dayjs(r.createdAt).format('DD/MM/YYYY HH:mm:ss'),
-      user:      `${r.user.displayName}`,
+      user:      r.user
+        ? r.user.displayName
+        : `Unknown (${(r.metadata as { attemptedUsername?: string } | null)?.attemptedUsername ?? '?'})`,
       action:    r.action,
       detail:    meta ? JSON.stringify(meta) : '',
       ip:        r.ipAddress ?? '',

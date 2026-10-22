@@ -67,7 +67,7 @@ export function DetailAssigneeItem({ assignee: a, compact }: Props) {
           {a.reports.map((r) => (
             <div key={r.id} className="mt-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
               <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded">v{r.version}</span>
+                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded">v{r.version}.{r.minorVersion ?? 0}</span>
                 <span className="text-[10px] text-slate-400 dark:text-slate-500">{formatDate(r.submittedAt)}</span>
               </div>
               <button

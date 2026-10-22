@@ -23,7 +23,7 @@ export function ReportDialog({ report, authorName, onClose, formatDate, formatSi
           <>
             <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700 pr-12">
               <DialogDescription className="text-xs text-slate-400">
-                Báo cáo hoàn thành v{report.version} · {formatDate(report.submittedAt)}
+                Báo cáo hoàn thành v{report.version}.{report.minorVersion ?? 0} · {formatDate(report.submittedAt)}
               </DialogDescription>
               <DialogTitle className="text-base font-bold text-slate-900 dark:text-slate-100">{authorName}</DialogTitle>
             </div>

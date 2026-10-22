@@ -67,7 +67,7 @@ export type UserLogEntry = {
     id: string;
     displayName: string;
     username: string;
-  };
+  } | null; // null = LOGIN_FAILED với username không tồn tại trong DB
 };
 
 export type UserLogFilters = LogDateRange & {

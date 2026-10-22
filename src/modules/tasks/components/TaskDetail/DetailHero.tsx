@@ -36,7 +36,8 @@ export function DetailHero({ task, permissions, currentAssigneeIds, currentUserI
     permissions.canApproveReview || permissions.canRejectReview ||
     permissions.canRejectTask || permissions.canTransfer ||
     permissions.canReassign || permissions.canCancel ||
-    permissions.canRestore || permissions.canRequestExtension;
+    permissions.canRestore || permissions.canRequestExtension ||
+    permissions.canSupplementReport;
 
   return (
     <div className="animate-in fade-in slide-in-from-top-2 duration-300 shrink-0 bg-gradient-to-br from-slate-50/80 to-white dark:from-slate-800/50 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 pt-4 pb-4">

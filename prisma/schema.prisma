@@ -226,15 +226,16 @@ model TaskAssignee {
 }
 
 model AssigneeReport {
-  id          String             @id @default(cuid())
-  assigneeId  String
-  content     String
-  version     Int                @default(1)
-  submittedAt DateTime           @default(now())
-  assignee    TaskAssignee       @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
-  attachments ReportAttachment[]
+  id           String             @id @default(cuid())
+  assigneeId   String
+  content      String
+  version      Int                @default(1)
+  minorVersion Int                @default(0)
+  submittedAt  DateTime           @default(now())
+  assignee     TaskAssignee       @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
+  attachments  ReportAttachment[]
 
-  @@unique([assigneeId, version])
+  @@unique([assigneeId, version, minorVersion])
   @@index([assigneeId, submittedAt(sort: Desc)])
 }
 
@@ -308,7 +309,7 @@ model TaskAuditLog {
 
 model UserActivityLog {
   id        String     @id @default(cuid())
-  userId    String
+  userId    String?    // Nullable: log brute-force attempt với username không tồn tại trong DB
   action    UserAction
   ipAddress String?
   userAgent String?
@@ -318,7 +319,7 @@ model UserActivityLog {
   country   String?
   ipType    String?
   ispName   String?
-  user      User       @relation(fields: [userId], references: [id])
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([action, createdAt(sort: Desc)])

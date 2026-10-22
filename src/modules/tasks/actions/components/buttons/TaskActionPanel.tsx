@@ -8,6 +8,7 @@ import { CompleteTaskModal } from '../modals/CompleteTaskModal';
 import { TransferModal } from '../modals/TransferModal';
 import { ReassignModal } from '../modals/ReassignModal';
 import { RequestExtensionModal } from '../modals/RequestExtensionModal';
+import { SupplementReportModal } from '../modals/SupplementReportModal';
 import type { TaskPermissions } from '../../hooks/useTaskPermissions';
 import { useTaskActionPanel } from '../../hooks/useTaskActionPanel';
 
@@ -32,7 +33,7 @@ export function TaskActionPanel({
     modal, setModal, close,
     acknowledge, complete, approvePlan, rejectPlan,
     approveReview, rejectReview, rejectTask,
-    transfer, reassign, cancelTask, restoreTask, requestExtension,
+    transfer, reassign, cancelTask, restoreTask, supplementReport, requestExtension,
   } = useTaskActionPanel();
 
   const completedAssignees = taskAssignees
@@ -53,6 +54,7 @@ export function TaskActionPanel({
     rejectTask: rejectTask.isPending, transfer: transfer.isPending,
     reassign: reassign.isPending,
     cancelTask: cancelTask.isPending, restoreTask: restoreTask.isPending,
+    supplementReport: supplementReport.isPending,
     requestExtension: requestExtension.isPending,
   };
 
@@ -140,6 +142,13 @@ export function TaskActionPanel({
         description="Công việc sẽ trở về trạng thái trước khi bị hủy. Tất cả người thực hiện sẽ được giao lại từ đầu (chờ tiếp nhận)."
         confirmLabel="Khôi phục" isLoading={restoreTask.isPending}
         onConfirm={() => restoreTask.mutate(taskId, { onSuccess: close })}
+      />
+
+      <SupplementReportModal taskId={taskId} open={modal === 'supplement'} onClose={close}
+        isLoading={supplementReport.isPending}
+        onConfirm={(content, files) =>
+          supplementReport.mutate({ taskId, content, files }, { onSuccess: close })
+        }
       />
     </>
   );

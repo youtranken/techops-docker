@@ -85,10 +85,23 @@ export function UserActivityLogTable() {
                     {format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      {log.user.displayName}
-                    </span>
-                    <span className="ml-1 text-xs text-gray-400">@{log.user.username}</span>
+                    {log.user ? (
+                      <>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {log.user.displayName}
+                        </span>
+                        <span className="ml-1 text-xs text-gray-400">@{log.user.username}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-medium text-red-600">🚨 Unknown</span>
+                        {typeof log.metadata?.attemptedUsername === 'string' && (
+                          <span className="ml-1 text-xs text-red-500 font-mono">
+                            @{log.metadata.attemptedUsername}
+                          </span>
+                        )}
+                      </>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                     {ACTION_LABELS[log.action] ?? log.action}

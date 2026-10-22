@@ -78,7 +78,12 @@ class UserActivityLogService {
     const skip = (page - 1) * limit;
 
     const where: Prisma.UserActivityLogWhereInput = {
-      ...(filters.userId && { userId: filters.userId }),
+      // 'UNKNOWN' = brute-force log với username không có trong DB (userId = null)
+      ...(filters.userId === 'UNKNOWN'
+        ? { userId: null }
+        : filters.userId
+          ? { userId: filters.userId }
+          : {}),
       ...(filters.action && { action: filters.action as UserAction }),
       ...(filters.ipType && { ipType: filters.ipType }),
       ...(filters.dateFrom || filters.dateTo

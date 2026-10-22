@@ -26,6 +26,7 @@ export function TaskRowCard({
   onOpenRejectReview,
   onOpenCancel,
   onOpenRestore,
+  onOpenSupplement,
   onOpenRejectPlan,
   onOpenExtension,
   onOpenApproveExtension,
@@ -89,7 +90,8 @@ export function TaskRowCard({
             onOpenQuickView={onOpenQuickView} onEdit={onEdit}
             onOpenComplete={onOpenComplete} onOpenTransfer={onOpenTransfer}
             onOpenRejectTask={onOpenRejectTask} onOpenRejectReview={onOpenRejectReview}
-            onOpenCancel={onOpenCancel} onOpenRestore={onOpenRestore} onOpenRejectPlan={onOpenRejectPlan}
+            onOpenCancel={onOpenCancel} onOpenRestore={onOpenRestore}
+            onOpenSupplement={onOpenSupplement} onOpenRejectPlan={onOpenRejectPlan}
             onOpenExtension={onOpenExtension} onOpenApproveExtension={onOpenApproveExtension}
             onAcknowledge={handleAcknowledge} onApprovePlan={handleApprovePlan} onApproveReview={handleApproveReview}
           />

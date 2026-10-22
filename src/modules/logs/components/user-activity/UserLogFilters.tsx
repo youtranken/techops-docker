@@ -42,6 +42,7 @@ function UserSelect({ filters, onChange }: Props) {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="ALL">Tất cả người dùng</SelectItem>
+        <SelectItem value="UNKNOWN">🚨 Username không tồn tại</SelectItem>
         {users.map((u) => (
           <SelectItem key={u.id} value={u.id}>{u.displayName}</SelectItem>
         ))}

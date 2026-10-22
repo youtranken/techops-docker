@@ -236,6 +236,7 @@ export function TaskListClient() {
         onOpenRejectReview={modals.setRejectReviewId}
         onOpenCancel={modals.setCancelTaskId}
         onOpenRestore={modals.setRestoreTaskId}
+        onOpenSupplement={modals.setSupplementTaskId}
         onOpenRejectPlan={modals.setRejectPlanTaskId}
         onOpenExtension={modals.setExtensionTaskId}
         onOpenApproveExtension={(taskId, extId) => modals.setApproveExtState({ taskId, extId })}

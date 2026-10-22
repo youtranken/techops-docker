@@ -17,7 +17,9 @@ import { useRejectReview } from '../../actions/hooks/useRejectReview';
 import { useRejectPlan } from '../../actions/hooks/useRejectPlan';
 import { useCancelTask } from '../../actions/hooks/useCancelTask';
 import { useRestoreTask } from '../../actions/hooks/useRestoreTask';
+import { useSupplementReport } from '../../actions/hooks/useSupplementReport';
 import { ConfirmActionModal } from '../../actions/components/modals/ConfirmActionModal';
+import { SupplementReportModal } from '../../actions/components/modals/SupplementReportModal';
 import { useRequestExtension, useApproveExtension, useRejectExtension } from '../../actions/hooks/useExtensions';
 
 interface TaskListModalsProps {
@@ -33,6 +35,7 @@ interface TaskListModalsProps {
   rejectReviewId: string | null;
   cancelTaskId: string | null;
   restoreTaskId: string | null;
+  supplementTaskId: string | null;
   rejectPlanTaskId: string | null;
   extensionTaskId: string | null;
   approveExtState: { taskId: string; extId: string } | null;
@@ -45,6 +48,7 @@ interface TaskListModalsProps {
   setRejectReviewId: (v: string | null) => void;
   setCancelTaskId: (v: string | null) => void;
   setRestoreTaskId: (v: string | null) => void;
+  setSupplementTaskId: (v: string | null) => void;
   setRejectPlanTaskId: (v: string | null) => void;
   setExtensionTaskId: (v: string | null) => void;
   setApproveExtState: (v: { taskId: string; extId: string } | null) => void;
@@ -54,10 +58,10 @@ export function TaskListModals({
   tasks, currentUserId, role,
   showCreate, editingTask, quickViewTaskId,
   completeTaskId, transferTaskId, rejectTaskId, rejectReviewId,
-  cancelTaskId, restoreTaskId, rejectPlanTaskId, extensionTaskId, approveExtState,
+  cancelTaskId, restoreTaskId, supplementTaskId, rejectPlanTaskId, extensionTaskId, approveExtState,
   setShowCreate, setEditingTask, setQuickViewTaskId,
   setCompleteTaskId, setTransferTaskId, setRejectTaskId, setRejectReviewId,
-  setCancelTaskId, setRestoreTaskId, setRejectPlanTaskId, setExtensionTaskId, setApproveExtState,
+  setCancelTaskId, setRestoreTaskId, setSupplementTaskId, setRejectPlanTaskId, setExtensionTaskId, setApproveExtState,
 }: TaskListModalsProps) {
   const complete         = useCompleteTask();
   const transfer         = useTransferTask();
@@ -66,6 +70,7 @@ export function TaskListModals({
   const rejectPlan       = useRejectPlan();
   const cancelTask       = useCancelTask();
   const restoreTask      = useRestoreTask();
+  const supplementReport = useSupplementReport();
   const requestExtension = useRequestExtension();
   const approveExtension = useApproveExtension();
   const rejectExtension  = useRejectExtension();
@@ -172,6 +177,19 @@ export function TaskListModals({
         confirmLabel="Khôi phục"
         isLoading={restoreTask.isPending}
         onConfirm={() => restoreTask.mutate(restoreTaskId!, { onSuccess: () => setRestoreTaskId(null) })}
+      />
+
+      <SupplementReportModal
+        taskId={supplementTaskId ?? undefined}
+        open={!!supplementTaskId}
+        onClose={() => setSupplementTaskId(null)}
+        isLoading={supplementReport.isPending}
+        onConfirm={(content, files) =>
+          supplementReport.mutate(
+            { taskId: supplementTaskId!, content, files },
+            { onSuccess: () => setSupplementTaskId(null) },
+          )
+        }
       />
 
       <ReasonModal

@@ -14,6 +14,7 @@ export interface TaskRowCardProps {
   onOpenRejectReview: (taskId: string) => void;
   onOpenCancel: (taskId: string) => void;
   onOpenRestore: (taskId: string) => void;
+  onOpenSupplement: (taskId: string) => void;
   onOpenRejectPlan: (taskId: string) => void;
   onOpenExtension: (taskId: string) => void;
   onOpenApproveExtension: (taskId: string, extId: string) => void;
