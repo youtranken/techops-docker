@@ -235,7 +235,26 @@
     "success": "Success"
   },
   "dnd": {
-    "reported": "{x}/{n} reported"
+    "accepted": "{x}/{n} accepted",
+    "drop": {
+      "accept": "Drop to accept",
+      "approve": "Drop to approve",
+      "report": "Drop to report done",
+      "review": "Drop to sign off"
+    },
+    "grip": "Drag to the next column to act faster",
+    "hint": "Tip: drag a card to the next column to act faster. Only steps you’re allowed to take will accept the card.",
+    "hintClose": "Hide tip",
+    "reported": "{x}/{n} reported",
+    "sr": {
+      "cancel": "Cancelled. {id} stays in {s}.",
+      "instr": "Draggable card. Press Space to pick it up, Left/Right arrows to choose a column, Enter to drop, Esc to cancel.",
+      "invalid": "Can’t drop here. {id} went back.",
+      "lift": "Picked up {id}. Column that accepts it: {s}. Use Right or Left arrow to choose, Enter to drop, Esc to cancel.",
+      "origin": "Back at the starting column, {s}.",
+      "over": "Over {s}. Press Enter to {a}.",
+      "start": "Dragging {id}. Only the {s} column accepts it."
+    }
   },
   "due": {
     "doneOnTime": "Done on time",
@@ -490,6 +509,16 @@
     "status": "Status",
     "title": "Task",
     "type": "Task Type"
+  },
+  "tbx": {
+    "actTo": "{a} — move to {s}",
+    "allInList": "See all {n} tasks in List",
+    "board": "Task board by status",
+    "doneHidden": "Done tasks don’t show in the Open tab.",
+    "instr": "Drag this card with a mouse to the next column. Without a mouse, use the action button on the card or the Quick actions menu.",
+    "more": "Show more ({n})",
+    "outFilter": "Not in the status filter",
+    "seeDone": "See done tasks"
   },
   "td": {
     "actions": "Actions",
