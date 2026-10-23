@@ -42,8 +42,8 @@ Module không được import trực tiếp từ module khác (chỉ qua API).
 | `helpdesk/` | Đồng bộ Helpdesk API, quản lý ticket | [xem](helpdesk/AGENTS.md) |
 | `hr/` | Quản lý nhân sự, user accounts | [xem](hr/AGENTS.md) |
 | `analytics/` | Báo cáo, thống kê hoạt động | — |
-| `notifications/` | Thông báo, email alerts | — |
-| `settings/` | Cài đặt hệ thống | — |
+| `notifications/` | Thông báo, email alerts | [xem](notifications/AGENTS.md) |
+| `settings/` | Cài đặt hệ thống, Hồ sơ cá nhân | [xem](settings/AGENTS.md) |
 | `logs/` | Nhật ký hoạt động người dùng | — |
 | `auth/` | Xác thực (NextAuth wrapper) | — |
 | `dashboard/` | Tổng quan dashboard | — |

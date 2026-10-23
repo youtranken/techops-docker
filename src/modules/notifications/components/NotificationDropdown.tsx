@@ -1,6 +1,7 @@
 'use client';
 
-/** Nội dung dropdown chuông (preview `.pop-h .pop-g .n-item .pop-note`). Nhóm Hôm nay / Trước đó theo múi giờ app. */
+/** Nội dung dropdown chuông (preview `.pop-h .pop-g .n-item .pop-note .pop-f`). Nhóm Hôm nay / Trước đó theo múi giờ app; chân có "Xem tất cả" → /notifications (A3-2). */
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { BellOff, Info } from 'lucide-react';
@@ -106,6 +107,16 @@ export function NotificationDropdown({ unreadIds, showAdminNote, onNavigate }: N
             <span>{t('notif.adminNoMail')}</span>
           </p>
         )}
+      </div>
+      <div className="flex shrink-0 justify-center border-t border-line px-3.5 py-1.5">
+        <Link
+          href="/notifications"
+          onClick={onNavigate}
+          aria-label={t('ntx.allLabel')}
+          className="inline-flex min-h-9 items-center rounded-sm px-2 text-[13px] font-medium text-primary-text hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {t('notif.all')}
+        </Link>
       </div>
       {isFetching && !isLoading && <span className="sr-only">{t('app.loading')}</span>}
     </div>

@@ -199,6 +199,40 @@
       "transferred": "Handed over to {a}."
     }
   },
+  "au": {
+    "cur": {
+      "_": "Current password",
+      "req": "Enter your current password"
+    },
+    "err": {
+      "cur": "Your current password is incorrect.",
+      "match": "The passwords don’t match.",
+      "policy": "The new password doesn’t meet all the requirements below.",
+      "same": "The new password must differ from the current one."
+    },
+    "hide": "Hide password",
+    "new": {
+      "_": "New password",
+      "req": "Enter a new password"
+    },
+    "new2": {
+      "_": "Confirm new password",
+      "req": "Re-enter the new password"
+    },
+    "pol": {
+      "count": "{x} of {n} requirements met",
+      "len": "At least {n} characters",
+      "low": "One lowercase letter (a–z)",
+      "met": "met",
+      "num": "One number (0–9)",
+      "sp": "One special character (! @ # …)",
+      "title": "Your new password needs",
+      "unmet": "not met",
+      "up": "One uppercase letter (A–Z)"
+    },
+    "saving": "Saving…",
+    "show": "Show password"
+  },
   "auth": {
     "forgotPassword": "Forgot Password",
     "login": "Login",
@@ -497,11 +531,189 @@
     "today": "Today",
     "unread": "{n} unread"
   },
+  "nt": {
+    "cat": {
+      "approval": "Plan approval",
+      "assign": "Assignments",
+      "comment": "Comments",
+      "due": "Due reminders",
+      "ext": "Extensions",
+      "review": "Review"
+    },
+    "empty": {
+      "all": {
+        "d": "When you’re assigned work, a task needs approval or someone comments, it shows up here.",
+        "t": "No notifications yet"
+      },
+      "unread": {
+        "d": "New notifications will show up here.",
+        "t": "You’re all caught up"
+      }
+    },
+    "end": "That’s everything",
+    "err": {
+      "d": "The server isn’t responding. Try again in a few minutes.",
+      "t": "Couldn’t load notifications"
+    },
+    "g": {
+      "older": "Older",
+      "today": "Today",
+      "yday": "Yesterday"
+    },
+    "list": "Notification list",
+    "m": {
+      "ALL_FAILED": "Everyone assigned declined {t}",
+      "COMMENT_ADDED": "{a} mentioned you in {t}",
+      "DEADLINE_REMINDER": "{t} is due within 3 days",
+      "EXTENSION_APPROVED": "{a} extended {t} to {d}",
+      "EXTENSION_REJECTED": "{a} declined the extension for {t}",
+      "EXTENSION_REQUESTED": "{a} asked to extend {t} to {d}",
+      "PLAN_APPROVAL_REQUESTED": "{a} sent the plan for {t} for your approval",
+      "REVIEW_REQUIRED": "{a} finished {t} — ready for your review",
+      "REVISION_REQUIRED": "{a} asked for rework on {t}",
+      "TASK_APPROVED": "{a} approved the plan for {t}",
+      "TASK_ASSIGNED": "{a} assigned you {t}",
+      "TASK_COMPLETED": "{t} passed review and is complete",
+      "TASK_REJECTED": "{a} sent back the plan for {t}",
+      "TRANSFER_RECEIVED": "{a} handed over {t} to you"
+    },
+    "markRead": "Mark as read",
+    "more": "Show older notifications",
+    "readAll": "Mark all as read",
+    "readAllDone": "Marked {n} notifications as read",
+    "sub": "{n} unread",
+    "subNone": "You’re all caught up",
+    "tab": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "title": "Notifications",
+    "unread": "Unread"
+  },
+  "ntx": {
+    "allLabel": "See all notifications",
+    "loadMoreErr": "Couldn’t load more notifications.",
+    "openTask": "Open task {code}",
+    "page": "Notifications page"
+  },
   "page": {
     "export": "Export to Excel",
     "new": "New task",
     "sub": "{n} open, {m} waiting on you",
     "title": "Tasks"
+  },
+  "pf": {
+    "acc": {
+      "created": "Created",
+      "d": "Managed by an Admin. Contact them to change it.",
+      "id": "Account ID",
+      "role": "Role",
+      "t": "Account",
+      "user": "Username"
+    },
+    "av": {
+      "change": "Change photo",
+      "color": "Initials background",
+      "colorHint": "Used when you don’t have a photo.",
+      "custom": "Custom color",
+      "d": "Shown next to your name in task lists, comments and notifications.",
+      "errSize": "“{f}” is {s}, over the 2 MB limit. Choose a smaller image.",
+      "errType": "“{f}” isn’t a JPG or PNG image.",
+      "hint": "JPG or PNG, up to 2 MB. Square photos look best.",
+      "instant": "Photo and colour are saved as soon as you pick them.",
+      "swatch": "Color {c}",
+      "t": "Profile photo",
+      "up": "Upload photo"
+    },
+    "bar": {
+      "msg": "Unsaved changes",
+      "save": "Save",
+      "undo": "Undo"
+    },
+    "basic": {
+      "d": "Display name is required; the rest is optional.",
+      "t": "Basic info"
+    },
+    "bio": {
+      "_": "About",
+      "ph": "A few lines about what you look after"
+    },
+    "ct": {
+      "d": "We send notifications and password reset links to this email.",
+      "t": "Contact"
+    },
+    "dept": {
+      "_": "Department",
+      "ph": "e.g. IT Department"
+    },
+    "email": {
+      "_": "Email",
+      "bad": "Enter a valid email, e.g. name@pmh.com.vn"
+    },
+    "err": {
+      "load": {
+        "d": "The server isn’t responding. Try again in a few minutes.",
+        "t": "Couldn’t load your profile"
+      }
+    },
+    "lang": {
+      "_": "Display language",
+      "en": "English",
+      "vi": "Tiếng Việt"
+    },
+    "name": {
+      "_": "Display name",
+      "req": "Enter a display name"
+    },
+    "phone": {
+      "_": "Phone",
+      "bad": "Use digits, spaces and + only, up to 20 characters."
+    },
+    "pos": {
+      "_": "Job title",
+      "ph": "e.g. IT support engineer"
+    },
+    "pref": {
+      "d": "Due dates and notification times use this time zone.",
+      "t": "Time zone and language"
+    },
+    "pw": {
+      "btn": "Change password",
+      "ok": "Password changed. Use the new one next time you sign in.",
+      "sub": "You’ll stay signed in on this device."
+    },
+    "saved": {
+      "av": "Profile photo saved",
+      "basic": "Basic info saved",
+      "color": "Colour saved",
+      "ct": "Contact info saved",
+      "pref": "Time zone and language saved"
+    },
+    "sec": {
+      "d": "Change it if you think it leaked, or on a regular schedule.",
+      "t": "Password"
+    },
+    "sub": "Teammates see this when assigning work, commenting and handing over tasks.",
+    "title": "My profile",
+    "today": "today",
+    "tz": {
+      "_": "Time zone",
+      "bkk": "GMT+7 · Vietnam, Bangkok",
+      "hcm": "GMT+7 · Ho Chi Minh (legacy)",
+      "sg": "GMT+8 · Singapore",
+      "tyo": "GMT+9 · Tokyo",
+      "utc": "UTC"
+    }
+  },
+  "pfx": {
+    "invalid": "This value isn’t valid.",
+    "lang": {
+      "hint": "Applies right away and is saved in this browser."
+    },
+    "pol": {
+      "loading": "Loading password requirements…"
+    },
+    "tooLong": "This is longer than allowed."
   },
   "pr": {
     "high": "High",

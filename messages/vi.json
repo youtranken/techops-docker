@@ -199,6 +199,40 @@
       "transferred": "Đã chuyển phần việc cho {a}."
     }
   },
+  "au": {
+    "cur": {
+      "_": "Mật khẩu hiện tại",
+      "req": "Nhập mật khẩu hiện tại"
+    },
+    "err": {
+      "cur": "Mật khẩu hiện tại không đúng.",
+      "match": "Hai mật khẩu chưa khớp.",
+      "policy": "Mật khẩu mới chưa đạt đủ yêu cầu bên dưới.",
+      "same": "Mật khẩu mới phải khác mật khẩu hiện tại."
+    },
+    "hide": "Ẩn mật khẩu",
+    "new": {
+      "_": "Mật khẩu mới",
+      "req": "Nhập mật khẩu mới"
+    },
+    "new2": {
+      "_": "Nhập lại mật khẩu mới",
+      "req": "Nhập lại mật khẩu mới"
+    },
+    "pol": {
+      "count": "Đạt {x}/{n} yêu cầu",
+      "len": "Ít nhất {n} ký tự",
+      "low": "Một chữ thường (a–z)",
+      "met": "đã đạt",
+      "num": "Một chữ số (0–9)",
+      "sp": "Một ký tự đặc biệt (! @ # …)",
+      "title": "Mật khẩu mới cần có",
+      "unmet": "chưa đạt",
+      "up": "Một chữ hoa (A–Z)"
+    },
+    "saving": "Đang lưu…",
+    "show": "Hiện mật khẩu"
+  },
   "auth": {
     "forgotPassword": "Quên mật khẩu",
     "login": "Đăng nhập",
@@ -497,11 +531,189 @@
     "today": "Hôm nay",
     "unread": "{n} chưa đọc"
   },
+  "nt": {
+    "cat": {
+      "approval": "Duyệt kế hoạch",
+      "assign": "Giao việc",
+      "comment": "Bình luận",
+      "due": "Nhắc hạn",
+      "ext": "Gia hạn",
+      "review": "Nghiệm thu"
+    },
+    "empty": {
+      "all": {
+        "d": "Khi bạn được giao việc, có việc chờ duyệt hoặc có bình luận mới, thông báo sẽ hiện ở đây.",
+        "t": "Chưa có thông báo nào"
+      },
+      "unread": {
+        "d": "Thông báo mới sẽ hiện ở đây.",
+        "t": "Bạn đã đọc hết thông báo"
+      }
+    },
+    "end": "Đã hiển thị hết thông báo",
+    "err": {
+      "d": "Máy chủ không phản hồi. Thử lại sau ít phút.",
+      "t": "Không tải được thông báo"
+    },
+    "g": {
+      "older": "Cũ hơn",
+      "today": "Hôm nay",
+      "yday": "Hôm qua"
+    },
+    "list": "Danh sách thông báo",
+    "m": {
+      "ALL_FAILED": "Mọi người được giao đều đã từ chối {t}",
+      "COMMENT_ADDED": "{a} nhắc đến bạn trong {t}",
+      "DEADLINE_REMINDER": "{t} đến hạn trong 3 ngày tới",
+      "EXTENSION_APPROVED": "{a} đồng ý gia hạn {t} tới {d}",
+      "EXTENSION_REJECTED": "{a} không đồng ý gia hạn {t}",
+      "EXTENSION_REQUESTED": "{a} xin gia hạn {t} sang {d}",
+      "PLAN_APPROVAL_REQUESTED": "{a} gửi kế hoạch {t} chờ bạn duyệt",
+      "REVIEW_REQUIRED": "{a} báo cáo xong {t}, chờ bạn nghiệm thu",
+      "REVISION_REQUIRED": "{a} yêu cầu làm lại {t}",
+      "TASK_APPROVED": "{a} đã duyệt kế hoạch {t}",
+      "TASK_ASSIGNED": "{a} giao cho bạn {t}",
+      "TASK_COMPLETED": "{t} đã được nghiệm thu và hoàn thành",
+      "TASK_REJECTED": "{a} trả lại kế hoạch {t}",
+      "TRANSFER_RECEIVED": "{a} chuyển giao cho bạn {t}"
+    },
+    "markRead": "Đánh dấu đã đọc",
+    "more": "Xem thông báo cũ hơn",
+    "readAll": "Đánh dấu tất cả đã đọc",
+    "readAllDone": "Đã đánh dấu {n} thông báo là đã đọc",
+    "sub": "{n} thông báo chưa đọc",
+    "subNone": "Bạn đã đọc hết thông báo",
+    "tab": {
+      "all": "Tất cả",
+      "unread": "Chưa đọc"
+    },
+    "title": "Thông báo",
+    "unread": "Chưa đọc"
+  },
+  "ntx": {
+    "allLabel": "Xem tất cả thông báo",
+    "loadMoreErr": "Không tải thêm được thông báo.",
+    "openTask": "Mở công việc {code}",
+    "page": "Trang thông báo"
+  },
   "page": {
     "export": "Xuất Excel",
     "new": "Tạo công việc",
     "sub": "{n} việc đang mở, {m} việc cần bạn xử lý",
     "title": "Công việc"
+  },
+  "pf": {
+    "acc": {
+      "created": "Ngày tạo",
+      "d": "Do Admin quản lý. Cần đổi, hãy liên hệ Admin.",
+      "id": "Mã tài khoản",
+      "role": "Vai trò",
+      "t": "Tài khoản",
+      "user": "Tên đăng nhập"
+    },
+    "av": {
+      "change": "Đổi ảnh",
+      "color": "Màu nền chữ cái",
+      "colorHint": "Dùng khi bạn chưa có ảnh.",
+      "custom": "Màu khác",
+      "d": "Hiện cạnh tên bạn trong danh sách việc, bình luận và thông báo.",
+      "errSize": "Ảnh “{f}” nặng {s}, vượt giới hạn 2 MB. Chọn ảnh nhỏ hơn.",
+      "errType": "Tệp “{f}” không phải ảnh JPG hoặc PNG.",
+      "hint": "JPG hoặc PNG, tối đa 2 MB. Ảnh vuông hiển thị đẹp nhất.",
+      "instant": "Ảnh và màu được lưu ngay khi chọn.",
+      "swatch": "Màu {c}",
+      "t": "Ảnh đại diện",
+      "up": "Tải ảnh lên"
+    },
+    "bar": {
+      "msg": "Có thay đổi chưa lưu",
+      "save": "Lưu",
+      "undo": "Hoàn tác"
+    },
+    "basic": {
+      "d": "Tên hiển thị là bắt buộc, các ô khác có thể để trống.",
+      "t": "Thông tin cơ bản"
+    },
+    "bio": {
+      "_": "Giới thiệu",
+      "ph": "Vài dòng về việc bạn phụ trách"
+    },
+    "ct": {
+      "d": "Email dùng để nhận thông báo và link đặt lại mật khẩu.",
+      "t": "Liên hệ"
+    },
+    "dept": {
+      "_": "Phòng ban",
+      "ph": "Ví dụ: Phòng IT"
+    },
+    "email": {
+      "_": "Email",
+      "bad": "Email chưa đúng định dạng, ví dụ ten@pmh.com.vn"
+    },
+    "err": {
+      "load": {
+        "d": "Máy chủ không phản hồi. Thử lại sau ít phút.",
+        "t": "Không tải được hồ sơ"
+      }
+    },
+    "lang": {
+      "_": "Ngôn ngữ giao diện",
+      "en": "English",
+      "vi": "Tiếng Việt"
+    },
+    "name": {
+      "_": "Tên hiển thị",
+      "req": "Nhập tên hiển thị"
+    },
+    "phone": {
+      "_": "Điện thoại",
+      "bad": "Chỉ gồm chữ số, dấu cách, dấu + và tối đa 20 ký tự."
+    },
+    "pos": {
+      "_": "Chức vụ",
+      "ph": "Ví dụ: Kỹ sư hỗ trợ IT"
+    },
+    "pref": {
+      "d": "Hạn công việc và giờ trong thông báo hiển thị theo múi giờ này.",
+      "t": "Múi giờ và ngôn ngữ"
+    },
+    "pw": {
+      "btn": "Đổi mật khẩu",
+      "ok": "Đã đổi mật khẩu. Lần đăng nhập sau dùng mật khẩu mới.",
+      "sub": "Bạn vẫn đăng nhập trên thiết bị này sau khi đổi."
+    },
+    "saved": {
+      "av": "Đã lưu ảnh đại diện",
+      "basic": "Đã lưu thông tin cơ bản",
+      "color": "Đã lưu màu nền",
+      "ct": "Đã lưu thông tin liên hệ",
+      "pref": "Đã lưu múi giờ và ngôn ngữ"
+    },
+    "sec": {
+      "d": "Đổi mật khẩu khi nghi bị lộ hoặc theo định kỳ.",
+      "t": "Mật khẩu"
+    },
+    "sub": "Đồng nghiệp thấy thông tin này khi giao việc, bình luận và chuyển giao.",
+    "title": "Hồ sơ của tôi",
+    "today": "hôm nay",
+    "tz": {
+      "_": "Múi giờ",
+      "bkk": "GMT+7 · Việt Nam, Bangkok",
+      "hcm": "GMT+7 · Hồ Chí Minh (tên cũ)",
+      "sg": "GMT+8 · Singapore",
+      "tyo": "GMT+9 · Tokyo",
+      "utc": "UTC"
+    }
+  },
+  "pfx": {
+    "invalid": "Giá trị chưa hợp lệ.",
+    "lang": {
+      "hint": "Áp dụng ngay, lưu trên trình duyệt này."
+    },
+    "pol": {
+      "loading": "Đang tải yêu cầu mật khẩu…"
+    },
+    "tooLong": "Dài quá giới hạn cho phép."
   },
   "pr": {
     "high": "Cao",

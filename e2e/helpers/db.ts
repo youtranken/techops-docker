@@ -22,7 +22,10 @@ export const E2E_USERS = {
   admin: { username: 'e2e_admin', displayName: '[E2E] Admin', role: 'ADMIN' },
 } as const;
 
-const usernames = Object.values(E2E_USERS).map((u) => `'${u.username}'`).join(',');
+/** User [E2E] do từng spec tự tạo (vd e2e_pw của notifications-profile-v2) — globalSetup không tạo, teardown vẫn dọn. */
+export const E2E_EXTRA_USERNAMES = ['e2e_pw'];
+
+const usernames = [...Object.values(E2E_USERS).map((u) => u.username), ...E2E_EXTRA_USERNAMES].map((u) => `'${u}'`).join(',');
 
 /** Xoá toàn bộ dữ liệu [E2E]: task do user E2E tạo (cascade assignee/report/comment/audit/view), user
  *  (cascade thông báo + quyền menu SidebarPermission), mức ưu tiên [E2E]. */

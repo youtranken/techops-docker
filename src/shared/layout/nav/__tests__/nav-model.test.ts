@@ -131,6 +131,7 @@ describe('buildCrumbs — breadcrumb từ pathname', () => {
     ['/settings/priorities', null, [{ label: 'nav.settings' }, { label: 'nav.sub.priorities' }]],
     ['/settings/general', null, [{ label: 'nav.settings' }, { label: 'nav.sub.general' }]],
     ['/settings/profile', null, [{ label: 'nav.settings' }, { label: 'top.profile' }]],
+    ['/notifications', null, [{ label: 'nt.title' }]],
     ['/khong-ton-tai', null, [{ label: 'er.crumb' }]],
     ['/tasks/ck1/la', null, [{ label: 'nav.tasks', href: '/tasks' }]],
   ])('%s ?view=%s', (path, view, want) => {

@@ -226,6 +226,15 @@ const vi = {
   'tfx.sum.dirty': 'Có thay đổi chưa lưu',
   'tfx.editOf': 'Sửa {id}',
   'tfx.ed.hr': 'Đường kẻ ngang',
+  // ── A3-2 Thông báo + Hồ sơ ──
+  'ntx.page': 'Trang thông báo',
+  'ntx.allLabel': 'Xem tất cả thông báo',
+  'ntx.openTask': 'Mở công việc {code}',
+  'ntx.loadMoreErr': 'Không tải thêm được thông báo.',
+  'pfx.tooLong': 'Dài quá giới hạn cho phép.',
+  'pfx.invalid': 'Giá trị chưa hợp lệ.',
+  'pfx.lang.hint': 'Áp dụng ngay, lưu trên trình duyệt này.',
+  'pfx.pol.loading': 'Đang tải yêu cầu mật khẩu…',
 };
 
 const en = {
@@ -444,6 +453,15 @@ const en = {
   'tfx.sum.dirty': 'Unsaved changes',
   'tfx.editOf': 'Edit {id}',
   'tfx.ed.hr': 'Horizontal line',
+  // ── A3-2 Notifications + profile ──
+  'ntx.page': 'Notifications page',
+  'ntx.allLabel': 'See all notifications',
+  'ntx.openTask': 'Open task {code}',
+  'ntx.loadMoreErr': 'Couldn’t load more notifications.',
+  'pfx.tooLong': 'This is longer than allowed.',
+  'pfx.invalid': 'This value isn’t valid.',
+  'pfx.lang.hint': 'Applies right away and is saved in this browser.',
+  'pfx.pol.loading': 'Loading password requirements…',
 };
 
 export const EXTRA = { vi, en };
