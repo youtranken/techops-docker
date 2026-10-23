@@ -5,6 +5,7 @@ import { QueryProvider } from '@/shared/providers/QueryProvider';
 import { ThemeProvider } from '@/shared/providers/ThemeProvider';
 import { IdleTimeoutProvider } from '@/shared/providers/IdleTimeoutProvider';
 import { DashboardShell } from '@/shared/layout/DashboardShell';
+import { ConfirmProvider } from '@/shared/ui/ConfirmDialog';
 
 export default async function DashboardLayout({
   children,
@@ -22,12 +23,14 @@ export default async function DashboardLayout({
       <QueryProvider>
         <ThemeProvider>
           <IdleTimeoutProvider>
-            <DashboardShell
-              displayName={session.user.displayName}
-              roleName={session.user.role.name}
-            >
-              {children}
-            </DashboardShell>
+            <ConfirmProvider>
+              <DashboardShell
+                displayName={session.user.displayName}
+                roleName={session.user.role.name}
+              >
+                {children}
+              </DashboardShell>
+            </ConfirmProvider>
           </IdleTimeoutProvider>
         </ThemeProvider>
       </QueryProvider>

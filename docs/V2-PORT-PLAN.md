@@ -111,6 +111,7 @@ Lý do: build Docker trên Windows rất lâu.
 **Tiến độ:**
 - A0 xong.
 - A1-1 (token màu + font + theme) xong 23/10. Thay đổi nhìn thấy còn nhỏ vì các màn vẫn viết cứng ~1.100 lớp màu; sẽ ra tông V2 khi làm A1-4 và A2/A3.
+- A1-2 (bộ component dùng chung) xong 23/10, nhánh `feat/v2-a1-components`: `src/shared/ui` (StatusDot, PriorityFlag, DueText, Block/Card, KvGrid, SummaryBar, DataTable, Pagination, EmptyState/ErrorState/Skeleton, ConfirmDialog `useConfirm`, StickySaveBar, QuickMenu, FilterChip; nhãn/màu trạng thái ở `status-meta.ts`) + `components/ui` (Button/Badge thêm biến thể, Tabs gạch chân, Segmented). Bỏ 3 `window.confirm` ở Cài đặt. Trang demo dev `/dev/ui` (404 ở production).
 
 ---
 

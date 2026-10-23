@@ -18,12 +18,28 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary-text underline-offset-4 hover:underline",
+        /* ---- V2 (preview .btn-*) — thêm mới, không đổi các biến thể cũ ---- */
+        danger:
+          "bg-danger-fill text-danger-ink hover:bg-danger-fill-hover",
+        /** Chữ ink-2, không viền (preview .btn-ghost) */
+        subtle:
+          "bg-transparent text-ink-2 hover:bg-surface-2 hover:text-ink",
+        /** Nút phụ cho hành động tiêu cực: viền thường, hover đỏ (preview .btn-neg) */
+        neg:
+          "border border-line bg-surface text-ink hover:border-danger hover:text-danger",
+        /** Nền primary-soft, chữ màu chính */
+        soft:
+          "bg-primary-soft text-primary-text hover:bg-primary-soft/70",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
+        /* ---- V2: 36 / 32 theo preview ---- */
+        md: "h-9 px-3.5",
+        xs: "h-8 rounded-md px-3 text-[13px] gap-1.5",
+        "icon-sm": "h-8 w-8",
       },
     },
     defaultVariants: {
