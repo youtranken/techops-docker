@@ -35,7 +35,7 @@ export function DraftList({ userId, drafts, onOpen }: { userId: string; drafts: 
     <div data-testid="draft-list">
       <p className="mb-3 flex items-center gap-2 text-[13px] text-ink-2">
         <Info aria-hidden className="size-4 flex-none text-ink-3" />
-        <span>{t('dr.local')}. {t('app.phaseB.d')}.</span>
+        <span>{t('dr.local')}.</span>
       </p>
       {drafts.length === 0 ? (
         <div className="rounded-card border border-line bg-surface">

@@ -1,11 +1,13 @@
 'use client';
 
-/** Nhãn nhỏ "Phase B" (preview `.phase-b` / `App.phaseB()`): phần V1 chưa có backend. Viền nét đứt, chữ mono in hoa, không nền. */
+/** Nhãn nhỏ "Phase B" (preview `.phase-b` / `App.phaseB()`): phần V1 chưa có backend. Viền nét đứt, chữ mono in hoa, không nền.
+ *  Chỉ là dấu cho người phát triển — bản production không hiện. */
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export function PhaseBBadge({ className }: { className?: string }) {
   const t = useTranslations();
+  if (process.env.NODE_ENV === 'production') return null;
   return (
     <span
       title={t('app.phaseB.d')}
