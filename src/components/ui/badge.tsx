@@ -15,6 +15,13 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
+        /* ---- V2 ---- */
+        /** Nhãn mã/phiên bản (preview .chip): viền, chữ mono 12px, bo 6 */
+        chip: "h-6 gap-1 rounded-sm border-line px-2 py-0 font-mono text-xs font-medium text-ink-2",
+        /** Nền nhạt màu chính */
+        soft: "border-transparent bg-primary-soft text-primary-text",
+        /** Nhãn Phase B: viền nét đứt, mono 10px in hoa, không nền */
+        phase: "rounded-sm border-dashed border-line-2 px-1.5 py-0 font-mono text-[10px] font-medium uppercase tracking-wide text-ink-3",
       },
     },
     defaultVariants: {

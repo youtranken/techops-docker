@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useConfirm } from '@/shared/ui/ConfirmDialog';
 import { useTaskTypes, useCreateTaskType, useUpdateTaskType, useDeleteTaskType, type TaskType } from '../hooks/useTaskTypes';
 import { TaskTypeIcon } from './TaskTypeIcon';
 import { TaskTypeForm } from './TaskTypeForm';
@@ -15,6 +16,7 @@ export function TaskTypesSection() {
   const create = useCreateTaskType();
   const update = useUpdateTaskType();
   const remove = useDeleteTaskType();
+  const confirm = useConfirm();
   const [showCreate, setShowCreate] = useState(false);
   const [editing, setEditing] = useState<TaskType | null>(null);
 
@@ -40,7 +42,13 @@ export function TaskTypesSection() {
   }
 
   async function handleDelete(t: TaskType) {
-    if (!confirm(`Xóa loại "${t.name}"?`)) return;
+    const ok = await confirm({
+      title: `Xóa loại "${t.name}"?`,
+      description: 'Thao tác này không hoàn tác được.',
+      confirmText: 'Xóa',
+      danger: true,
+    });
+    if (!ok) return;
     try { await remove.mutateAsync(t.id); } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Không thể xóa — đang được sử dụng');
     }

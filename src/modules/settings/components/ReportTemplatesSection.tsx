@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { useConfirm } from '@/shared/ui/ConfirmDialog';
 import {
   useReportTemplates,
   useCreateReportTemplate,
@@ -119,6 +120,7 @@ export function ReportTemplatesSection() {
   const create = useCreateReportTemplate();
   const update = useUpdateReportTemplate();
   const remove = useDeleteReportTemplate();
+  const confirm = useConfirm();
   const [showCreate, setShowCreate] = useState(false);
   const [editing, setEditing] = useState<ReportTemplate | null>(null);
 
@@ -154,7 +156,13 @@ export function ReportTemplatesSection() {
   }
 
   async function handleDelete(t: ReportTemplate) {
-    if (!confirm(`Xóa mẫu "${t.title}"?`)) return;
+    const ok = await confirm({
+      title: `Xóa mẫu "${t.title}"?`,
+      description: 'Thao tác này không hoàn tác được.',
+      confirmText: 'Xóa',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await remove.mutateAsync(t.id);
       toast.success('Đã xóa');

@@ -23,7 +23,7 @@ export const E2E_USERS = {
 
 const usernames = Object.values(E2E_USERS).map((u) => `'${u.username}'`).join(',');
 
-/** Xoá toàn bộ dữ liệu [E2E]: task do user E2E tạo (cascade assignee/report/comment/audit/view), rồi user. */
+/** Xoá toàn bộ dữ liệu [E2E]: task do user E2E tạo (cascade assignee/report/comment/audit/view), user, mức ưu tiên [E2E]. */
 export function cleanupE2E() {
   psql(`
     DELETE FROM "Task" WHERE "creatorId" IN (SELECT id FROM "User" WHERE username IN (${usernames}))
@@ -31,5 +31,8 @@ export function cleanupE2E() {
     DELETE FROM "TaskAuditLog" WHERE "performedById" IN (SELECT id FROM "User" WHERE username IN (${usernames}));
     DELETE FROM "UserActivityLog" WHERE "userId" IN (SELECT id FROM "User" WHERE username IN (${usernames}));
     DELETE FROM "User" WHERE username IN (${usernames});
+    -- mức ưu tiên tạo trong E2E (chưa gắn task nào)
+    DELETE FROM "Priority" WHERE name LIKE '[E2E]%'
+      AND NOT EXISTS (SELECT 1 FROM "Task" t WHERE t."priorityId" = "Priority".id);
   `);
 }

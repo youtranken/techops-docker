@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useConfirm } from '@/shared/ui/ConfirmDialog';
 import { usePriorities, useCreatePriority, useUpdatePriority, useDeletePriority, type Priority } from '../hooks/usePriorities';
 import { PriorityForm } from './PriorityForm';
 
@@ -15,6 +16,7 @@ export function PrioritiesSection() {
   const create = useCreatePriority();
   const update = useUpdatePriority();
   const remove = useDeletePriority();
+  const confirm = useConfirm();
   const [showCreate, setShowCreate] = useState(false);
   const [editing, setEditing] = useState<Priority | null>(null);
 
@@ -40,7 +42,13 @@ export function PrioritiesSection() {
   }
 
   async function handleDelete(p: Priority) {
-    if (!confirm(`Xóa ưu tiên "${p.name}"?`)) return;
+    const ok = await confirm({
+      title: `Xóa ưu tiên "${p.name}"?`,
+      description: 'Thao tác này không hoàn tác được.',
+      confirmText: 'Xóa',
+      danger: true,
+    });
+    if (!ok) return;
     try { await remove.mutateAsync(p.id); } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Không thể xóa — đang được sử dụng');
     }
@@ -82,8 +90,8 @@ export function PrioritiesSection() {
                 <TableCell className="text-muted-foreground">{p._count?.tasks ?? 0}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditing(p)}><Pencil className="h-3.5 w-3.5" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(p)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" aria-label={`Sửa ${p.name}`} onClick={() => setEditing(p)}><Pencil className="h-3.5 w-3.5" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label={`Xóa ${p.name}`} onClick={() => handleDelete(p)}><Trash2 className="h-3.5 w-3.5" /></Button>
                   </div>
                 </TableCell>
               </TableRow>
