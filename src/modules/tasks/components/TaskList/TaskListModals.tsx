@@ -8,7 +8,7 @@ import { ReasonModal } from '../../actions/components/modals/ReasonModal';
 import { RejectReviewModal } from '../../actions/components/modals/RejectReviewModal';
 import { RequestExtensionModal } from '../../actions/components/modals/RequestExtensionModal';
 import { ApproveExtensionModal } from '../../actions/components/modals/ApproveExtensionModal';
-import { TaskQuickViewSheet } from '../TaskQuickView/TaskQuickViewSheet';
+import { TaskDetailDrawer } from '../TaskDetail/TaskDetailDrawer';
 import type { TaskListItem } from '../../services/task-query.service';
 import { useCompleteTask } from '../../actions/hooks/useCompleteTask';
 import { useTransferTask } from '../../actions/hooks/useTransferTask';
@@ -88,12 +88,12 @@ export function TaskListModals({
       <CreateTaskSheet open={showCreate} onClose={() => setShowCreate(false)} />
       <EditTaskModal taskId={editingTask} onClose={() => setEditingTask(null)} />
 
-      <TaskQuickViewSheet
-        open={!!quickViewTaskId}
-        onOpenChange={(open) => { if (!open) setQuickViewTaskId(null); }}
-        taskId={quickViewTaskId ?? ''}
-        currentUserId={currentUserId}
-        role={role}
+      {/* V2 A2-1: ngăn xem nhanh mới (‹ › theo thứ tự danh sách đang hiển thị) */}
+      <TaskDetailDrawer
+        taskId={quickViewTaskId}
+        ids={tasks.map((t) => t.id)}
+        onNavigate={setQuickViewTaskId}
+        onClose={() => setQuickViewTaskId(null)}
       />
 
       <CompleteTaskModal

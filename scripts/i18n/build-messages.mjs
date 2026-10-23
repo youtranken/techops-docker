@@ -33,11 +33,18 @@ export const INCLUDE = {
     'app', 'top', 'nav', 'st', 'pr', 'due', 'act', 'qa', 'role', 'filter', 'view', 'page', 'empty', 'notif', 'ago',
     'er', // trang/toast lỗi chung
     'idle', 'lang', 'card', 'lane', 'flow', 'n',
+    'td', // A2-1 chi tiết công việc (trang + ngăn xem nhanh)
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
     'td.as.', // trạng thái người làm (StatusDot kind="assignee")
     'tl.pg.', // phân trang (Pagination)
+    'dnd.reported', // A2-1: "x/n đã báo cáo" ở khối Kết quả của người làm
+  ],
+  /** Bỏ các khoá theo tiền tố: điều khiển của trang preview, tính năng Phase B */
+  exclude: [
+    'td.pv.', // thanh điều khiển preview
+    'td.cm.lock', // khoá bình luận khi xong/hủy — Phase B
   ],
 };
 
@@ -62,12 +69,13 @@ export function loadCopyDictionary(copyPath = DEFAULT_COPY) {
 /**
  * Lọc khoá theo nhóm (đoạn đầu khớp đúng) hoặc tiền tố đầy đủ.
  * @param {Record<string, string>} flat
- * @param {{ groups?: string[], prefixes?: string[] }} [opts]
+ * @param {{ groups?: string[], prefixes?: string[], exclude?: string[] }} [opts]
  */
-export function selectKeys(flat, { groups = [], prefixes = [] } = {}) {
+export function selectKeys(flat, { groups = [], prefixes = [], exclude = [] } = {}) {
   const g = new Set(groups);
   const out = {};
   for (const k of Object.keys(flat)) {
+    if (exclude.some((p) => k.startsWith(p))) continue;
     if (g.has(k.split(SEP)[0]) || prefixes.some((p) => k.startsWith(p))) out[k] = flat[k];
   }
   return out;

@@ -21,7 +21,7 @@ export * from './hooks/useExtensions';
 // Components — buttons
 export { ActionButton } from './components/buttons/ActionButton';
 export { TaskActionButtons } from './components/buttons/TaskActionButtons';
-export { TaskActionPanel } from './components/buttons/TaskActionPanel';
+export { TaskActionPanel, TaskActionModals } from './components/buttons/TaskActionPanel';
 
 // Components — modals
 export { ConfirmActionModal } from './components/modals/ConfirmActionModal';

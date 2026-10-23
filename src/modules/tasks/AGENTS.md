@@ -51,12 +51,11 @@ tasks/
   components/
     TaskList/                     # Danh sách task
     TaskCard/                     # Card task (trong list)
-    TaskDetail/                   # Chi tiết task
+    TaskDetail/                   # Chi tiết task V2 — DÙNG CHUNG cho trang /tasks/[id] (TaskDetailPage) và ngăn xem nhanh (TaskDetailDrawer)
     TaskModals/                   # Các modal (tạo, sửa, xóa, v.v.)
     ActionModals/                 # Modals cho các action workflow
     action-buttons/               # Nút hành động theo trạng thái
     Comments/                     # Bình luận
-    TaskQuickView/                # Xem nhanh task (panel)
 
   config/
     taskActionMatrix.ts           # Ma trận: role + status → actions được phép
@@ -116,9 +115,9 @@ Xem `config/taskActionMatrix.ts` — đây là nguồn sự thật duy nhất ch
 - Hiển thị monospace (`font-mono`) trên card và quick view
 - Task từ Helpdesk hiển thị riêng: `HD-{hdCode}` (không phải `taskCode`)
 
-## WorkflowTimeline component
+## Chi tiết công việc V2 (A2-1)
 
-- File: `components/TaskQuickView/WorkflowTimeline.tsx`
-- Dùng chung cho Quick View (compact=true) và Detail (compact=false)
-- IMMEDIATE: 3 bước — Đang thực hiện → Chờ review → Hoàn thành
-- NEED_APPROVAL: 5 bước — Chờ duyệt KH → Chờ tiếp nhận → Đang TH → Chờ review → Hoàn thành
+- `components/TaskDetail/`: `TaskDetailPage` (trang), `TaskDetailDrawer` (ngăn xem nhanh, thay TaskQuickView V1; nhận `ids` để bật ‹ ›), `TaskDetailLoader` (đang tải / 404 / 403 / lỗi mạng).
+- Logic hiển thị thuần + test: `detail-logic.ts` — `buildJourney` (Hành trình), `taskHolder` ("Đang ở chỗ ai · bao lâu"), `detailActions`/`viewerTurn` (nút + "Đến lượt bạn…", CHỈ đọc cờ của `useTaskPermissions`), `drawerNav`, `assigneeNote`.
+- Hành trình: Phê duyệt 5 bước (Chờ duyệt → Chờ nhận việc → Đang làm → Chờ nghiệm thu → Đã xong); Trực tiếp 3 bước (Chờ nhận việc → Đang làm → Đã xong) theo service V1. Ngày mỗi bước lấy từ `TaskAuditLog`.
+- Nút bấm mở đúng hộp thoại V1 qua `TaskActionModals` (tách từ `TaskActionPanel`, chung state `useTaskActionPanel`).

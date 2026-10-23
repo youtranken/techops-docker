@@ -234,6 +234,9 @@
     "search": "Tìm kiếm",
     "success": "Thành công"
   },
+  "dnd": {
+    "reported": "{x}/{n} đã báo cáo"
+  },
   "due": {
     "doneOnTime": "Xong đúng hạn",
     "in": "Còn {n} ngày",
@@ -489,6 +492,18 @@
     "type": "Loại công việc"
   },
   "td": {
+    "actions": "Hành động",
+    "addFile": "Thêm tệp",
+    "af": {
+      "admin": "Bấm Giao lại để chọn người khác; việc sẽ quay về Chờ nhận việc.",
+      "boss": "Admin có thể giao lại cho người khác. {a} (người tạo) đã được báo.",
+      "creator": "Bạn là người tạo nên có thể hủy việc này. Nút Giao lại chỉ Admin có.",
+      "holder": "Không còn ai làm, đang chờ giao lại hoặc hủy",
+      "other": "{a} (người tạo) đã được báo.",
+      "t": "Mọi người được giao đều đã từ chối hoặc chuyển đi"
+    },
+    "allReports": "Xem cả {n} báo cáo",
+    "andN": "{a} và {n} người khác",
     "as": {
       "ACCEPTED": "Đã nhận",
       "COMPLETED": "Đã báo cáo",
@@ -500,7 +515,187 @@
       "REVISION_REQUIRED": "Cần làm lại",
       "REWORK": "Cần làm lại",
       "TRANSFERRED": "Đã chuyển giao"
-    }
+    },
+    "assignees": "Người làm",
+    "at": "Đang ở chỗ {a} · {n} ngày",
+    "atNow": "Vừa chuyển đến {a}",
+    "atYou": "Đang ở chỗ bạn · {n} ngày",
+    "back": "Quay lại",
+    "backList": "Về danh sách công việc",
+    "byCancel": "Do công việc bị hủy",
+    "cancelReason": "Lý do hủy",
+    "cancelledOn": "Đã hủy ngày {d}",
+    "closed": "Hoàn tất ngày {d}",
+    "cm": {
+      "all": "Xem cả {n} bình luận",
+      "del": "Xóa",
+      "delOther": "Xóa bình luận (quyền Admin)",
+      "edit": "Sửa",
+      "edited": "đã sửa",
+      "empty": "Chưa có bình luận.",
+      "hint": "Gõ @ để nhắc tên",
+      "label": "Bình luận",
+      "mention": "Gợi ý nhắc tên",
+      "save": "Lưu",
+      "send": "Gửi",
+      "write": "Viết bình luận…"
+    },
+    "created": "Ngày tạo",
+    "creator": "Người tạo",
+    "declineWhy": "Lý do từ chối",
+    "desc": "Mô tả",
+    "descEmpty": "Chưa có mô tả.",
+    "detail": "Chi tiết công việc",
+    "download": "Tải xuống {f}",
+    "due": "Hạn",
+    "ext": {
+      "auto": "Tự động từ chối vì việc đã kết thúc.",
+      "empty": "Chưa có đơn gia hạn nào.",
+      "reply": "Phản hồi của {a}",
+      "rules": "Tối đa 2 đơn chờ cùng lúc, tổng 5 lần mỗi việc.",
+      "st": {
+        "APPROVED": "Đã duyệt",
+        "PENDING": "Chờ duyệt",
+        "REJECTED": "Từ chối",
+        "WITHDRAWN": "Đã rút"
+      },
+      "to": "Xin dời hạn {a} → {b}",
+      "wd": "Người xin đã tự rút đơn.",
+      "withdraw": "Rút đơn"
+    },
+    "extUsed": "Đã xin gia hạn {n}/5",
+    "extra": "Thông tin thêm",
+    "files": "Tệp đính kèm",
+    "force": "Bắt buộc",
+    "fromPerson": "Nhận chuyển giao từ {a}",
+    "h": {
+      "accepted": "{a} nhận việc",
+      "allFailed": "Mọi người được giao đã từ chối, đã báo {b}",
+      "approved": "{a} duyệt kế hoạch",
+      "cancelled": "{a} hủy công việc",
+      "created": "{a} tạo công việc",
+      "declined": "{a} từ chối nhận việc",
+      "extNo": "{a} từ chối đơn gia hạn của {b}",
+      "extOk": "{a} duyệt gia hạn đến {d}",
+      "extReq": "{a} xin gia hạn đến {d}",
+      "extWd": "{a} rút đơn gia hạn",
+      "files": "{a} thêm {n} tệp",
+      "reassigned": "{a} giao lại cho {n}",
+      "rejected": "{a} từ chối kế hoạch",
+      "reported": "{a} gửi báo cáo {v}",
+      "restored": "{a} khôi phục công việc",
+      "returned": "{a} từ chối, phần việc quay lại {b}",
+      "reviewed": "{a} nghiệm thu công việc",
+      "rework": "{a} yêu cầu {b} làm lại",
+      "starOff": "{a} bỏ đánh dấu quan trọng",
+      "starOn": "{a} đánh dấu quan trọng",
+      "supplemented": "{a} bổ sung báo cáo {v}",
+      "transferred": "{a} chuyển phần việc cho {b}"
+    },
+    "hist": {
+      "empty": "Chưa có hoạt động."
+    },
+    "info": "Thông tin",
+    "infoToggle": "Thông tin công việc",
+    "journey": "Hành trình",
+    "less": "Thu gọn",
+    "mode": {
+      "_": "Chế độ",
+      "approval": "Phê duyệt",
+      "direct": "Trực tiếp"
+    },
+    "more": "Xem toàn bộ",
+    "na": {
+      "d": "Nhân viên chỉ thấy việc mình tạo và việc mình được giao (trừ khi việc đang Chờ duyệt). Nhờ Vice Manager hoặc Admin thêm bạn vào việc nếu cần xem.",
+      "t": "Bạn không có quyền xem công việc này"
+    },
+    "ne": {
+      "d": "Mất kết nối tới máy chủ. Kiểm tra mạng rồi thử lại.",
+      "t": "Không tải được công việc"
+    },
+    "next": "Việc sau",
+    "nf": {
+      "d": "Mã có thể bị gõ sai, hoặc công việc đã bị xóa khỏi hệ thống.",
+      "t": "Không tìm thấy công việc {id}"
+    },
+    "noFiles": "Chưa có tệp nào.",
+    "noReason": "(Không ghi lý do)",
+    "noReport": "Chưa báo cáo",
+    "openFull": "Mở trang đầy đủ",
+    "openTicket": "Mở phiếu Helpdesk",
+    "pos": "Việc {i} trên {n}",
+    "pplN": "{n} người",
+    "prev": "Việc trước",
+    "priority": "Ưu tiên",
+    "reassigned": "Được giao lại",
+    "rejectReason": "Lý do từ chối kế hoạch",
+    "report": "Báo cáo",
+    "reportOf": "Báo cáo của {a}",
+    "requester": "Người yêu cầu",
+    "results": "Kết quả của người làm",
+    "reworkThis": "Yêu cầu {a} làm lại",
+    "reworkWhy": "Lý do làm lại",
+    "sections": "Trao đổi và lịch sử",
+    "source": "Nguồn Helpdesk",
+    "status": "Trạng thái",
+    "stepOf": "Bước {i}/{n}",
+    "sum": "Tóm tắt công việc",
+    "tab": {
+      "cm": "Bình luận",
+      "ext": "Gia hạn",
+      "hist": "Lịch sử"
+    },
+    "taskId": "Mã công việc",
+    "ticket": "Phiếu",
+    "toPerson": "Đã chuyển cho {a}",
+    "turn": {
+      "accept": "Đến lượt bạn nhận việc",
+      "approve": "Đến lượt bạn duyệt",
+      "days": "đang chờ {n} ngày",
+      "new": "vừa đến lượt",
+      "reassign": "Mọi người đã từ chối, đến lượt bạn giao lại",
+      "report": "Đến lượt bạn báo cáo kết quả",
+      "restore": "Bạn có thể khôi phục việc này",
+      "review": "Đến lượt bạn nghiệm thu",
+      "supplement": "Bạn có thể bổ sung báo cáo"
+    },
+    "type": "Loại",
+    "version": "Phiên bản",
+    "viewReport": "Xem báo cáo",
+    "wait": {
+      "CANCELLED": "Việc đã hủy.",
+      "COMPLETED": "Việc đã xong.",
+      "DRAFT": "Việc đang ở dạng nháp.",
+      "IN_PROGRESS": "Người làm đang thực hiện.",
+      "PENDING_APPROVAL": "Đang chờ Vice Manager hoặc Admin duyệt kế hoạch.",
+      "PENDING_REVIEW": "Đang chờ Vice Manager hoặc Admin nghiệm thu.",
+      "WAITING_ACKNOWLEDGE": "Đang chờ người làm nhận việc.",
+      "reported": "Bạn đã báo cáo, đang chờ người khác."
+    },
+    "you": "Bạn",
+    "yourTurn": "Đến lượt bạn"
+  },
+  "tdx": {
+    "cm": {
+      "cancel": "Hủy sửa",
+      "cancelReply": "Bỏ trả lời",
+      "deleted": "Bình luận đã bị xóa",
+      "reply": "Trả lời",
+      "replyTo": "Trả lời @{a}…",
+      "sendHint": "Ctrl+Enter để gửi"
+    },
+    "dept": "Phòng ban",
+    "doneAt": "Hoàn thành lúc",
+    "ext": {
+      "date": "Xin gia hạn đến {d}",
+      "review": "Xem xét"
+    },
+    "nf": {
+      "d": "Công việc có thể đã bị xóa, hoặc bạn không có quyền xem."
+    },
+    "processing": "Đang xử lý…",
+    "start": "Ngày bắt đầu",
+    "view": "Xem"
   },
   "tl": {
     "pg": {

@@ -309,3 +309,16 @@
     height: calc(100% + var(--content-pt, 24px) + var(--content-pb, 24px));
   }
 }
+
+/* ===================== Chi tiết công việc V2 (A2-1) =====================
+ * Ngăn xem nhanh tối: nền/khối sáng hơn trang một bậc (preview `html[data-theme=dark] .dr`).
+ */
+@layer components {
+  .dark .v2-drawer {
+    --canvas: #171B21;
+    --surface: #1E232B;
+    --surface-2: #262C35;
+    --line: #323944;
+    border-left: 1px solid var(--line-2);
+  }
+}
