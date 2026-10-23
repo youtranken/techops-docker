@@ -362,3 +362,21 @@
     .v2-db-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "act" "due" "perf" "st" "pr" "rec" "cm"; gap: 12px; }
   }
 }
+
+/* ===================== Nhân sự V2 (A3-4) =====================
+ * Bảng `.v2-people` (hr/users/components/People/PeopleTable.tsx) theo preview people: khoảng cột 16;
+ * ≤680 dòng 2 tầng, ô chọn + nút ⋯ đặt tuyệt đối ở hai mép (chừa lề trái/phải).
+ */
+@layer components {
+  .v2-people .v2-thead,
+  .v2-people .v2-tr { column-gap: 16px; }
+  @media (max-width: 1023px) {
+    .v2-people .v2-thead,
+    .v2-people .v2-tr { padding: 0 12px 0 16px; }
+  }
+  @media (max-width: 680px) {
+    .v2-people .v2-tr { padding: 12px 48px 12px 16px; row-gap: 4px; }
+    .v2-people.is-sel-on .v2-tr { padding-left: 52px; }
+    .v2-people .v2-td[data-m="end"] { margin-left: 0; }
+  }
+}

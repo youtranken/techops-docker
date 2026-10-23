@@ -2,6 +2,8 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { toApiError } from '@/lib/errors';
+import { useTranslations } from 'next-intl';
 import { useErrorMessage } from '@/lib/useErrorMessage';
 
 export type BulkActionType = 'deactivate' | 'activate' | 'changeRole' | 'forceChangePassword';
@@ -20,19 +22,21 @@ async function executeBulkAction(payload: BulkActionPayload): Promise<{ affected
   });
   const body = await res.json();
   if (!res.ok) {
-    throw new Error(body?.error?.message ?? 'Thao tác thất bại');
+    throw toApiError(body, 'Thao tác thất bại', res.status);
   }
   return body.data as { affected: number };
 }
 
-const ACTION_LABELS: Record<BulkActionType, string> = {
-  deactivate: 'Vô hiệu hóa',
-  activate: 'Kích hoạt lại',
-  changeRole: 'Đổi vai trò',
-  forceChangePassword: 'Bắt buộc đổi mật khẩu',
+/** Câu báo thành công (song ngữ, A3-4) */
+const DONE_KEYS: Record<BulkActionType, string> = {
+  deactivate: 'ppx.t.bulk.deactivate',
+  activate: 'ppx.t.bulk.activate',
+  changeRole: 'ppx.t.bulk.changeRole',
+  forceChangePassword: 'ppx.t.bulk.forceChangePassword',
 };
 
 export function useBulkAction(onSuccess?: () => void) {
+  const t = useTranslations();
   const errMsg = useErrorMessage();
   const queryClient = useQueryClient();
 
@@ -40,8 +44,7 @@ export function useBulkAction(onSuccess?: () => void) {
     mutationFn: executeBulkAction,
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['hr', 'users'] });
-      const label = ACTION_LABELS[variables.action] ?? 'Thao tác';
-      toast.success(`${label} ${data.affected} người dùng thành công`);
+      toast.success(t(DONE_KEYS[variables.action], { n: data.affected }));
       onSuccess?.();
     },
     onError: (err) => {

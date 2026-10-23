@@ -10,6 +10,4 @@ export * from './hooks/useActivateUser';
 export * from './hooks/useDeleteUser';
 export * from './hooks/useRoles';
 export * from './hooks/useBulkAction';
-export * from './components/UserTable';
-export * from './components/CreateUserModal';
-export * from './components/EditUserModal';
+export * from './components/People/PeoplePage';

@@ -814,6 +814,547 @@
     },
     "tooLong": "Dài quá giới hạn cho phép."
   },
+  "pp": {
+    "a": {
+      "CREATE_USER": "Tạo tài khoản",
+      "DEACTIVATE_USER": "Khoá tài khoản",
+      "LOGIN": "Đăng nhập",
+      "LOGIN_FAILED": "Đăng nhập thất bại",
+      "PASSWORD_CHANGED_SELF": "Tự đổi mật khẩu",
+      "PASSWORD_RESET_REQUESTED": "Gửi link thiết lập mật khẩu",
+      "RESET_PASSWORD": "Đặt lại mật khẩu",
+      "UPDATE_USER": "Cập nhật thông tin"
+    },
+    "act": {
+      "ACKNOWLEDGE": "Nhận việc",
+      "APPROVE": "Duyệt, nghiệm thu",
+      "APPROVE_EXTENSION": "Duyệt gia hạn",
+      "CANCEL": "Huỷ công việc",
+      "COMPLETE": "Báo cáo xong",
+      "DELETE": "Xoá",
+      "EDIT": "Sửa",
+      "REASSIGN": "Giao lại người làm",
+      "REJECT": "Từ chối nhận",
+      "REJECT_REVIEW": "Yêu cầu làm lại",
+      "REQUEST_EXTENSION": "Xin gia hạn",
+      "TOGGLE_FORCE_MODE": "Bật, tắt chế độ Bắt buộc",
+      "TRANSFER": "Chuyển giao",
+      "VIEW": "Xem",
+      "WITHDRAW_EXTENSION": "Rút đơn gia hạn"
+    },
+    "ad": {
+      "ACKNOWLEDGE": "Xác nhận nhận việc được giao",
+      "APPROVE": "Duyệt việc mới hoặc nghiệm thu kết quả",
+      "APPROVE_EXTENSION": "Chấp nhận hoặc từ chối đơn gia hạn",
+      "CANCEL": "Dừng công việc, kèm lý do",
+      "COMPLETE": "Gửi kết quả để nghiệm thu",
+      "DELETE": "Xoá công việc nháp",
+      "EDIT": "Sửa tiêu đề, mô tả, hạn",
+      "REASSIGN": "Đổi người làm",
+      "REJECT": "Trả lại việc, kèm lý do",
+      "REJECT_REVIEW": "Trả kết quả để làm lại",
+      "REQUEST_EXTENSION": "Xin thêm thời gian, kèm lý do",
+      "TOGGLE_FORCE_MODE": "Buộc người làm nhận, không được từ chối",
+      "TRANSFER": "Chuyển việc cho người khác",
+      "VIEW": "Mở và đọc công việc",
+      "WITHDRAW_EXTENSION": "Huỷ đơn gia hạn đã gửi"
+    },
+    "back": "Danh sách",
+    "bulk": {
+      "clear": "Bỏ chọn",
+      "force": "Bắt buộc đổi mật khẩu",
+      "label": "Thao tác hàng loạt",
+      "lock": "Khoá tài khoản",
+      "n": "Đã chọn {n} người",
+      "role": "Đổi vai trò",
+      "unlock": "Mở khoá"
+    },
+    "c": {
+      "how": "Cách đặt mật khẩu",
+      "mc": "Bắt buộc đổi mật khẩu ở lần đăng nhập đầu",
+      "ok": "Tạo người dùng",
+      "okLink": "Tạo và gửi link",
+      "title": "Tạo người dùng",
+      "wLink": "Gửi link thiết lập qua email",
+      "wLinkD": "Người dùng tự đặt mật khẩu, link hiệu lực 24 giờ, phải đổi lại ở lần đăng nhập đầu. Cần email.",
+      "wPw": "Đặt mật khẩu ngay",
+      "wPwD": "Bạn đặt mật khẩu và gửi cho người dùng. Không bắt đổi ở lần đăng nhập đầu."
+    },
+    "col": {
+      "act": "Thao tác",
+      "dept": "Phòng ban",
+      "last": "Đăng nhập cuối",
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "tasks": "Số việc liên quan",
+      "tasksS": "Việc",
+      "user": "Người dùng"
+    },
+    "create": "Tạo người dùng",
+    "d": {
+      "del": {
+        "d": "Tài khoản {u} bị xoá vĩnh viễn, không hoàn tác được. Chỉ xoá được người chưa có việc nào; người đã có việc hãy khoá tài khoản.",
+        "ok": "Xoá vĩnh viễn",
+        "t": "Xoá {n}?"
+      },
+      "force": {
+        "d": "Ở lần đăng nhập tới, họ phải đặt mật khẩu mới theo chính sách bảo mật trước khi dùng tiếp.",
+        "ok": "Bắt buộc đổi",
+        "t": "Bắt buộc {n} người đổi mật khẩu?"
+      },
+      "force1": {
+        "t": "Bắt buộc {n} đổi mật khẩu?"
+      },
+      "lock": {
+        "d": "Người bị khoá không đăng nhập được nữa. Việc đang chờ nhận hoặc đang làm của họ chuyển sang Từ chối, người giao việc được báo để giao lại.",
+        "ok": "Khoá tài khoản",
+        "t": "Khoá {n} tài khoản?",
+        "tasks": "Hiện có {n} việc sẽ bị ảnh hưởng."
+      },
+      "lock1": {
+        "t": "Khoá tài khoản {n}?"
+      },
+      "resend": {
+        "d": "Link mới gửi tới {e}, hiệu lực 24 giờ. Link cũ hết hiệu lực.",
+        "ok": "Gửi link",
+        "t": "Gửi lại link thiết lập mật khẩu?"
+      },
+      "role": {
+        "d": "Vai trò mới: {r}. Quyền xem menu và quyền công việc đổi theo vai trò mới từ lần tải trang tiếp theo.",
+        "ok": "Đổi vai trò",
+        "t": "Đổi vai trò cho {n} người?"
+      },
+      "unlock": {
+        "d": "Người dùng đăng nhập lại được ngay. Việc đã chuyển đi trước đó không tự quay về.",
+        "t": "Mở khoá {n}?"
+      },
+      "unlockN": {
+        "t": "Mở khoá {n} tài khoản?"
+      }
+    },
+    "e": {
+      "dupEmail": "Email này đã gắn với tài khoản khác",
+      "dupUser": "Tên đăng nhập này đã có người dùng",
+      "email": "Email không hợp lệ",
+      "emailLink": "Cần email để gửi link thiết lập",
+      "ok": "Lưu thay đổi",
+      "pwMatch": "Mật khẩu nhập lại không khớp",
+      "pwPolicy": "Mật khẩu chưa đạt đủ yêu cầu bên trên",
+      "req": "Bắt buộc nhập",
+      "role": "Chọn vai trò",
+      "selfRole": "Vai trò do Quản trị viên hoặc Vice Manager đổi.",
+      "selfRoleW": "Bạn đang sửa chính mình: V1 vẫn cho đổi vai trò, hãy cẩn thận.",
+      "title": "Sửa thông tin",
+      "titleMe": "Sửa thông tin của tôi",
+      "user": "Chỉ dùng chữ không dấu, số, dấu gạch dưới; 3–50 ký tự"
+    },
+    "empNote": "Bạn thấy chính mình và các nhân viên khác. Chỉ sửa được thông tin của chính mình nếu được cấp quyền Sửa thông tin.",
+    "err": {
+      "d": "Kiểm tra kết nối mạng rồi thử lại.",
+      "pt": "Không tải được phân quyền",
+      "t": "Không tải được danh sách người dùng"
+    },
+    "export": "Xuất CSV",
+    "f": {
+      "allRoles": "Mọi vai trò",
+      "allSt": "Mọi trạng thái",
+      "clear": "Xoá bộ lọc",
+      "dept": "Phòng ban",
+      "email": "Email",
+      "name": "Tên hiển thị",
+      "namePh": "vd: Nguyễn Văn An",
+      "phone": "Điện thoại",
+      "pickRole": "Chọn vai trò",
+      "pos": "Chức danh",
+      "pw": "Mật khẩu",
+      "pw2": "Nhập lại mật khẩu",
+      "role": "Lọc theo vai trò",
+      "status": "Lọc theo trạng thái",
+      "user": "Tên đăng nhập",
+      "userHint": "3–50 ký tự: chữ không dấu, số, dấu gạch dưới."
+    },
+    "fd": {
+      "hr": {
+        "change_password": "V1 chưa có tác dụng: nhân viên chỉ thao tác được trên chính mình",
+        "deactivate": "V1 chưa có tác dụng: chỉ Quản trị viên, Vice Manager khoá được",
+        "delete": "V1 chưa có tác dụng: chỉ Quản trị viên, Vice Manager xoá được",
+        "edit": "Sửa thông tin của chính mình"
+      },
+      "logs": {
+        "task_activity": "Xem ai đã làm gì với từng công việc",
+        "user_activity": "Xem lượt đăng nhập và thay đổi tài khoản"
+      },
+      "settings": {
+        "completion_templates": "Soạn mẫu báo cáo khi hoàn thành",
+        "notifications": "Xem cấu hình thông báo (chỉ xem)",
+        "priorities": "Thêm, sửa các mức ưu tiên",
+        "profile": "Sửa hồ sơ của chính mình",
+        "task_types": "Quản lý danh mục loại công việc"
+      }
+    },
+    "feat": {
+      "hr": {
+        "change_password": "Đổi mật khẩu",
+        "deactivate": "Khoá, mở khoá tài khoản",
+        "delete": "Xoá người dùng",
+        "edit": "Sửa thông tin"
+      },
+      "logs": {
+        "task_activity": "Nhật ký công việc",
+        "user_activity": "Nhật ký người dùng"
+      },
+      "settings": {
+        "completion_templates": "Mẫu báo cáo hoàn thành",
+        "notifications": "Thông báo",
+        "priorities": "Mức ưu tiên",
+        "profile": "Hồ sơ",
+        "task_types": "Loại công việc"
+      }
+    },
+    "h": {
+      "all": "Xem toàn bộ trong Nhật ký",
+      "by": "bởi {n}"
+    },
+    "k": {
+      "created": "Ngày tạo",
+      "pw": "Đổi mật khẩu lần cuối",
+      "pwNone": "Chưa đặt",
+      "user": "Tên đăng nhập"
+    },
+    "m": {
+      "del": "Xoá người dùng",
+      "edit": "Sửa thông tin",
+      "editMe": "Sửa thông tin của tôi",
+      "force": "Bắt buộc đổi mật khẩu",
+      "hist": "Lịch sử hoạt động",
+      "lock": "Khoá tài khoản",
+      "myPw": "Đổi mật khẩu của tôi",
+      "perm": "Phân quyền menu",
+      "pw": "Đặt lại mật khẩu",
+      "resend": "Gửi lại link thiết lập",
+      "unlock": "Mở khoá"
+    },
+    "mc": "Phải đổi mật khẩu ở lần đăng nhập tới",
+    "md": {
+      "analytics": "Báo cáo tiến độ. Hiệu suất của nhân viên chỉ hiện số của chính họ",
+      "helpdesk": "Xem phiếu Helpdesk và tạo việc từ phiếu",
+      "hr": "Danh sách nhân sự và tài khoản",
+      "logs": "Xem lịch sử thao tác. Nhân viên chỉ thấy của chính mình",
+      "settings": "Chỉ các mục bật bên dưới. Báo cáo định kỳ, Nhắc quá hạn, SMTP, Bảo mật không cấp được cho Nhân viên",
+      "tasks": "Tạo, giao và theo dõi công việc"
+    },
+    "menu": {
+      "analytics": "Báo cáo",
+      "helpdesk": "Helpdesk",
+      "hr": "Nhân sự",
+      "logs": "Nhật ký",
+      "settings": "Cài đặt",
+      "tasks": "Công việc"
+    },
+    "mode": {
+      "IMMEDIATE": "Giao trực tiếp",
+      "NEED_APPROVAL": "Cần duyệt"
+    },
+    "more": "Thao tác với {n}",
+    "n": {
+      "limited": "Lịch sử hoạt động chỉ quản lý hoặc chính người đó xem được.",
+      "locked": "Tài khoản đang bị khoá, không đăng nhập được.",
+      "mc": "Người này phải đổi mật khẩu ở lần đăng nhập tới.",
+      "pending": "Đã gửi link thiết lập mật khẩu tới {e}. Người dùng chưa đặt mật khẩu."
+    },
+    "na": {
+      "back": "Về danh sách người dùng",
+      "d": "Chỉ Quản trị viên và Vice Manager được xem và thay đổi phân quyền.",
+      "t": "Bạn không có quyền xem phân quyền"
+    },
+    "never": "Chưa đăng nhập",
+    "noEmail": "Chưa có email",
+    "nomatch": {
+      "d": "Thử từ khoá khác hoặc xoá bộ lọc.",
+      "t": "Không có người nào khớp bộ lọc"
+    },
+    "p": {
+      "how": "Cách đặt lại",
+      "mcNote": "Đặt tay: giữ nguyên yêu cầu đổi mật khẩu hiện tại. Qua link: sau khi người dùng đặt lại, hệ thống bỏ yêu cầu đổi mật khẩu.",
+      "noEmail": "Người này chưa có email.",
+      "okLink": "Gửi link",
+      "okSet": "Đặt mật khẩu",
+      "title": "Đặt lại mật khẩu cho {n}",
+      "wLink": "Gửi link đặt lại qua email",
+      "wLinkD": "Gửi tới {e}, link hiệu lực 15 phút, người dùng tự đặt.",
+      "wSet": "Đặt mật khẩu mới",
+      "wSetD": "Bạn đặt mật khẩu và báo cho người dùng."
+    },
+    "pbLast": "V1 không lưu lần đăng nhập cuối trên người dùng (chỉ có trong Nhật ký).",
+    "pbPending": "V1 không có trạng thái này: tạo bằng link thì tài khoản vẫn Hoạt động và phải đổi mật khẩu ở lần đầu.",
+    "pbT": "Chưa có ở V1 — cần backend mới hoặc đổi logic, làm ở Phase B. Hiện để tham khảo.",
+    "pbTasks": "V1 chỉ biết người dùng có việc hay không (để chặn xoá), không đếm số việc.",
+    "phaseB": "Phase B",
+    "pick": "Chọn {n}",
+    "pickAll": "Chọn tất cả",
+    "pm": {
+      "always": "Luôn đủ quyền",
+      "byRole": "Theo vai trò",
+      "byUser": "Theo người dùng",
+      "colMenu": "Menu và tính năng",
+      "core": "Menu lõi, luôn bật",
+      "editable": "Chỉnh được",
+      "lg": {
+        "lock": "Khoá: Quản trị viên và Vice Manager luôn có toàn quyền",
+        "off": "Tắt menu = ẩn khỏi thanh bên và chặn cả trang lẫn API",
+        "user": "Người có phân quyền riêng giữ phần riêng của họ"
+      },
+      "matrix": "Ma trận menu theo vai trò",
+      "needMenu": "Bật menu {m} trước",
+      "roleD": "Logic mới: mặc định theo vai trò + ngoại lệ theo người. V1 không có — quyền menu chỉ đặt theo từng nhân viên.",
+      "smtp": "Cấu hình SMTP chỉ Quản trị viên",
+      "sub": "Ai thấy menu nào, ai được làm gì với công việc",
+      "title": "Phân quyền",
+      "userD": "Bật hoặc tắt menu cho từng nhân viên đang hoạt động. Người chưa đặt riêng dùng cấu hình mặc định. V1 lưu ngay mỗi lần bật/tắt; V2 gom lại bằng nút Lưu.",
+      "view": "Kiểu phân quyền"
+    },
+    "pw": {
+      "len": "Ít nhất {n} ký tự",
+      "lo": "Có chữ thường (a–z)",
+      "no": "chưa đạt",
+      "num": "Có chữ số (0–9)",
+      "policy": "Yêu cầu mật khẩu",
+      "sp": "Có ký tự đặc biệt (!@#…)",
+      "src": "Theo chính sách mật khẩu trong Cài đặt › Bảo mật.",
+      "up": "Có chữ hoa (A–Z)",
+      "yes": "đã đạt"
+    },
+    "px": {
+      "allOn": "Mọi menu đang bật",
+      "clear": "Xoá tìm kiếm",
+      "collapseAll": "Thu gọn tất cả",
+      "core": "Menu lõi, luôn bật cho mọi vai trò",
+      "custGo": "Xem theo người dùng",
+      "custN": "{n} nhân viên có cấu hình riêng",
+      "expandAll": "Mở tất cả",
+      "grpEdit": "Chỉnh được",
+      "grpLock": "Luôn có quyền",
+      "inh": "Theo vai trò: {v}",
+      "lgLock": "Vice Manager và Quản trị viên luôn có toàn quyền",
+      "menuOff": "Bật menu để cấu hình tính năng",
+      "menuOffR": "Menu đang tắt cho {r}. Bật menu để cấu hình tính năng.",
+      "nFeat": "{n} tính năng",
+      "none": "Không có tính năng nào khớp",
+      "noneD": "Thử từ khoá khác hoặc xoá tìm kiếm.",
+      "off": "Đang tắt: {m}",
+      "planned": "Vai trò dự kiến",
+      "plannedT": "Chưa có trong hệ thống, hiện để xem trước bố cục khi thêm vai trò",
+      "ppl": "{n} người",
+      "ppl0": "Chưa có ai",
+      "ppl1": "1 người",
+      "r": {
+        "ADMIN": "Quản trị viên",
+        "BOSS": "Vice Manager",
+        "EMPLOYEE": "Nhân viên",
+        "MANAGER": "Quản lý"
+      },
+      "revert": "Về mặc định của vai trò",
+      "saved": "Đã lưu {n} thay đổi phân quyền theo vai trò",
+      "search": "Tìm tính năng",
+      "sumL": "Tóm tắt theo vai trò",
+      "sumOn": "đang bật cho {r}",
+      "sumU": "thay đổi so với mặc định của {u}",
+      "toggle": "Mở hoặc thu gọn {m}",
+      "uNone": "Đang dùng cấu hình mặc định",
+      "yes": "Có quyền"
+    },
+    "role": {
+      "ADMIN": "Quản trị viên",
+      "BOSS": "Vice Manager",
+      "EMPLOYEE": "Nhân viên"
+    },
+    "search": "Tìm theo tên, tên đăng nhập, email",
+    "shown": "{n} người",
+    "st": {
+      "active": "Hoạt động",
+      "locked": "Đã khoá",
+      "pending": "Chờ kích hoạt"
+    },
+    "sub": "{n} người, {a} đang hoạt động",
+    "subEmp": "{n} người trong danh sách của bạn",
+    "subnav": "Mục nhân sự",
+    "sv": {
+      "label": "Thay đổi chưa lưu",
+      "leaveD": "Các thay đổi chưa lưu sẽ mất.",
+      "leaveOk": "Bỏ thay đổi",
+      "leaveT": "Bỏ {n} thay đổi chưa lưu?",
+      "n": "{n} thay đổi chưa lưu",
+      "save": "Lưu thay đổi",
+      "undo": "Hoàn tác"
+    },
+    "t": {
+      "created": "Đã tạo tài khoản {n}",
+      "createdLink": "Đã tạo tài khoản và gửi link thiết lập tới {e}",
+      "del": "Đã xoá {n}",
+      "export": "Đang xuất {n} người ra CSV theo bộ lọc hiện tại",
+      "force": "{n} người sẽ phải đổi mật khẩu ở lần đăng nhập tới",
+      "lock": "Đã khoá {n} tài khoản",
+      "lock1": "Đã khoá tài khoản {n}",
+      "myPw": "Đổi mật khẩu của bạn ở Cài đặt › Hồ sơ (đang thiết kế).",
+      "noop": "Không có người nào cần thay đổi trong nhóm đã chọn",
+      "pw": "Đã đặt mật khẩu mới cho {n}",
+      "reset": "Đã đưa {u} về cấu hình mặc định",
+      "role": "Đã đổi {n} người sang {r}",
+      "roleSaved": "Đã lưu {n} thay đổi cho vai trò Nhân viên",
+      "saved": "Đã lưu thông tin {n}",
+      "sent": "Đã gửi link tới {e}",
+      "undone": "Đã hoàn tác thay đổi",
+      "unlock": "Đã mở khoá {n}",
+      "unlockN": "Đã mở khoá {n} tài khoản",
+      "userSaved": "Đã lưu {n} thay đổi cho {u}"
+    },
+    "tab": {
+      "perms": "Phân quyền",
+      "users": "Người dùng"
+    },
+    "title": "Nhân sự",
+    "u": {
+      "adminD": "Không đặt quyền riêng cho Quản trị viên. Muốn giới hạn, hãy đổi vai trò của người này.",
+      "adminT": "Quản trị viên luôn có toàn quyền",
+      "d": "Theo vai trò",
+      "empOnly": "Chỉ áp cho Nhân viên đang hoạt động. Quản trị viên và Vice Manager luôn có toàn quyền nên không có trong danh sách.",
+      "g": "Cho phép",
+      "has": "Có",
+      "inh": "Vai trò: {v}",
+      "lg": {
+        "d": "dùng giá trị của vai trò",
+        "g": "mở thêm cho riêng người này",
+        "lock": "khoá theo luật quy trình",
+        "r": "chặn dù vai trò có"
+      },
+      "lockD": "Luôn tắt khi việc ở chế độ Bắt buộc, kể cả khi cho phép riêng",
+      "lockT": "Khoá khi việc ở chế độ Bắt buộc",
+      "menus": "Menu và tính năng",
+      "menusD": "Menu nhìn thấy trên thanh bên và tính năng bên trong. Tắt menu thì chặn cả trang lẫn API.",
+      "menusPriv": "Vai trò này luôn thấy mọi menu, không đặt riêng được.",
+      "mode": "Chế độ quy trình",
+      "nAct": "{n} quyền",
+      "none": "Không tìm thấy người nào",
+      "noneD": "Thử tên khác hoặc xoá từ khoá.",
+      "not": "Không",
+      "ovN": "{n} quyền riêng",
+      "own": "Đã đặt riêng",
+      "pick": "Chọn người dùng",
+      "r": "Thu hồi",
+      "reset": "Về mặc định",
+      "resetD": "Bỏ cấu hình riêng của người này; menu và tính năng dùng lại mặc định của hệ thống.",
+      "resetOk": "Đặt lại",
+      "resetT": "Đưa {n} về cấu hình mặc định?",
+      "search": "Tìm người",
+      "selfD": "Nhờ một quản trị viên khác thay đổi quyền của bạn.",
+      "selfT": "Không tự phân quyền cho chính mình",
+      "showAll": "Hiện cả quyền vai trò không có",
+      "tasks": "Quyền công việc riêng",
+      "tasksD": "Theo từng trạng thái của công việc. Mặc định chỉ hiện quyền vai trò có và quyền đã đặt riêng.",
+      "tasksPB": "V1 có dữ liệu và API (chỉ Quản trị viên) nhưng chưa có hiệu lực: trang quyền riêng trả 404 và không API nào kiểm quyền này. Quyền công việc thật đang viết cứng theo vai trò."
+    },
+    "you": "(bạn)"
+  },
+  "ppx": {
+    "a": {
+      "ACTIVATE_USER": "Mở khoá tài khoản",
+      "CHANGE_SETTINGS": "Thay đổi cài đặt",
+      "CREATE_USER": "Tạo tài khoản",
+      "DEACTIVATE_USER": "Khoá tài khoản",
+      "DELETE_USER": "Xoá tài khoản",
+      "EXPORT_DATA": "Xuất dữ liệu",
+      "LOGIN": "Đăng nhập",
+      "LOGIN_FAILED": "Đăng nhập thất bại",
+      "LOGOUT": "Đăng xuất",
+      "RESET_PASSWORD": "Đặt lại mật khẩu",
+      "SESSION_TIMEOUT": "Hết phiên",
+      "UPDATE_USER": "Cập nhật thông tin",
+      "VIEW_PAGE": "Xem trang"
+    },
+    "c": {
+      "wLinkD": "Người dùng tự đặt mật khẩu qua email (link hiệu lực 24 giờ) và phải đổi lại ở lần đăng nhập đầu. Cần email."
+    },
+    "d": {
+      "deact1": {
+        "d": "Người này sẽ không đăng nhập được nữa. Công việc đang giao cho họ giữ nguyên, hãy giao lại nếu cần."
+      },
+      "deactN": {
+        "d": "Các tài khoản này sẽ không đăng nhập được nữa. Việc đang chờ nhận hoặc đang làm của họ chuyển sang Từ chối."
+      },
+      "link": {
+        "d": "Link gửi tới {e} của {n}, hiệu lực 15 phút. Người dùng tự đặt mật khẩu mới.",
+        "t": "Gửi link đặt lại mật khẩu?"
+      },
+      "role": {
+        "d": "Vai trò mới: {r}. Có hiệu lực từ lần tải trang tiếp theo của họ."
+      },
+      "unlock": {
+        "d": "Người dùng đăng nhập lại được ngay. Việc đã chuyển đi trước đó không tự quay về."
+      }
+    },
+    "e": {
+      "emailKeep": "Để trống thì vẫn giữ email hiện tại.",
+      "nameMax": "Tối đa 100 ký tự",
+      "newPw": "Mật khẩu mới",
+      "newPwHint": "Để trống nếu không đổi. Mật khẩu mới phải đạt chính sách trong Cài đặt › Bảo mật.",
+      "pwMin6": "Tối thiểu 6 ký tự",
+      "pwMin8": "Tối thiểu 8 ký tự",
+      "selfRoleW": "Bạn đang sửa chính mình: vẫn đổi được vai trò, hãy cẩn thận."
+    },
+    "f": {
+      "clearDate": "Xoá lọc ngày tạo",
+      "created": "Ngày tạo",
+      "from": "Tạo từ ngày",
+      "to": "Tạo đến ngày"
+    },
+    "fd": {
+      "hr": {
+        "deactivate": "V1 chưa có tác dụng: chỉ Quản trị viên, Quản lý khoá được",
+        "delete": "V1 chưa có tác dụng: chỉ Quản trị viên, Quản lý xoá được"
+      }
+    },
+    "h": {
+      "none": "Chưa có hoạt động nào"
+    },
+    "m": {
+      "link": "Gửi link đặt lại mật khẩu"
+    },
+    "na": {
+      "d": "Chỉ Quản trị viên và Quản lý được xem và thay đổi phân quyền."
+    },
+    "p": {
+      "mcNote": "Yêu cầu đổi mật khẩu ở lần đăng nhập tới (nếu đang có) được giữ nguyên."
+    },
+    "pm": {
+      "all": "Tất cả menu",
+      "filter": "Lọc theo menu",
+      "noEmp": "Chưa có nhân viên đang hoạt động",
+      "pbRole": "Phân quyền theo vai trò (mặc định theo vai trò + ngoại lệ theo người) chưa có ở V1, làm ở Phase B.",
+      "sub": "Menu và tính năng mà từng nhân viên được thấy",
+      "userD": "Bật hoặc tắt menu cho từng nhân viên đang hoạt động. Người chưa đặt riêng dùng cấu hình mặc định. Bấm Lưu để áp dụng."
+    },
+    "role": {
+      "ADMIN": "Quản trị viên",
+      "BOSS": "Quản lý",
+      "EMPLOYEE": "Nhân viên"
+    },
+    "sub": "{n} người dùng",
+    "t": {
+      "bulk": {
+        "activate": "Đã mở khoá {n} tài khoản",
+        "changeRole": "Đã đổi vai trò cho {n} người",
+        "deactivate": "Đã khoá {n} tài khoản",
+        "forceChangePassword": "{n} người sẽ phải đổi mật khẩu ở lần đăng nhập tới"
+      }
+    },
+    "u": {
+      "custom": "Khác mặc định",
+      "customN": "Khác mặc định {n} mục",
+      "empOnly": "Chỉ áp cho Nhân viên đang hoạt động. Quản trị viên và Quản lý luôn có toàn quyền nên không có trong danh sách.",
+      "tasksPB": "V1 có dữ liệu và API (chỉ Quản trị viên) nhưng chưa có hiệu lực: trang quyền riêng trả 404 và luồng công việc dùng quyền viết cứng theo vai trò. Làm ở Phase B."
+    },
+    "verified": "Email đã xác nhận"
+  },
   "pr": {
     "high": "Cao",
     "low": "Thấp",

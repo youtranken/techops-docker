@@ -1,5 +1,6 @@
-import { PermissionsMatrixSection } from '@/modules/hr/permissions/sections/PermissionsMatrixSection';
+import { PermissionsPage } from '@/modules/hr/permissions/components/PermissionsPage/PermissionsPage';
 
+/** Trang con V1: chỉ hiện menu tương ứng (A3-4 giữ đường dẫn, hiện thành bộ lọc). */
 export default function PermissionsAnalyticsPage() {
-  return <PermissionsMatrixSection filterMenus={['analytics']} />;
+  return <PermissionsPage route="analytics" />;
 }
