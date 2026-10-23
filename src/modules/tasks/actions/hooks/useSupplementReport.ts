@@ -2,6 +2,8 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
+import { toApiError } from '@/lib/errors';
 
 interface FileEntry { fileName: string; filePath: string; fileSize: number; _file?: File }
 
@@ -19,13 +21,14 @@ async function uploadFile(taskId: string, file: File): Promise<{ filePath: strin
   const res = await fetch('/api/upload', { method: 'POST', body: fd });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error?.message ?? `Upload thất bại: ${file.name}`);
+    throw toApiError(body, `Upload thất bại: ${file.name}`, res.status);
   }
   const data = await res.json();
   return { filePath: data.filePath, fileSize: file.size };
 }
 
 export function useSupplementReport() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, content, files }: SupplementPayload) => {
@@ -46,7 +49,7 @@ export function useSupplementReport() {
         body: JSON.stringify({ content, files: uploadedFiles }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error?.message ?? 'Bổ sung báo cáo thất bại');
+      if (!res.ok) throw toApiError(json, 'Bổ sung báo cáo thất bại', res.status);
       return json as { ok: boolean; version: string };
     },
     onSuccess: (data, vars) => {
@@ -54,6 +57,6 @@ export function useSupplementReport() {
       qc.invalidateQueries({ queryKey: ['task', vars.taskId] });
       qc.invalidateQueries({ queryKey: ['tasks'] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }

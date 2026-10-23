@@ -10,11 +10,13 @@ import { useHelpdeskCronConfig } from '../hooks/useHelpdeskCronConfig';
 import { CronPanel } from '../components/admin/CronPanel';
 import { SyncHistorySection } from './SyncHistorySection';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 function pad(n: number) { return String(n).padStart(2, '0'); }
 
 /** Panel dành riêng cho BOSS / ADMIN — Get API + Lịch tự động */
 export function HelpdeskAdminPanel() {
+  const errMsg = useErrorMessage();
   const { mutate: runSync, isLoading: isSyncing, data: syncResult, error: syncError } = useHelpdeskSync();
   const { config, isLoading: loadingCron } = useHelpdeskCronConfig();
   const [showCron, setShowCron] = useState(false);
@@ -28,7 +30,7 @@ export function HelpdeskAdminPanel() {
     try {
       const res = await fetch('/api/integrations/helpdesk/reset/request-otp', { method: 'POST' });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error?.message ?? 'Lỗi gửi OTP'); return; }
+      if (!res.ok) { toast.error(errMsg(data.error, 'Lỗi gửi OTP')); return; }
       toast.success(data.hint ?? 'OTP đã gửi đến email của bạn');
       setResetStep('otp');
     } catch { toast.error('Lỗi kết nối'); }
@@ -41,7 +43,7 @@ export function HelpdeskAdminPanel() {
     try {
       const res = await fetch(`/api/integrations/helpdesk/reset?otp=${encodeURIComponent(otpValue)}`, { method: 'DELETE' });
       const data = await res.json();
-      if (!res.ok) { toast.error(data.error?.message ?? 'Reset thất bại'); return; }
+      if (!res.ok) { toast.error(errMsg(data.error, 'Reset thất bại')); return; }
       toast.success(`Đã xóa ${data.tasks} task và ${data.pending} pending`);
       setResetStep('idle');
       setOtpValue('');

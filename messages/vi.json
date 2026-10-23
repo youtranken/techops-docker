@@ -1,38 +1,512 @@
 {
+  "act": {
+    "accept": "Nhận việc",
+    "approve": "Duyệt",
+    "cancel": "Hủy công việc",
+    "decline": "Từ chối",
+    "edit": "Sửa",
+    "extend": "Xin gia hạn",
+    "open": "Mở",
+    "reassign": "Giao lại",
+    "report": "Báo cáo xong",
+    "restore": "Khôi phục",
+    "review": "Nghiệm thu",
+    "rework": "Yêu cầu làm lại",
+    "supplement": "Bổ sung báo cáo",
+    "transfer": "Chuyển giao"
+  },
+  "ago": {
+    "hour": "{n} giờ trước",
+    "min": "{n} phút trước",
+    "now": "Vừa xong",
+    "yday": "Hôm qua {h}"
+  },
+  "app": {
+    "account": "Tài khoản",
+    "att": {
+      "drop": "Kéo tệp vào đây hoặc",
+      "hint": "Bản xem trước: tệp không được tải lên.",
+      "label": "Tệp đính kèm",
+      "paste": "Mẹo: Win+Shift+S chụp màn hình rồi Ctrl+V để dán ảnh.",
+      "pick": "chọn tệp",
+      "remove": "Bỏ tệp {f}"
+    },
+    "close": "Đóng",
+    "dlg": {
+      "accept": {
+        "d": "Bạn xác nhận nhận “{t}”. Việc chuyển sang {s}.",
+        "multi": "Việc có {n} người làm, mỗi người tự nhận phần của mình. Hiện {x}/{n} người đã nhận.",
+        "t": "Nhận công việc này?"
+      },
+      "approve": {
+        "d": "“{t}” sẽ chuyển sang {s} và người được giao nhận thông báo.",
+        "t": "Duyệt công việc này?"
+      },
+      "cancel": {
+        "d": "Việc chuyển sang Đã hủy, mọi người liên quan nhận thông báo kèm lý do. Đơn gia hạn đang chờ sẽ tự bị từ chối.",
+        "label": "Lý do hủy",
+        "ph": "Ví dụ: yêu cầu đã được xử lý ở việc khác",
+        "t": "Hủy công việc này?"
+      },
+      "cmDel": {
+        "d": "Bình luận sẽ bị xóa với mọi người và không khôi phục được.",
+        "dOther": "Bình luận của {a} sẽ bị xóa với mọi người và không khôi phục được.",
+        "ok": "Xóa bình luận",
+        "t": "Xóa bình luận?"
+      },
+      "decline": {
+        "back": "{a} đã chuyển phần việc này cho bạn. Nếu bạn từ chối, phần việc quay lại {a} và {a} nhận thông báo “Công việc được trả lại”.",
+        "ph": "Ví dụ: đang xử lý việc khẩn khác, đề nghị giao người khác",
+        "t": "Từ chối nhận việc?"
+      },
+      "ext": {
+        "blockPending": "Đang có 2 đơn gia hạn chờ duyệt, tối đa cho phép. Chờ duyệt hoặc rút bớt 1 đơn rồi xin tiếp.",
+        "blockT": "Chưa thể xin gia hạn",
+        "blockTotal": "Việc này đã dùng hết 5 lượt xin gia hạn. Hãy trao đổi với Vice Manager trong phần bình luận.",
+        "cur": "Hạn hiện tại",
+        "dateErr": "Chọn ngày sau {d}: phải sau hạn hiện tại, sau hôm nay và sau đơn đang chờ.",
+        "new": "Hạn mới",
+        "ph": "Vì sao cần thêm thời gian…",
+        "quota": "Còn {n}/5 lượt xin gia hạn và {p}/2 chỗ cho đơn đang chờ. Vice Manager hoặc Admin sẽ duyệt.",
+        "send": "Gửi đơn",
+        "t": "Xin gia hạn"
+      },
+      "extNo": {
+        "d": "Chỉ người xin nhận thông báo kèm phản hồi của bạn.",
+        "t": "Từ chối đơn gia hạn?"
+      },
+      "extOk": {
+        "d": "Hạn mới của việc là {d}. Mọi người làm nhận thông báo.",
+        "t": "Duyệt gia hạn?"
+      },
+      "forceNote": "Việc bắt buộc: không thể từ chối hay chuyển giao.",
+      "minErr": "Nhập ít nhất 10 ký tự ({n}/10).",
+      "next": {
+        "approval": "Gửi xong, việc chuyển sang Chờ nghiệm thu để Vice Manager hoặc Admin kiểm tra.",
+        "direct": "Việc giao thẳng nên không qua nghiệm thu: gửi xong, việc chuyển sang Đã xong.",
+        "wait": "Còn {n} người làm chưa báo cáo. Việc chỉ chuyển tiếp khi mọi người đã báo cáo."
+      },
+      "ra": {
+        "d": "Mọi người được giao đều đã từ chối hoặc chuyển đi. Chọn một hoặc nhiều người; việc quay về Chờ nhận việc và họ nhận thông báo “Được giao lại”.",
+        "err": "Chọn ít nhất 1 người.",
+        "n": "Đã chọn {n} người",
+        "pick": "Người thực hiện mới",
+        "t": "Giao lại công việc"
+      },
+      "reason": "Lý do",
+      "reasonErr": "Nhập lý do.",
+      "reject": {
+        "d": "Việc chuyển sang Đã hủy và người tạo nhận thông báo. Việc bị từ chối kế hoạch không khôi phục được.",
+        "ok": "Từ chối kế hoạch",
+        "ph": "Không bắt buộc. Ví dụ: cần bổ sung báo giá trước khi làm",
+        "t": "Từ chối kế hoạch?"
+      },
+      "reply": {
+        "_": "Phản hồi",
+        "ph": "Ghi chú cho người xin (không bắt buộc)"
+      },
+      "report": {
+        "label": "Nội dung báo cáo",
+        "ph": "Bạn đã làm gì, kết quả ra sao, còn lưu ý gì…",
+        "send": "Gửi báo cáo",
+        "t": "Báo cáo xong việc",
+        "ver": "Báo cáo này sẽ là phiên bản {v}."
+      },
+      "restore": {
+        "d": "Việc quay về trạng thái trước khi hủy: {s}.",
+        "ppl": "Mọi người làm được giao lại từ đầu (Chờ nhận) và cần bấm Nhận việc lại.",
+        "t": "Khôi phục công việc?"
+      },
+      "review": {
+        "d": "Xác nhận “{t}” đã đạt yêu cầu. Việc chuyển sang {s}.",
+        "t": "Nghiệm thu công việc này?"
+      },
+      "rework": {
+        "d": "Chọn người cần làm lại và ghi lý do cho từng người. Việc quay về Đang làm, những người còn lại giữ nguyên báo cáo.",
+        "errPick": "Chọn ít nhất 1 người.",
+        "ph": "Cần sửa gì, bổ sung gì…",
+        "pick": "Người cần làm lại",
+        "reason": "Lý do cho {a}",
+        "t": "Yêu cầu làm lại"
+      },
+      "supp": {
+        "label": "Nội dung bổ sung",
+        "ph": "Thêm kết quả, ảnh chụp hoặc lưu ý mới…",
+        "send": "Gửi bổ sung",
+        "t": "Bổ sung báo cáo"
+      },
+      "tpl": {
+        "_": "Mẫu hoàn thành",
+        "hint": "Gồm mẫu chung và mẫu cho loại “{ty}”. Chọn mẫu sẽ thay nội dung đang nhập.",
+        "none": "Chưa có mẫu nào. Admin hoặc Vice Manager tạo mẫu ở Cài đặt → Mẫu hoàn thành.",
+        "ph": "Chọn mẫu để điền sẵn nội dung…"
+      },
+      "tr": {
+        "d": "Người nhận sẽ thay bạn làm phần việc này và cần bấm Nhận việc. Nếu họ từ chối, phần việc quay về bạn.",
+        "err": "Chọn người nhận.",
+        "hint": "Không hiện người đã có trong việc này (kể cả người đã từ chối hoặc đã chuyển giao), nên không thể chuyển vòng lại.",
+        "in": "đang làm việc này",
+        "loop": "{a} vừa chuyển việc này cho bạn nên không chuyển ngược lại được.",
+        "note": "Ghi chú chuyển giao",
+        "noteErr": "Nhập ghi chú chuyển giao.",
+        "ok": "Chuyển giao",
+        "ph": "Bàn giao những gì đã làm, còn lại gì…",
+        "t": "Chuyển giao phần việc",
+        "to": "Chuyển cho"
+      },
+      "wd": {
+        "d": "Đơn xin dời hạn sang {d} sẽ bị rút. Lượt đã dùng vẫn được tính.",
+        "ok": "Rút đơn",
+        "t": "Rút đơn gia hạn?"
+      }
+    },
+    "loading": "Đang tải…",
+    "name": "TechOps",
+    "opt": "không bắt buộc",
+    "org": "Phòng IT · PMH",
+    "phaseB": {
+      "_": "Phase B",
+      "d": "Chưa có ở V1, làm ở Phase B"
+    },
+    "pv": {
+      "label": "Điều khiển xem trước"
+    },
+    "req": "bắt buộc",
+    "retry": "Thử lại",
+    "skip": "Bỏ qua tới nội dung chính",
+    "soon": "Trang này đang thiết kế, sẽ có ở bản xem trước sau.",
+    "toast": {
+      "accepted": "Đã nhận phần việc của bạn ở {id}.",
+      "allFailed": "Đã từ chối {id}. Mọi người được giao đều đã từ chối, người tạo đã được báo.",
+      "cancelled": "Đã hủy {id}.",
+      "close": "Đóng thông báo",
+      "cmDel": "Đã xóa bình luận.",
+      "declined": "Đã từ chối {id} và báo lại người giao.",
+      "extNo": "Đã từ chối đơn gia hạn.",
+      "extOk": "Đã duyệt gia hạn. Hạn mới: {d}.",
+      "extSent": "Đã gửi đơn xin gia hạn đến {d}.",
+      "extWd": "Đã rút đơn gia hạn.",
+      "files": "Đã thêm {n} tệp.",
+      "moved": "{id} đã chuyển sang “{s}”.",
+      "partial": "Đã gửi báo cáo của bạn. Việc chuyển sang nghiệm thu khi mọi người làm đã báo cáo.",
+      "partialDirect": "Đã gửi báo cáo của bạn. Việc hoàn tất khi mọi người làm đã báo cáo.",
+      "reassigned": "Đã giao lại {id} cho {n} người, việc chuyển sang Chờ nhận việc.",
+      "rejected": "Đã từ chối kế hoạch, {id} chuyển sang Đã hủy.",
+      "restored": "Đã khôi phục {id} về “{s}”.",
+      "returned": "Đã từ chối {id}. Phần việc đã quay lại {a}.",
+      "rework": "Đã yêu cầu {n} người làm lại. {id} quay về Đang làm.",
+      "supp": "Đã gửi bổ sung báo cáo {v}.",
+      "transferred": "Đã chuyển phần việc cho {a}."
+    }
+  },
+  "auth": {
+    "forgotPassword": "Quên mật khẩu",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "password": "Mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "username": "Tên đăng nhập"
+  },
+  "card": {
+    "comments": "{n} bình luận",
+    "files": "{n} tệp",
+    "more": "Thao tác khác",
+    "new": "Mới xong",
+    "star": "Đánh dấu quan trọng",
+    "unassigned": "Chưa giao",
+    "unseen": "Chưa xem",
+    "unstar": "Bỏ đánh dấu quan trọng"
+  },
   "common": {
-    "save": "Lưu",
+    "back": "Quay lại",
     "cancel": "Hủy",
+    "create": "Tạo mới",
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
-    "create": "Tạo mới",
-    "search": "Tìm kiếm",
-    "filter": "Lọc",
+    "error": "Lỗi",
     "export": "Xuất",
+    "filter": "Lọc",
     "import": "Nhập",
-    "back": "Quay lại",
+    "loading": "Đang tải...",
     "next": "Tiếp theo",
     "previous": "Trước",
-    "loading": "Đang tải...",
-    "error": "Lỗi",
+    "save": "Lưu",
+    "search": "Tìm kiếm",
     "success": "Thành công"
   },
+  "due": {
+    "doneOnTime": "Xong đúng hạn",
+    "in": "Còn {n} ngày",
+    "none": "Chưa có hạn",
+    "on": "Hạn {d}",
+    "overdue": "Trễ {n} ngày",
+    "today": "Hạn hôm nay",
+    "tomorrow": "Hạn ngày mai"
+  },
+  "empty": {
+    "cancelled": {
+      "t": "Không có việc đã hủy"
+    },
+    "done": {
+      "t": "Chưa có việc đã xong"
+    },
+    "mine": {
+      "d": "Việc cần bạn nhận, duyệt hoặc nghiệm thu sẽ hiện ở đây.",
+      "t": "Không có việc nào đang chờ bạn"
+    }
+  },
+  "er": {
+    "403": {
+      "d": "Trang này chỉ dành cho Vice Manager hoặc Admin. Nếu công việc cần, hãy nhờ Admin cấp quyền trong mục Nhân sự.",
+      "t": "Bạn không có quyền xem trang này"
+    },
+    "404": {
+      "d": "Đường dẫn có thể đã cũ hoặc bị gõ sai. Nếu bạn mở từ email, công việc đó có thể đã bị xoá.",
+      "t": "Không tìm thấy trang"
+    },
+    "500": {
+      "d": "Thao tác vừa rồi chưa được lưu. Thử lại sau ít phút; nếu vẫn lỗi, gửi mã lỗi bên dưới cho phòng IT.",
+      "t": "Hệ thống đang gặp sự cố"
+    },
+    "back": "Quay lại",
+    "code": "Mã lỗi",
+    "copied": "Đã sao chép mã lỗi",
+    "copy": "Sao chép mã lỗi",
+    "crumb": "Lỗi",
+    "home": "Về Công việc",
+    "offline": {
+      "d": "Kiểm tra Wi-Fi hoặc cáp mạng. Trang tự tải lại khi có mạng trở lại.",
+      "t": "Mất kết nối mạng"
+    },
+    "pv": {
+      "403": "Không có quyền (403)",
+      "404": "Không tìm thấy (404)",
+      "500": "Lỗi máy chủ (500)",
+      "offline": "Mất mạng",
+      "toast": "Mẫu toast lỗi",
+      "type": "Loại lỗi"
+    },
+    "retrying": "Đang thử lại…",
+    "still": "Vẫn chưa được. Thử lại sau ít phút.",
+    "toast": {
+      "403": "Bạn không có quyền thực hiện thao tác này.",
+      "429": "Bạn thao tác quá nhanh. Đợi {n} giây rồi thử lại.",
+      "500": "Máy chủ gặp sự cố, thao tác chưa được lưu. Thử lại sau ít phút.",
+      "net": "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại."
+    }
+  },
+  "err": {
+    "assigneesRequired": "Chọn ít nhất 1 người làm.",
+    "auth": "Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.",
+    "commentNotFound": "Không tìm thấy bình luận, có thể đã bị xoá.",
+    "emailFailed": "Chưa gửi được email. Kiểm tra cấu hình SMTP rồi thử lại.",
+    "extDate": "Ngày gia hạn chưa hợp lệ: phải sau hạn hiện tại, sau hôm nay và sau đơn đang chờ.",
+    "extMax": "Việc này đã dùng hết 5 lượt xin gia hạn.",
+    "extNotFound": "Không tìm thấy đơn gia hạn, có thể đã được xử lý.",
+    "extPending": "Đang có 2 đơn gia hạn chờ duyệt, tối đa cho phép. Chờ duyệt hoặc rút bớt 1 đơn rồi xin tiếp.",
+    "failed": "Chưa thực hiện được thao tác. Thử lại sau ít phút.",
+    "fileLimit": "Tối đa 3 tệp, mỗi tệp không quá 10 MB.",
+    "fileTooLarge": "Tệp quá lớn.",
+    "fileTooLargeNamed": "Tệp {name} vượt quá {max} MB.",
+    "fileType": "Không nhận tệp {ext}. Chỉ nhận tệp PDF.",
+    "fileTypeAny": "Loại tệp này không được phép.",
+    "flowSwitch": "Không đổi được quy trình ở giai đoạn này của công việc.",
+    "forbidden": "Bạn không có quyền thực hiện thao tác này.",
+    "forceMode": "Việc bắt buộc: không thể từ chối hay chuyển giao.",
+    "forceModeApproval": "Chế độ Bắt buộc chỉ dùng được với quy trình Phê duyệt.",
+    "generic": "Có lỗi xảy ra, thao tác chưa thực hiện được.",
+    "genericCode": "Có lỗi xảy ra, thao tác chưa thực hiện được (mã {code}).",
+    "helpdeskConfig": "Chưa cấu hình kết nối Helpdesk.",
+    "inUse": "Mục này đang được dùng nên chưa xoá được.",
+    "invalid": "Dữ liệu chưa hợp lệ. Kiểm tra lại các ô đã nhập.",
+    "network": "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.",
+    "notAssignee": "Bạn không còn là người làm của việc này, hoặc đã xử lý rồi.",
+    "notFound": "Không tìm thấy dữ liệu, có thể đã bị xoá.",
+    "origin": "Yêu cầu bị chặn vì không đến từ trang TechOps. Tải lại trang rồi thử lại.",
+    "otp": "Mã OTP không đúng hoặc đã hết hạn.",
+    "passwordRequired": "Nhập mật khẩu.",
+    "priorityInUse": "Mức ưu tiên này đang được dùng ở công việc nên chưa xoá được.",
+    "rateLimit": "Bạn thao tác quá nhanh. Đợi một lát rồi thử lại.",
+    "reportRequired": "Nhập nội dung báo cáo.",
+    "samePassword": "Mật khẩu mới phải khác mật khẩu hiện tại.",
+    "sameUser": "Không thể chuyển giao cho chính mình.",
+    "server": "Máy chủ gặp sự cố, thao tác chưa được lưu. Thử lại sau ít phút.",
+    "smtp": "Không kết nối được máy chủ email. Kiểm tra cấu hình SMTP.",
+    "smtpDecrypt": "Không đọc được cấu hình SMTP đã lưu (khoá mã hoá đã đổi). Nhập lại cấu hình SMTP rồi lưu.",
+    "smtpKey": "Máy chủ chưa cấu hình khoá mã hoá SMTP. Báo quản trị hệ thống.",
+    "statusChanged": "Trạng thái công việc đã thay đổi. Tải lại trang rồi thử lại.",
+    "taskNotFound": "Không tìm thấy công việc, có thể đã bị xoá.",
+    "taskTypeInUse": "Loại công việc này đang được dùng nên chưa xoá được.",
+    "unavailable": "Dịch vụ tạm thời không sẵn sàng. Thử lại sau ít phút.",
+    "userDuplicate": "Tên đăng nhập hoặc email đã được dùng.",
+    "userHasTasks": "Người dùng còn công việc nên chưa xoá được.",
+    "userInactive": "Tài khoản đang bị vô hiệu hoá.",
+    "userNotFound": "Người dùng này không còn tồn tại.",
+    "weakPassword": "Mật khẩu chưa đủ mạnh theo chính sách mật khẩu.",
+    "wrongPassword": "Mật khẩu hiện tại không đúng."
+  },
+  "filter": {
+    "assignee": "Người làm",
+    "btn": "Lọc",
+    "due": "Hạn",
+    "priority": "Ưu tiên",
+    "search": "Tìm theo tiêu đề",
+    "status": "Trạng thái"
+  },
+  "flow": {
+    "count": "{n} việc",
+    "label": "Quy trình công việc",
+    "mine": "{n} chờ bạn"
+  },
+  "idle": {
+    "d": "Bạn không thao tác gần {m} phút. Tự đăng xuất sau",
+    "keep": "Tiếp tục làm việc",
+    "kept": "Đã giữ phiên làm việc.",
+    "t": "Phiên làm việc sắp hết hạn"
+  },
+  "lane": {
+    "empty": "Không có việc nào"
+  },
+  "lang": {
+    "en": "EN",
+    "vi": "VI"
+  },
+  "n": {
+    "allFailed": "Mọi người được giao đã từ chối “{t}”. Bạn có thể hủy hoặc nhờ Admin giao lại.",
+    "transfer": "{a} chuyển giao “{t}” cho bạn"
+  },
+  "nav": {
+    "crumbs": "Đường dẫn",
+    "group": {
+      "admin": "Quản trị",
+      "granted": "Được cấp riêng",
+      "work": "Công việc"
+    },
+    "helpdesk": "Helpdesk",
+    "home": "Tổng quan",
+    "label": "Điều hướng chính",
+    "logs": "Nhật ký",
+    "open": "Mở menu",
+    "people": "Nhân sự",
+    "reports": "Báo cáo",
+    "settings": "Cài đặt",
+    "starred": "Quan trọng",
+    "tasks": "Công việc",
+    "unseen": "Mới xong"
+  },
+  "notif": {
+    "adminNoMail": "Admin không nhận email thông báo công việc, chỉ nhận trong ứng dụng.",
+    "all": "Xem tất cả",
+    "earlier": "Trước đó",
+    "readAll": "Đánh dấu đã đọc",
+    "title": "Thông báo",
+    "today": "Hôm nay"
+  },
+  "page": {
+    "export": "Xuất Excel",
+    "new": "Tạo công việc",
+    "sub": "{n} việc đang mở, {m} việc cần bạn xử lý",
+    "title": "Công việc"
+  },
+  "pr": {
+    "high": "Cao",
+    "low": "Thấp",
+    "normal": "Thường",
+    "urgent": "Khẩn"
+  },
+  "qa": {
+    "copied": "Đã sao chép mã {id}",
+    "copy": "Sao chép mã",
+    "menu": "Thao tác nhanh cho {id}",
+    "starOff": "Đã bỏ đánh dấu quan trọng cho {id}",
+    "starOn": "Đã đánh dấu {id} là quan trọng",
+    "view": "Xem nhanh"
+  },
+  "role": {
+    "admin": "Quản trị viên",
+    "boss": "Vice Manager",
+    "emp": "Nhân viên"
+  },
+  "st": {
+    "CANCELLED": "Đã hủy",
+    "COMPLETED": "Đã xong",
+    "DRAFT": "Nháp",
+    "IN_PROGRESS": "Đang làm",
+    "PENDING_APPROVAL": "Chờ duyệt",
+    "PENDING_REVIEW": "Chờ nghiệm thu",
+    "WAITING_ACKNOWLEDGE": "Chờ nhận việc"
+  },
   "task": {
-    "title": "Công việc",
-    "status": "Trạng thái",
-    "priority": "Độ ưu tiên",
-    "type": "Loại công việc",
     "assignee": "Người thực hiện",
+    "attachments": "Tệp đính kèm",
     "creator": "Người tạo",
     "deadline": "Thời hạn",
     "description": "Mô tả",
-    "attachments": "Tệp đính kèm"
+    "priority": "Độ ưu tiên",
+    "status": "Trạng thái",
+    "title": "Công việc",
+    "type": "Loại công việc"
   },
-  "auth": {
-    "login": "Đăng nhập",
-    "logout": "Đăng xuất",
-    "username": "Tên đăng nhập",
-    "password": "Mật khẩu",
-    "forgotPassword": "Quên mật khẩu",
-    "rememberMe": "Ghi nhớ đăng nhập"
+  "td": {
+    "as": {
+      "ACCEPTED": "Đã nhận",
+      "COMPLETED": "Đã báo cáo",
+      "DECLINED": "Từ chối",
+      "IN_PROGRESS": "Đang làm",
+      "PENDING": "Chờ nhận",
+      "REJECTED": "Từ chối",
+      "REPORTED": "Đã báo cáo",
+      "REVISION_REQUIRED": "Cần làm lại",
+      "REWORK": "Cần làm lại",
+      "TRANSFERRED": "Đã chuyển giao"
+    }
+  },
+  "tl": {
+    "pg": {
+      "nav": "Phân trang",
+      "next": "Trang sau",
+      "of": "{a}–{b} trên {n} việc",
+      "page": "Trang {n}",
+      "prev": "Trang trước",
+      "size": "Mỗi trang"
+    }
+  },
+  "top": {
+    "notifications": "Thông báo",
+    "profile": "Hồ sơ",
+    "search": "Tìm công việc hoặc mã HD",
+    "signout": "Đăng xuất"
+  },
+  "ui": {
+    "confirm": "Xác nhận",
+    "lang": {
+      "en": "English",
+      "label": "Ngôn ngữ",
+      "vi": "Tiếng Việt"
+    },
+    "loadFailed": "Không tải được dữ liệu",
+    "noData": "Không có dữ liệu",
+    "quickActions": "Thao tác nhanh",
+    "removeFilter": "Bỏ lọc {f}",
+    "saveChanges": "Lưu thay đổi",
+    "saving": "Đang lưu…",
+    "summary": "Tóm tắt",
+    "theme": {
+      "toDark": "Chuyển sang giao diện tối",
+      "toLight": "Chuyển sang giao diện sáng"
+    },
+    "undo": "Hoàn tác",
+    "unsaved": "Bạn có thay đổi chưa lưu",
+    "userMenu": "Menu tài khoản"
+  },
+  "view": {
+    "board": "Bảng",
+    "cancelled": "Đã hủy",
+    "done": "Đã xong",
+    "list": "Danh sách",
+    "mine": "Cần tôi xử lý",
+    "open": "Đang mở",
+    "starred": "Quan trọng",
+    "unseen": "Mới xong"
   }
 }

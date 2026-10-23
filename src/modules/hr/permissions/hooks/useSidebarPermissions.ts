@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type { UserPermRow, SavePermissionInput } from '../types';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 type ApiResponse = { data: UserPermRow[] };
 
@@ -31,6 +32,7 @@ export function useSidebarPermissions() {
 }
 
 export function useSavePermission() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: savePermission,
@@ -39,7 +41,7 @@ export function useSavePermission() {
       toast.success('Đã cập nhật phân quyền');
     },
     onError: (err: Error) => {
-      toast.error(err.message ?? 'Lưu phân quyền thất bại');
+      toast.error(errMsg(err, 'Lưu phân quyền thất bại'));
     },
   });
 }

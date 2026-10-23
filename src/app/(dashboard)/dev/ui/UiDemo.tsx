@@ -19,6 +19,9 @@ import { FilterChip } from '@/shared/ui/FilterChip';
 import { StickySaveBar } from '@/shared/ui/StickySaveBar';
 import { useConfirm } from '@/shared/ui/ConfirmDialog';
 import { TASK_STATUS_META, ASSIGNEE_STATUS_META } from '@/shared/ui/status-meta';
+import { useFormat } from '@/i18n/useFormat';
+import { useErrorMessage } from '@/lib/useErrorMessage';
+import { ApiError } from '@/lib/errors';
 import { DemoTable } from './DemoTable';
 
 const day = (n: number) => new Date(Date.now() + n * 86_400_000);
@@ -34,6 +37,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function UiDemo() {
   const confirm = useConfirm();
+  const fmt = useFormat();
+  const errMsg = useErrorMessage();
   const [view, setView] = useState<'list' | 'board'>('list');
   const [chips, setChips] = useState([{ k: 'st', l: 'Trạng thái', v: 'Đang làm' }, { k: 'pr', l: 'Ưu tiên', v: 'Khẩn' }]);
   const [name, setName] = useState('Phòng IT');
@@ -45,6 +50,22 @@ export function UiDemo() {
         <h1 className="font-head text-[22px] font-semibold">Bộ component V2</h1>
         <p className="text-sm text-ink-3">Trang dev (/dev/ui) — production trả 404.</p>
       </header>
+
+      <Section title="Song ngữ (A1.3) — định dạng + lỗi">
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-4" data-testid="fmt-demo">
+          <div><dt className="text-xs text-ink-3">locale</dt><dd className="font-mono">{fmt.locale}</dd></div>
+          <div><dt className="text-xs text-ink-3">date</dt><dd className="font-mono">{fmt.date('2026-10-23T03:00:00Z')}</dd></div>
+          <div><dt className="text-xs text-ink-3">number</dt><dd className="font-mono">{fmt.number(1248)}</dd></div>
+          <div><dt className="text-xs text-ink-3">percent</dt><dd className="font-mono">{fmt.percent(0.924)}</dd></div>
+        </dl>
+        <div className="flex flex-wrap gap-2">
+          <Button size="xs" variant="outline" onClick={() => toast.error(errMsg(new ApiError('Insufficient permissions', 'FORBIDDEN', 403)))}>403</Button>
+          <Button size="xs" variant="outline" onClick={() => toast.error(errMsg(new Error('Too many requests. Please try again later.')))}>429</Button>
+          <Button size="xs" variant="outline" onClick={() => toast.error(errMsg(new Error('PRIORITY_IN_USE')))}>PRIORITY_IN_USE</Button>
+          <Button size="xs" variant="outline" onClick={() => toast.error(errMsg(new TypeError('Failed to fetch')))}>offline</Button>
+          <Button size="xs" variant="outline" onClick={() => toast.error(errMsg(new ApiError('boom', 'EXEC_FAILED', 400)))}>unknown</Button>
+        </div>
+      </Section>
 
       <Section title="Nút">
         <div className="flex flex-wrap gap-2">

@@ -1,5 +1,6 @@
 /** Thanh tóm tắt (preview `.td-sum`): ô nhãn/giá trị kẻ dọc, 6 → 3 (≤1100) → 2 cột (≤680). */
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export interface SummaryItem {
@@ -15,9 +16,10 @@ export interface SummaryBarProps {
   ariaLabel?: string;
 }
 
-export function SummaryBar({ items, className, ariaLabel = 'Tóm tắt' }: SummaryBarProps) {
+export function SummaryBar({ items, className, ariaLabel }: SummaryBarProps) {
+  const t = useTranslations();
   return (
-    <section aria-label={ariaLabel} className={cn('overflow-hidden rounded-card border border-line bg-surface shadow-v2-1', className)}>
+    <section aria-label={ariaLabel ?? t('ui.summary')} className={cn('overflow-hidden rounded-card border border-line bg-surface shadow-v2-1', className)}>
       <dl className="m-0 grid grid-cols-6 gap-px bg-line max-[1100px]:grid-cols-3 max-[680px]:grid-cols-2">
         {items.map((it, i) => (
           <div key={it.key ?? i} className="min-w-0 bg-surface px-4 pb-[13px] pt-3 max-[680px]:px-3.5 max-[680px]:pb-[11px] max-[680px]:pt-2.5">

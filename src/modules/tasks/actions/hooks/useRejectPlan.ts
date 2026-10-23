@@ -2,10 +2,13 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
+import { toApiError } from '@/lib/errors';
 
 interface RejectPlanPayload { taskId: string; reason?: string }
 
 export function useRejectPlan() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, reason }: RejectPlanPayload) => {
@@ -16,7 +19,7 @@ export function useRejectPlan() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Từ chối công việc thất bại');
+        throw toApiError(body, 'Từ chối công việc thất bại', res.status);
       }
     },
     onSuccess: (_data, { taskId }) => {
@@ -24,6 +27,6 @@ export function useRejectPlan() {
       qc.invalidateQueries({ queryKey: ['tasks'] });
       qc.invalidateQueries({ queryKey: ['task', taskId] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type { SecurityConfig } from '../types';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 const QUERY_KEY = ['settings', 'security-config'];
 
@@ -45,6 +46,7 @@ async function resetSecurityConfig(): Promise<SecurityConfig> {
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function useSecurityConfig() {
+  const errMsg = useErrorMessage();
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -60,7 +62,7 @@ export function useSecurityConfig() {
       toast.success('Đã lưu cấu hình bảo mật');
     },
     onError: (err: Error) => {
-      toast.error(err.message);
+      toast.error(errMsg(err));
     },
   });
 
@@ -71,7 +73,7 @@ export function useSecurityConfig() {
       toast.success('Đã reset về cấu hình mặc định');
     },
     onError: (err: Error) => {
-      toast.error(err.message);
+      toast.error(errMsg(err));
     },
   });
 

@@ -25,6 +25,7 @@ import { useRoles } from '../hooks/useRoles';
 import { DeleteUserDialog } from './DeleteUserDialog';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import { UserHistoryModal } from './UserHistoryModal';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 function getInitials(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
@@ -56,6 +57,7 @@ interface Props {
 }
 
 export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, selectedIds, onSelectChange }: Props) {
+  const errMsg = useErrorMessage();
   const { data: session } = useSession();
   const deactivate = useDeactivateUser();
   const activate = useActivateUser();
@@ -94,12 +96,12 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
 
   async function handleDeactivate(userId: string) {
     try { await deactivate.mutateAsync(userId); toast.success('Đã vô hiệu hóa người dùng'); }
-    catch (err: unknown) { toast.error((err as Error).message ?? 'Không thể vô hiệu hóa người dùng'); }
+    catch (err: unknown) { toast.error(errMsg(err, 'Không thể vô hiệu hóa người dùng')); }
   }
 
   async function handleActivate(userId: string) {
     try { await activate.mutateAsync(userId); toast.success('Đã kích hoạt lại người dùng'); }
-    catch (err: unknown) { toast.error((err as Error).message ?? 'Không thể kích hoạt người dùng'); }
+    catch (err: unknown) { toast.error(errMsg(err, 'Không thể kích hoạt người dùng')); }
   }
 
   async function handleSendResetLink(user: UserWithRoleAndTasks) {
@@ -114,7 +116,7 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
           if (!res.ok) throw new Error(body.error?.message ?? 'Không thể gửi email');
           toast.success('Đã gửi link reset mật khẩu');
         } catch (err: unknown) {
-          toast.error((err as Error).message ?? 'Gửi email thất bại');
+          toast.error(errMsg(err, 'Gửi email thất bại'));
         } finally {
           setSendingResetLinkId(null);
         }
@@ -127,7 +129,7 @@ export function UserTable({ users, hrFeatures, actorIsPrivileged, onEdit, select
     const id = deleteTargetId;
     setDeleteTargetId(null);
     try { await deleteUser.mutateAsync(id); toast.success('Đã xóa người dùng thành công'); }
-    catch (err: unknown) { toast.error((err as Error).message ?? 'Xóa thất bại'); }
+    catch (err: unknown) { toast.error(errMsg(err, 'Xóa thất bại')); }
   }
 
   if (users.length === 0) {

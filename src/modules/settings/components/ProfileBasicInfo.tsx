@@ -9,6 +9,7 @@ import { useUpdateProfile } from '../hooks/useProfile';
 import { toast } from 'sonner';
 import { ROLE_LABELS } from '@/lib/constants';
 import type { UserProfileData } from '../types';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 const TIMEZONES = [
   { value: 'Asia/Bangkok',     label: 'GMT+7 — Việt Nam / Bangkok' },
@@ -21,6 +22,7 @@ const TIMEZONES = [
 interface Props { profile: UserProfileData }
 
 export function ProfileBasicInfo({ profile }: Props) {
+  const errMsg = useErrorMessage();
   const update = useUpdateProfile();
   const [form, setForm] = useState({
     displayName: profile.displayName,
@@ -42,7 +44,7 @@ export function ProfileBasicInfo({ profile }: Props) {
       toast.success('Đã lưu thông tin cơ bản');
       setDirty(false);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi lưu');
+      toast.error(errMsg(err, 'Lỗi khi lưu'));
     }
   }
 

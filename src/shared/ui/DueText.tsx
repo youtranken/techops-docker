@@ -2,8 +2,10 @@
 
 /** Chữ hạn theo tông (preview `.due-*`). Logic ở `due.ts` (hàm thuần, có test). */
 import type { TaskStatus } from '@prisma/client';
+import { useLocale, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { dueInfo, type DueTone } from './due';
+import { resolveLocale } from '@/i18n/locale';
+import { dueInfo, dueLabel, type DueTone } from './due';
 
 const TONE_CLASS: Record<DueTone, string> = {
   overdue: 'text-due-overdue font-medium',
@@ -23,10 +25,12 @@ export interface DueTextProps {
 }
 
 export function DueText({ dueDate, status, now, className }: DueTextProps) {
-  const info = dueInfo(dueDate, now ?? new Date(), status);
+  const t = useTranslations();
+  const locale = resolveLocale(useLocale());
+  const info = dueInfo(dueDate, now ?? new Date(), status, { locale });
   return (
     <span data-tone={info.tone} className={cn('whitespace-nowrap text-[13px]', TONE_CLASS[info.tone], className)}>
-      {info.label}
+      {dueLabel(info, t)}
     </span>
   );
 }

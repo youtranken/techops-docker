@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useOverdueReminderConfig, useUpdateOverdueReminderConfig } from '../hooks/useOverdueReminderConfig';
 import { DIGEST_CATEGORIES, INDIVIDUAL_EMAIL_TYPES, INDIVIDUAL_EMAIL_TYPE_INFO } from '../types';
 import type { OverdueReminderConfigInput, DigestCategory, IndividualEmailType } from '../types';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 const ALL_CATEGORIES = [...DIGEST_CATEGORIES] as DigestCategory[];
 const ALL_INDIVIDUAL_TYPES = [...INDIVIDUAL_EMAIL_TYPES] as IndividualEmailType[];
@@ -43,6 +44,7 @@ const MINUTES = [0, 15, 30, 45];
 const WEEKDAYS = [1, 2, 3, 4, 5];
 
 export function OverdueReminderSection() {
+  const errMsg = useErrorMessage();
   const { data, isLoading } = useOverdueReminderConfig();
   const update = useUpdateOverdueReminderConfig();
   const [form, setForm] = useState<OverdueReminderConfigInput>(DEFAULT);
@@ -117,7 +119,7 @@ export function OverdueReminderSection() {
       toast.success('Đã lưu cấu hình nhắc nhở');
       setIsDirty(false);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi lưu');
+      toast.error(errMsg(err, 'Lỗi khi lưu'));
     }
   }
 

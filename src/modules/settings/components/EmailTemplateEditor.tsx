@@ -8,6 +8,7 @@ import { Loader2, Save, RotateCcw } from 'lucide-react';
 import { useUpsertEmailTemplate } from '../hooks/useEmailTemplates';
 import { toast } from 'sonner';
 import type { EmailTemplate } from '../types';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 interface Props {
   template: EmailTemplate & { isDefault?: boolean };
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function EmailTemplateEditor({ template, onClose }: Props) {
+  const errMsg = useErrorMessage();
   const upsert = useUpsertEmailTemplate();
   const [subject, setSubject] = useState(template.subject);
   const [body, setBody] = useState(template.body);
@@ -30,7 +32,7 @@ export function EmailTemplateEditor({ template, onClose }: Props) {
       toast.success('Đã lưu template');
       onClose();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi lưu');
+      toast.error(errMsg(err, 'Lỗi khi lưu'));
     }
   }
 

@@ -14,6 +14,7 @@ import { SmtpSenderFields } from './SmtpSenderFields';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 const DEFAULT_FORM: SmtpConfigInput = {
   host: '', port: 587, secure: false, user: '', password: '',
@@ -21,6 +22,7 @@ const DEFAULT_FORM: SmtpConfigInput = {
 };
 
 export function SmtpSection() {
+  const errMsg = useErrorMessage();
   const { data: config, isLoading } = useSmtpConfig();
   const updateSmtp = useUpdateSmtpConfig();
   const testSmtp = useTestSmtp();
@@ -49,7 +51,7 @@ export function SmtpSection() {
       toast.success('Đã lưu cấu hình SMTP');
       setIsDirty(false);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi lưu SMTP');
+      toast.error(errMsg(err, 'Lỗi lưu SMTP'));
     }
   }
 
@@ -60,7 +62,7 @@ export function SmtpSection() {
       const result = await testSmtp.mutateAsync(target.email);
       toast.success(result.message);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi kết nối SMTP');
+      toast.error(errMsg(err, 'Lỗi kết nối SMTP'));
     }
   }
 

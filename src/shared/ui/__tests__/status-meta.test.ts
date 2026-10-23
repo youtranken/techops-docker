@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { translator } from '@/test/translator';
 import { TaskStatus, AssigneeStatus } from '@prisma/client';
 import {
   TASK_STATUS_META,
@@ -7,20 +8,28 @@ import {
   assigneeStatusMeta,
   priorityTone,
   PRIORITY_TONE_META,
+  metaLabel,
+  type StatusMeta,
 } from '../status-meta';
+
+// Nhãn giờ lấy từ messages/*.json qua khoá (A1.3) → kiểm bằng translator thật của next-intl
+const tVi = translator('vi');
+const tEn = translator('en');
+const vi = (m: StatusMeta) => metaLabel(m, tVi);
+const en = (m: StatusMeta) => metaLabel(m, tEn);
 
 describe('TASK_STATUS_META', () => {
   it('phủ đủ mọi giá trị enum TaskStatus', () => {
     expect(Object.keys(TASK_STATUS_META).sort()).toEqual(Object.values(TaskStatus).sort());
   });
   it('nhãn tiếng Việt như preview', () => {
-    expect(TASK_STATUS_META.DRAFT.label).toBe('Nháp');
-    expect(TASK_STATUS_META.PENDING_APPROVAL.label).toBe('Chờ duyệt');
-    expect(TASK_STATUS_META.WAITING_ACKNOWLEDGE.label).toBe('Chờ nhận việc');
-    expect(TASK_STATUS_META.IN_PROGRESS.label).toBe('Đang làm');
-    expect(TASK_STATUS_META.PENDING_REVIEW.label).toBe('Chờ nghiệm thu');
-    expect(TASK_STATUS_META.COMPLETED.label).toBe('Đã xong');
-    expect(TASK_STATUS_META.CANCELLED.label).toBe('Đã hủy');
+    expect(vi(TASK_STATUS_META.DRAFT)).toBe('Nháp');
+    expect(vi(TASK_STATUS_META.PENDING_APPROVAL)).toBe('Chờ duyệt');
+    expect(vi(TASK_STATUS_META.WAITING_ACKNOWLEDGE)).toBe('Chờ nhận việc');
+    expect(vi(TASK_STATUS_META.IN_PROGRESS)).toBe('Đang làm');
+    expect(vi(TASK_STATUS_META.PENDING_REVIEW)).toBe('Chờ nghiệm thu');
+    expect(vi(TASK_STATUS_META.COMPLETED)).toBe('Đã xong');
+    expect(vi(TASK_STATUS_META.CANCELLED)).toBe('Đã hủy');
   });
   it('màu theo token --c-*', () => {
     expect(TASK_STATUS_META.PENDING_APPROVAL.color).toBe('var(--c-approval)');
@@ -31,7 +40,8 @@ describe('TASK_STATUS_META', () => {
     expect(TASK_STATUS_META.CANCELLED.color).toBe('var(--ink-3)');
   });
   it('taskStatusMeta: giá trị lạ không làm vỡ giao diện', () => {
-    expect(taskStatusMeta('XYZ').label).toBe('XYZ');
+    expect(vi(taskStatusMeta('XYZ'))).toBe('XYZ');
+    expect(taskStatusMeta('XYZ').labelKey).toBeNull();
   });
 });
 
@@ -40,12 +50,12 @@ describe('ASSIGNEE_STATUS_META', () => {
     expect(Object.keys(ASSIGNEE_STATUS_META).sort()).toEqual(Object.values(AssigneeStatus).sort());
   });
   it('nhãn theo V1 (preview _SPEC mục 8)', () => {
-    expect(ASSIGNEE_STATUS_META.PENDING.label).toBe('Chờ nhận');
-    expect(ASSIGNEE_STATUS_META.IN_PROGRESS.label).toBe('Đang làm');
-    expect(ASSIGNEE_STATUS_META.COMPLETED.label).toBe('Đã báo cáo');
-    expect(ASSIGNEE_STATUS_META.REJECTED.label).toBe('Từ chối');
-    expect(ASSIGNEE_STATUS_META.TRANSFERRED.label).toBe('Đã chuyển giao');
-    expect(ASSIGNEE_STATUS_META.REVISION_REQUIRED.label).toBe('Cần làm lại');
+    expect(vi(ASSIGNEE_STATUS_META.PENDING)).toBe('Chờ nhận');
+    expect(vi(ASSIGNEE_STATUS_META.IN_PROGRESS)).toBe('Đang làm');
+    expect(vi(ASSIGNEE_STATUS_META.COMPLETED)).toBe('Đã báo cáo');
+    expect(vi(ASSIGNEE_STATUS_META.REJECTED)).toBe('Từ chối');
+    expect(vi(ASSIGNEE_STATUS_META.TRANSFERRED)).toBe('Đã chuyển giao');
+    expect(vi(ASSIGNEE_STATUS_META.REVISION_REQUIRED)).toBe('Cần làm lại');
   });
   it('chấm rỗng cho Chờ nhận và Đã chuyển giao', () => {
     expect(ASSIGNEE_STATUS_META.PENDING.hollow).toBe(true);
@@ -58,7 +68,7 @@ describe('ASSIGNEE_STATUS_META', () => {
     expect(ASSIGNEE_STATUS_META.COMPLETED.color).toBe('var(--c-done)');
   });
   it('assigneeStatusMeta: giá trị lạ không làm vỡ giao diện', () => {
-    expect(assigneeStatusMeta('ABC').label).toBe('ABC');
+    expect(en(assigneeStatusMeta('ABC'))).toBe('ABC');
   });
 });
 
@@ -76,9 +86,31 @@ describe('priorityTone (theo level của bảng Priority)', () => {
     expect(priorityTone(null)).toBe('normal');
   });
   it('meta: nhãn mặc định + màu', () => {
-    expect(PRIORITY_TONE_META.urgent).toMatchObject({ label: 'Khẩn', color: 'var(--danger)' });
-    expect(PRIORITY_TONE_META.high).toMatchObject({ label: 'Cao', color: 'var(--c-review)' });
-    expect(PRIORITY_TONE_META.normal).toMatchObject({ label: 'Thường', color: 'var(--ink-3)' });
-    expect(PRIORITY_TONE_META.low).toMatchObject({ label: 'Thấp', color: 'var(--ink-3)' });
+    expect(PRIORITY_TONE_META.urgent).toMatchObject({ labelKey: 'pr.urgent', color: 'var(--danger)' });
+    expect(PRIORITY_TONE_META.high).toMatchObject({ labelKey: 'pr.high', color: 'var(--c-review)' });
+    expect(PRIORITY_TONE_META.normal).toMatchObject({ labelKey: 'pr.normal', color: 'var(--ink-3)' });
+    expect(PRIORITY_TONE_META.low).toMatchObject({ labelKey: 'pr.low', color: 'var(--ink-3)' });
+    expect(vi(PRIORITY_TONE_META.urgent)).toBe('Khẩn');
+    expect(en(PRIORITY_TONE_META.urgent)).toBe('Urgent');
+  });
+});
+
+describe('khoá nhãn (A1.3)', () => {
+  it('trạng thái việc dùng khoá st.*, người làm td.as.*, ưu tiên pr.*', () => {
+    expect(TASK_STATUS_META.PENDING_APPROVAL.labelKey).toBe('st.PENDING_APPROVAL');
+    expect(ASSIGNEE_STATUS_META.REVISION_REQUIRED.labelKey).toBe('td.as.REVISION_REQUIRED');
+    expect(ASSIGNEE_STATUS_META.ACKNOWLEDGED.labelKey).toBe('td.as.ACCEPTED');
+  });
+  it('mọi khoá đều có trong vi.json và en.json (không hiện tên khoá)', () => {
+    const metas = [...Object.values(TASK_STATUS_META), ...Object.values(ASSIGNEE_STATUS_META), ...Object.values(PRIORITY_TONE_META)];
+    for (const m of metas) {
+      expect(tVi.has(m.labelKey!)).toBe(true);
+      expect(tEn.has(m.labelKey!)).toBe(true);
+    }
+  });
+  it('nhãn tiếng Anh', () => {
+    expect(en(TASK_STATUS_META.PENDING_APPROVAL)).toBe('Awaiting approval');
+    expect(en(TASK_STATUS_META.COMPLETED)).toBe('Done');
+    expect(en(ASSIGNEE_STATUS_META.TRANSFERRED)).toBe('Handed over');
   });
 });

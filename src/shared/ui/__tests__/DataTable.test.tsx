@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { screen, fireEvent, within } from '@testing-library/react';
+import { render } from '@/test/intl';
 import { DataTable, type DataTableColumn } from '../DataTable';
 
 type Row = { id: string; code: string; title: string; who: string };
@@ -81,5 +82,14 @@ describe('DataTable', () => {
     render(<DataTable ariaLabel="T" columns={cols} rows={rows} getRowId={(r) => r.id} onRowClick={onRowClick} />);
     fireEvent.keyDown(screen.getAllByRole('button', { name: 'nút' })[0], { key: 'Enter' });
     expect(onRowClick).not.toHaveBeenCalled();
+  });
+
+  it('EN: chữ mặc định rỗng / lỗi / Thử lại theo ngôn ngữ', () => {
+    const { unmount } = render(<DataTable ariaLabel="T" columns={columns} rows={[]} getRowId={(r) => r.id} />, { locale: 'en' });
+    expect(screen.getByText('No data')).toBeInTheDocument();
+    unmount();
+    render(<DataTable ariaLabel="T" columns={columns} rows={rows} getRowId={(r) => r.id} error="x" onRetry={() => {}} />, { locale: 'en' });
+    expect(screen.getByText('Couldn’t load data')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
   });
 });

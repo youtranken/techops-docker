@@ -1,3 +1,8 @@
+import createNextIntlPlugin from 'next-intl/plugin';
+
+// next-intl: ngôn ngữ theo cookie NEXT_LOCALE (src/i18n/config.ts), không dùng tiền tố URL.
+const withNextIntl = createNextIntlPlugin('./src/i18n/config.ts');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone', // For production Docker
@@ -60,5 +65,5 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);
   

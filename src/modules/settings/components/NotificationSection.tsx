@@ -8,6 +8,7 @@ import { useNotificationPrefs, useUpdateNotificationPrefs, NOTIFICATION_TYPES } 
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { NotificationTypeList } from './NotificationTypeList';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 type RoleFilter = 'all' | 'BOSS' | 'EMPLOYEE';
 
@@ -18,6 +19,7 @@ const ROLE_TABS: { key: RoleFilter; label: string; icon: React.ElementType }[] =
 ];
 
 export function NotificationSection() {
+  const errMsg = useErrorMessage();
   const { data: session } = useSession();
   const userRole = session?.user?.role?.name ?? 'EMPLOYEE';
   const { data: prefs, isLoading } = useNotificationPrefs();
@@ -52,7 +54,7 @@ export function NotificationSection() {
       toast.success('Đã lưu cài đặt thông báo');
       setIsDirty(false);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi lưu');
+      toast.error(errMsg(err, 'Lỗi khi lưu'));
     }
   }
 

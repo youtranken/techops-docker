@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render } from '@/test/intl';
 import { ConfirmProvider, useConfirm, type ConfirmOptions } from '../ConfirmDialog';
 
 /** Nút bấm gọi confirm(), ghi kết quả ra DOM để kiểm tra */
@@ -102,5 +103,17 @@ describe('ConfirmDialog / useConfirm', () => {
     console.error = () => {};
     expect(() => render(<Bad />)).toThrow(/ConfirmProvider/);
     console.error = spy;
+  });
+
+  it('EN: nút đóng / nút chính mặc định theo ngôn ngữ (Close / Confirm)', async () => {
+    render(
+      <ConfirmProvider>
+        <Harness opts={{ title: 'Continue?' }} />
+      </ConfirmProvider>,
+      { locale: 'en' },
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Mở' }));
+    expect(await screen.findByRole('button', { name: 'Close' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
   });
 });

@@ -10,8 +10,10 @@ import { toast } from 'sonner';
 import { useConfirm } from '@/shared/ui/ConfirmDialog';
 import { usePriorities, useCreatePriority, useUpdatePriority, useDeletePriority, type Priority } from '../hooks/usePriorities';
 import { PriorityForm } from './PriorityForm';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 export function PrioritiesSection() {
+  const errMsg = useErrorMessage();
   const { data: priorities = [], isLoading } = usePriorities();
   const create = useCreatePriority();
   const update = useUpdatePriority();
@@ -26,7 +28,7 @@ export function PrioritiesSection() {
       setShowCreate(false);
       toast.success('Đã thêm mức ưu tiên');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi thêm');
+      toast.error(errMsg(err, 'Lỗi khi thêm'));
     }
   }
 
@@ -37,7 +39,7 @@ export function PrioritiesSection() {
       setEditing(null);
       toast.success('Đã cập nhật');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi cập nhật');
+      toast.error(errMsg(err, 'Lỗi khi cập nhật'));
     }
   }
 
@@ -50,7 +52,7 @@ export function PrioritiesSection() {
     });
     if (!ok) return;
     try { await remove.mutateAsync(p.id); } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể xóa — đang được sử dụng');
+      toast.error(errMsg(err, 'Không thể xóa — đang được sử dụng'));
     }
   }
 
