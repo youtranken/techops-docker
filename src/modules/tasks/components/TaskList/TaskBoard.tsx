@@ -469,8 +469,8 @@ export function TaskBoard({
               aria-labelledby={`tb-h-${c.col}`}
               style={{ ['--k' as string]: COL_COLOR[c.col] }}
               className={cn(
-                'relative flex max-h-[max(380px,calc(100dvh-300px))] w-[272px] flex-none flex-col rounded-card bg-lane transition-[opacity,background-color]',
-                'max-[680px]:max-h-none max-[680px]:w-[calc(100vw-48px)] max-[680px]:snap-start',
+                'relative flex max-h-[max(380px,calc(100dvh-300px))] min-w-[216px] max-w-[340px] flex-1 basis-0 flex-col rounded-card bg-lane transition-[opacity,background-color]',
+                'max-[680px]:max-h-none max-[680px]:w-[calc(100vw-48px)] max-[680px]:max-w-none max-[680px]:flex-none max-[680px]:basis-auto max-[680px]:snap-start',
                 no && 'opacity-45 [&_*]:!cursor-not-allowed',
                 ok && 'min-h-[240px] bg-primary-soft outline-2 -outline-offset-2 outline-dashed outline-primary',
                 isOver && 'bg-[color-mix(in_srgb,var(--primary)_14%,var(--surface))] outline-solid',
