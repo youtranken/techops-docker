@@ -94,7 +94,23 @@ Lát nào đụng tới một trong các điểm trên thì chuyển sang Phase 
 - Dọn code chết.
 - Cập nhật docs.
 
-**Mỗi lát là 1 nhánh.** Phải đạt DoD (vitest, tsc, E2E, docker build, `/api/health`) rồi mới deploy.
+**Cách làm (chốt 23/10/2026):**
+- Mỗi lát là 1 nhánh `feat/v2-…`, xong thì gộp vào nhánh tích hợp **`v2/phase-a`**.
+- `main` giữ nguyên = Prod cho tới khi xong cả Phase A.
+
+| | Mỗi lát | Cuối Phase A |
+|---|---|---|
+| TDD (lát có logic/hành vi) | ✓ | |
+| tsc + vitest (không tăng 16 lỗi sẵn có) | ✓ | ✓ |
+| E2E | ✓ trên `next dev` | ✓ trên bản Docker |
+| Docker build + `/api/health` | | ✓ |
+| Deploy Prod (`update-techops.ps1`) | | ✓ |
+
+Lý do: build Docker trên Windows rất lâu.
+
+**Tiến độ:**
+- A0 xong.
+- A1-1 (token màu + font + theme) xong 23/10. Thay đổi nhìn thấy còn nhỏ vì các màn vẫn viết cứng ~1.100 lớp màu; sẽ ra tông V2 khi làm A1-4 và A2/A3.
 
 ---
 
@@ -117,6 +133,7 @@ Lát nào đụng tới một trong các điểm trên thì chuyển sang Phase 
 | B1 | Gom ~140 chỗ viết cứng `'ADMIN'/'BOSS'` về `lib/roles.ts`. Giữ nguyên hành vi, có test bao quanh. |
 | B2 | Thêm MANAGER: seed + đổi nhãn BOSS thành "Vice Manager", không đổi schema. |
 | B3 | Các câu Q4–Q21 trong `_GAP-code-vs-preview.md`. Đề xuất mặc định nằm ở bảng dưới, **chưa duyệt**. |
+| B5 | **Sau Phase B:** sửa xuất PDF ở Báo cáo (container thiếu Chrome — Dockerfile đặt `PUPPETEER_SKIP_DOWNLOAD`), nâng Node 22 → 24. |
 | B4 | Tính năng mới cần backend: xuất Excel danh sách việc và nhật ký, khoá bình luận, nhiều thiết bị, bản nháp (nếu cần), ma trận quyền theo vai trò, bật lại quyền công việc riêng. |
 
 #### Đề xuất mặc định cho B3 (chờ duyệt ở Phase B)
