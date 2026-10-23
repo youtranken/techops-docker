@@ -146,6 +146,21 @@ const vi = {
   'er.500.dShort': 'Trang chưa tải được. Thử lại sau ít phút; nếu vẫn lỗi, gửi mã lỗi bên dưới cho phòng IT.',
   'idle.expired.t': 'Phiên làm việc đã hết hạn',
   'idle.expired.d': 'Bạn đã bị đăng xuất do không hoạt động.',
+  // ── A2-1 chi tiết công việc: chữ cho hành vi V1 mà preview không có ──
+  'tdx.nf.d': 'Công việc có thể đã bị xóa, hoặc bạn không có quyền xem.',
+  'tdx.ext.date': 'Xin gia hạn đến {d}',
+  'tdx.ext.review': 'Xem xét',
+  'tdx.cm.reply': 'Trả lời',
+  'tdx.cm.replyTo': 'Trả lời @{a}…',
+  'tdx.cm.cancelReply': 'Bỏ trả lời',
+  'tdx.cm.deleted': 'Bình luận đã bị xóa',
+  'tdx.cm.sendHint': 'Ctrl+Enter để gửi',
+  'tdx.cm.cancel': 'Hủy sửa',
+  'tdx.dept': 'Phòng ban',
+  'tdx.start': 'Ngày bắt đầu',
+  'tdx.doneAt': 'Hoàn thành lúc',
+  'tdx.view': 'Xem',
+  'tdx.processing': 'Đang xử lý…',
 };
 
 const en = {
@@ -284,6 +299,21 @@ const en = {
   'er.500.dShort': 'This page didn’t load. Try again in a few minutes; if it keeps failing, send the error code below to IT.',
   'idle.expired.t': 'Your session has ended',
   'idle.expired.d': 'You were signed out because you were inactive.',
+  // ── A2-1 task details ──
+  'tdx.nf.d': 'It may have been removed, or you don’t have access to it.',
+  'tdx.ext.date': 'Asks to extend to {d}',
+  'tdx.ext.review': 'Review',
+  'tdx.cm.reply': 'Reply',
+  'tdx.cm.replyTo': 'Reply to @{a}…',
+  'tdx.cm.cancelReply': 'Stop replying',
+  'tdx.cm.deleted': 'Comment deleted',
+  'tdx.cm.sendHint': 'Ctrl+Enter to send',
+  'tdx.cm.cancel': 'Cancel edit',
+  'tdx.dept': 'Department',
+  'tdx.start': 'Start date',
+  'tdx.doneAt': 'Completed',
+  'tdx.view': 'View',
+  'tdx.processing': 'Working…',
 };
 
 export const EXTRA = { vi, en };

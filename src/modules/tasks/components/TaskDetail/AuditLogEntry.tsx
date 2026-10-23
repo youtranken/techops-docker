@@ -1,7 +1,7 @@
 'use client';
 
 import type { TaskStatus } from '@prisma/client';
-import { TaskStatusBadge } from '../TaskCard/TaskStatusBadge';
+import { StatusDot } from '@/shared/ui/StatusDot';
 import type { TaskDetail } from '../../services/task-query.service';
 
 type Log      = TaskDetail['auditLogs'][number];
@@ -31,10 +31,10 @@ const ACTION_CFG: Record<string, { label: string; tone: Tone }> = {
   STATUS_CHANGED:      { label: 'Đổi trạng thái',       tone: 'neutral'  },
 };
 
-const TONE_PILL: Record<Tone, string> = {
-  positive: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  negative: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-  neutral:  'bg-slate-100 text-slate-600 dark:bg-slate-700/60 dark:text-slate-400',
+const TONE_DOT: Record<Tone, string> = {
+  positive: 'bg-c-done',
+  negative: 'bg-danger',
+  neutral:  'bg-line-2',
 };
 
 function fmt(d: Date | string) {
@@ -107,64 +107,23 @@ function getContext(log: Log, assignees: Assignee[]): string | null {
 
 interface Props { log: Log; assignees: Assignee[] }
 
+/** Một dòng Lịch sử (preview `.hist li`). Nhãn + diễn giải giữ nguyên chữ V1 (dịch ở lát sau). */
 export function AuditLogEntry({ log, assignees }: Props) {
-  const cfg        = ACTION_CFG[log.action] ?? { label: log.action, tone: 'neutral' as Tone };
-  const context    = getContext(log, assignees);
-  const isBoss     = ['BOSS', 'ADMIN'].includes(log.performedBy.role.name);
-  const showStatus  = !!log.newStatus && log.action !== 'COMPLETED';
-
-  const bubble = isBoss
-    ? 'bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-800/40 rounded-xl rounded-tl-sm'
-    : 'bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-xl rounded-tr-sm';
-
-  const roleLabel = isBoss
-    ? 'text-indigo-400 dark:text-indigo-500'
-    : 'text-slate-400 dark:text-slate-500';
-
+  const cfg = ACTION_CFG[log.action] ?? { label: log.action, tone: 'neutral' as Tone };
+  const context = getContext(log, assignees);
+  const showStatus = !!log.newStatus && log.oldStatus !== log.newStatus && log.action !== 'COMPLETED';
   return (
-    <div className={`flex gap-2 mb-3 ${isBoss ? 'justify-start' : 'justify-end'}`}>
-      {isBoss && (
-        <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center shrink-0 mt-1">
-          <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400">
-            {log.performedBy.displayName.charAt(0).toUpperCase()}
-          </span>
-        </div>
-      )}
-
-      <div className={`max-w-[82%] px-3 py-2.5 ${bubble}`}>
-        <div className="flex items-center gap-1.5 flex-wrap mb-1">
-          <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 leading-none">
-            {log.performedBy.displayName}
-          </span>
-          <span className={`text-[9px] font-medium uppercase tracking-wide ${roleLabel}`}>
-            {log.performedBy.role.name}
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${TONE_PILL[cfg.tone]}`}>
-            {cfg.label}
-          </span>
-          {showStatus && <TaskStatusBadge status={log.newStatus as TaskStatus} size="sm" />}
-        </div>
-        {context && (
-          <div className="mt-1.5 space-y-0.5">
-            {context.split('\n').map((line, i) => (
-              <p key={i} className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                ↳ {line}
-              </p>
-            ))}
-          </div>
-        )}
-        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5">{fmt(log.createdAt)}</p>
+    <li className="relative grid grid-cols-[minmax(0,1fr)_auto] gap-3 pb-3.5 pl-5 before:absolute before:bottom-[-2px] before:left-[3px] before:top-3.5 before:w-px before:bg-line before:content-[''] last:before:hidden">
+      <span aria-hidden className={`absolute left-0 top-[7px] size-[7px] rounded-full ${TONE_DOT[cfg.tone]}`} />
+      <div className="min-w-0 text-sm text-ink-2 [overflow-wrap:anywhere]">
+        <p className="m-0"><b className="font-medium text-ink">{log.performedBy.displayName}</b> · {cfg.label}
+          {showStatus && <> → <StatusDot status={log.newStatus as TaskStatus} className="align-middle text-xs" /></>}
+        </p>
+        {context && context.split('\n').map((line, i) => (
+          <p key={i} className="m-0 mt-0.5 text-[13px] text-ink-3">{line}</p>
+        ))}
       </div>
-
-      {!isBoss && (
-        <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0 mt-1">
-          <span className="text-[9px] font-black text-slate-600 dark:text-slate-300">
-            {log.performedBy.displayName.charAt(0).toUpperCase()}
-          </span>
-        </div>
-      )}
-    </div>
+      <time className="whitespace-nowrap pt-0.5 font-mono text-xs text-ink-3">{fmt(log.createdAt)}</time>
+    </li>
   );
 }

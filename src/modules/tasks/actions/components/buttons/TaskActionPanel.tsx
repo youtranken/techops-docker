@@ -29,12 +29,44 @@ interface TaskActionPanelProps {
 export function TaskActionPanel({
   taskId, permissions, currentAssigneeIds, currentUserId, scheduleEnd, taskAssignees = [],
 }: TaskActionPanelProps) {
+  const panel = useTaskActionPanel();
+  const isPending = {
+    acknowledge: panel.acknowledge.isPending, complete: panel.complete.isPending,
+    approvePlan: panel.approvePlan.isPending, rejectPlan: panel.rejectPlan.isPending,
+    approveReview: panel.approveReview.isPending, rejectReview: panel.rejectReview.isPending,
+    rejectTask: panel.rejectTask.isPending, transfer: panel.transfer.isPending,
+    reassign: panel.reassign.isPending,
+    cancelTask: panel.cancelTask.isPending, restoreTask: panel.restoreTask.isPending,
+    supplementReport: panel.supplementReport.isPending,
+    requestExtension: panel.requestExtension.isPending,
+  };
+
+  return (
+    <>
+      <TaskActionButtons permissions={permissions} onModal={panel.setModal} isPending={isPending} />
+      <TaskActionModals
+        panel={panel} taskId={taskId} currentAssigneeIds={currentAssigneeIds}
+        currentUserId={currentUserId} scheduleEnd={scheduleEnd} taskAssignees={taskAssignees}
+      />
+    </>
+  );
+}
+
+export interface TaskActionModalsProps extends Omit<TaskActionPanelProps, 'permissions'> {
+  /** Kết quả `useTaskActionPanel()` — chung một trạng thái modal với nơi đặt nút */
+  panel: ReturnType<typeof useTaskActionPanel>;
+}
+
+/** Bộ hộp thoại hành động V1 (tách khỏi TaskActionPanel để chi tiết V2 tự đặt nút nhưng dùng đúng hộp thoại/luồng V1). */
+export function TaskActionModals({
+  panel, taskId, currentAssigneeIds, currentUserId, scheduleEnd, taskAssignees = [],
+}: TaskActionModalsProps) {
   const {
-    modal, setModal, close,
+    modal, close,
     acknowledge, complete, approvePlan, rejectPlan,
     approveReview, rejectReview, rejectTask,
     transfer, reassign, cancelTask, restoreTask, supplementReport, requestExtension,
-  } = useTaskActionPanel();
+  } = panel;
 
   const completedAssignees = taskAssignees
     .filter((a) => a.status === 'COMPLETED')
@@ -47,21 +79,8 @@ export function TaskActionPanel({
       };
     });
 
-  const isPending = {
-    acknowledge: acknowledge.isPending, complete: complete.isPending,
-    approvePlan: approvePlan.isPending, rejectPlan: rejectPlan.isPending,
-    approveReview: approveReview.isPending, rejectReview: rejectReview.isPending,
-    rejectTask: rejectTask.isPending, transfer: transfer.isPending,
-    reassign: reassign.isPending,
-    cancelTask: cancelTask.isPending, restoreTask: restoreTask.isPending,
-    supplementReport: supplementReport.isPending,
-    requestExtension: requestExtension.isPending,
-  };
-
   return (
     <>
-      <TaskActionButtons permissions={permissions} onModal={setModal} isPending={isPending} />
-
       {scheduleEnd && (
         <RequestExtensionModal open={modal === 'extension'} onClose={close}
           currentDeadline={scheduleEnd} isLoading={requestExtension.isPending}

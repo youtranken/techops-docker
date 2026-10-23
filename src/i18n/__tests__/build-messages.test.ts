@@ -62,6 +62,13 @@ describe('selectKeys — chỉ lấy nhóm khoá được chọn', () => {
   it('theo tiền tố nhóm (khớp đúng đoạn, "st" không ăn "stx") + theo tiền tố khoá cụ thể', () => {
     expect(selectKeys(flat, { groups: ['st'], prefixes: ['td.as.'] })).toEqual({ 'st.DRAFT': '1', 'td.as.PENDING': '3' });
   });
+  it('bỏ các khoá theo tiền tố trong exclude (vd khoá điều khiển preview td.pv.*)', () => {
+    expect(selectKeys(flat, { groups: ['td'], exclude: ['td.as.'] })).toEqual({ 'td.title': '4' });
+  });
+  it('A2-1: có nhóm td (chi tiết công việc) nhưng không lấy khoá preview / Phase B', () => {
+    expect(INCLUDE.groups).toContain('td');
+    expect(INCLUDE.exclude).toEqual(expect.arrayContaining(['td.pv.', 'td.cm.lock']));
+  });
   it('INCLUDE có đủ các nhóm khung dùng chung', () => {
     for (const g of ['app', 'top', 'nav', 'st', 'pr', 'due', 'act', 'qa', 'role', 'filter', 'view', 'page', 'empty', 'notif', 'ago']) {
       expect(INCLUDE.groups).toContain(g);

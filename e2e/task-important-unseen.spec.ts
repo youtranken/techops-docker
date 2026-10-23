@@ -132,9 +132,9 @@ test.describe.serial('V2 — ★ Quan trọng & Hoàn thành chưa xem', () => {
     await expect(page.getByText('Thu gọn', { exact: true })).toBeVisible();
 
     // Mục 3: popup báo cáo đầy đủ
-    // mở accordion người thực hiện (cột phải) — nút chứa tên + username
-    await page.getByRole('button', { name: new RegExp(`${E2E_USERS.emp.username}`) }).first().click();
-    await page.getByRole('button', { name: /Xem đầy đủ báo cáo/ }).first().click();
+    // V2 A2-1: khối "Kết quả của người làm" — mỗi người 1 dòng, nút "Xem báo cáo" (thay accordion cột phải V1)
+    await page.getByTestId('results').locator(`[data-assignee="${E2E_USERS.emp.username}"]`)
+      .getByRole('button', { name: 'Xem báo cáo' }).click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).toContainText('DÒNG CUỐI BÁO CÁO');
     await page.keyboard.press('Escape');

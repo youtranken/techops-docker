@@ -1,3 +1,5 @@
+/** BẢN SAO NGUYÊN VĂN của V1 src/modules/tasks/components/TaskQuickView/workflowTimeline.utils.ts (đã xoá ở A2-1)
+ *  — giữ làm mốc đối chiếu cho test Hành trình V2 (chế độ Phê duyệt). Không dùng trong code chạy. */
 import type { TaskStatus } from '@prisma/client';
 
 export interface TimelineStep {

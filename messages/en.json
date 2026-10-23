@@ -234,6 +234,9 @@
     "search": "Search",
     "success": "Success"
   },
+  "dnd": {
+    "reported": "{x}/{n} reported"
+  },
   "due": {
     "doneOnTime": "Done on time",
     "in": "Due in {n}d",
@@ -489,6 +492,18 @@
     "type": "Task Type"
   },
   "td": {
+    "actions": "Actions",
+    "addFile": "Add files",
+    "af": {
+      "admin": "Use Reassign to pick someone else. The task goes back to Awaiting pickup.",
+      "boss": "An Admin can reassign it. {a} (creator) has been told.",
+      "creator": "You created this task, so you can cancel it. Only Admins have the Reassign button.",
+      "holder": "Nobody is on it. Waiting to be reassigned or cancelled",
+      "other": "{a} (creator) has been told.",
+      "t": "Everyone assigned declined or handed it over"
+    },
+    "allReports": "See all {n} reports",
+    "andN": "{a} and {n} more",
     "as": {
       "ACCEPTED": "Accepted",
       "COMPLETED": "Reported",
@@ -500,7 +515,187 @@
       "REVISION_REQUIRED": "Needs rework",
       "REWORK": "Needs rework",
       "TRANSFERRED": "Handed over"
-    }
+    },
+    "assignees": "Assignees",
+    "at": "With {a} for {n} days",
+    "atNow": "Just moved to {a}",
+    "atYou": "With you for {n} days",
+    "back": "Back",
+    "backList": "Back to tasks",
+    "byCancel": "Because the task was cancelled",
+    "cancelReason": "Why it was cancelled",
+    "cancelledOn": "Cancelled on {d}",
+    "closed": "Closed on {d}",
+    "cm": {
+      "all": "View all {n} comments",
+      "del": "Delete",
+      "delOther": "Delete comment (Admin)",
+      "edit": "Edit",
+      "edited": "edited",
+      "empty": "No comments yet.",
+      "hint": "Type @ to mention someone",
+      "label": "Comment",
+      "mention": "Mention suggestions",
+      "save": "Save",
+      "send": "Send",
+      "write": "Write a comment…"
+    },
+    "created": "Created",
+    "creator": "Created by",
+    "declineWhy": "Why they declined",
+    "desc": "Description",
+    "descEmpty": "No description.",
+    "detail": "Task details",
+    "download": "Download {f}",
+    "due": "Due",
+    "ext": {
+      "auto": "Declined automatically because the task has ended.",
+      "empty": "No extension requests yet.",
+      "reply": "Reply from {a}",
+      "rules": "Up to 2 pending at a time, 5 in total per task.",
+      "st": {
+        "APPROVED": "Approved",
+        "PENDING": "Pending",
+        "REJECTED": "Declined",
+        "WITHDRAWN": "Withdrawn"
+      },
+      "to": "Move due date {a} → {b}",
+      "wd": "Withdrawn by the requester.",
+      "withdraw": "Withdraw"
+    },
+    "extUsed": "{n}/5 extension requests used",
+    "extra": "More details",
+    "files": "Attachments",
+    "force": "Mandatory",
+    "fromPerson": "Handed over from {a}",
+    "h": {
+      "accepted": "{a} accepted",
+      "allFailed": "Everyone assigned declined; {b} was told",
+      "approved": "{a} approved the plan",
+      "cancelled": "{a} cancelled the task",
+      "created": "{a} created the task",
+      "declined": "{a} declined",
+      "extNo": "{a} declined {b}’s extension request",
+      "extOk": "{a} approved an extension to {d}",
+      "extReq": "{a} asked for more time, until {d}",
+      "extWd": "{a} withdrew an extension request",
+      "files": "{a} added {n} file(s)",
+      "reassigned": "{a} reassigned it to {n}",
+      "rejected": "{a} rejected the plan",
+      "reported": "{a} sent report {v}",
+      "restored": "{a} restored the task",
+      "returned": "{a} declined; the part went back to {b}",
+      "reviewed": "{a} signed off the task",
+      "rework": "{a} sent {b} back for rework",
+      "starOff": "{a} unstarred the task",
+      "starOn": "{a} starred the task",
+      "supplemented": "{a} updated their report to {v}",
+      "transferred": "{a} handed their part over to {b}"
+    },
+    "hist": {
+      "empty": "No activity yet."
+    },
+    "info": "Details",
+    "infoToggle": "Task details",
+    "journey": "Journey",
+    "less": "Show less",
+    "mode": {
+      "_": "Workflow",
+      "approval": "Approval",
+      "direct": "Direct"
+    },
+    "more": "Show all",
+    "na": {
+      "d": "Staff only see tasks they created or are assigned to (unless it’s awaiting approval). Ask a Vice Manager or Admin to add you if you need it.",
+      "t": "You don’t have access to this task"
+    },
+    "ne": {
+      "d": "Lost the connection to the server. Check your network and try again.",
+      "t": "Couldn’t load this task"
+    },
+    "next": "Next task",
+    "nf": {
+      "d": "The code may be mistyped, or the task was removed from the system.",
+      "t": "Task {id} not found"
+    },
+    "noFiles": "No files yet.",
+    "noReason": "(No reason given)",
+    "noReport": "No report yet",
+    "openFull": "Open full page",
+    "openTicket": "Open Helpdesk ticket",
+    "pos": "Task {i} of {n}",
+    "pplN": "{n} people",
+    "prev": "Previous task",
+    "priority": "Priority",
+    "reassigned": "Reassigned",
+    "rejectReason": "Why the plan was rejected",
+    "report": "Report",
+    "reportOf": "{a}’s report",
+    "requester": "Requested by",
+    "results": "Assignee results",
+    "reworkThis": "Send {a} back for rework",
+    "reworkWhy": "Why it was sent back",
+    "sections": "Discussion and history",
+    "source": "From Helpdesk",
+    "status": "Status",
+    "stepOf": "Step {i} of {n}",
+    "sum": "Task summary",
+    "tab": {
+      "cm": "Comments",
+      "ext": "Extensions",
+      "hist": "History"
+    },
+    "taskId": "Task ID",
+    "ticket": "Ticket",
+    "toPerson": "Handed over to {a}",
+    "turn": {
+      "accept": "Your turn to accept",
+      "approve": "Your turn to approve",
+      "days": "waiting {n} days",
+      "new": "just arrived",
+      "reassign": "Everyone declined. Your turn to reassign",
+      "report": "Your turn to report back",
+      "restore": "You can restore this task",
+      "review": "Your turn to sign off",
+      "supplement": "You can add to your report"
+    },
+    "type": "Type",
+    "version": "Version",
+    "viewReport": "View report",
+    "wait": {
+      "CANCELLED": "This task was cancelled.",
+      "COMPLETED": "This task is done.",
+      "DRAFT": "This task is still a draft.",
+      "IN_PROGRESS": "Assignees are working on it.",
+      "PENDING_APPROVAL": "Waiting for a Vice Manager or Admin to approve the plan.",
+      "PENDING_REVIEW": "Waiting for a Vice Manager or Admin to sign off.",
+      "WAITING_ACKNOWLEDGE": "Waiting for assignees to accept.",
+      "reported": "You’ve reported. Waiting on the others."
+    },
+    "you": "You",
+    "yourTurn": "Your turn"
+  },
+  "tdx": {
+    "cm": {
+      "cancel": "Cancel edit",
+      "cancelReply": "Stop replying",
+      "deleted": "Comment deleted",
+      "reply": "Reply",
+      "replyTo": "Reply to @{a}…",
+      "sendHint": "Ctrl+Enter to send"
+    },
+    "dept": "Department",
+    "doneAt": "Completed",
+    "ext": {
+      "date": "Asks to extend to {d}",
+      "review": "Review"
+    },
+    "nf": {
+      "d": "It may have been removed, or you don’t have access to it."
+    },
+    "processing": "Working…",
+    "start": "Start date",
+    "view": "View"
   },
   "tl": {
     "pg": {
