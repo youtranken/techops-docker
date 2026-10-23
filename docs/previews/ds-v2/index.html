@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Mục lục</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+/* ---------- Riêng trang Mục lục ---------- */
+.ix-sec{margin:0 0 24px}
+.ix-sec>h2{display:flex;align-items:baseline;gap:8px;margin:0 0 14px;font:600 15px/1.3 var(--f-head)}
+.ix-sec>h2 .n{font:500 12px/1 var(--f-mono);color:var(--ink-3)}
+.ix-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.ix-card{position:relative;display:flex;flex-direction:column;gap:6px;height:100%;padding:16px 18px 18px}
+.ix-card h3{margin:0;font:600 16px/1.35 var(--f-head);letter-spacing:-.01em}
+.ix-card h3 a{text-decoration:none}
+.ix-card h3 a::after{content:"";position:absolute;inset:0;border-radius:var(--r-card)}
+.ix-card h3 a:focus-visible{outline:none}
+.ix-card:focus-within{box-shadow:0 0 0 2px var(--primary)}
+.ix-card .alt{font-size:var(--fs-xs);color:var(--ink-3)}
+.ix-card p{margin:4px 0 0;font-size:var(--fs-sm);color:var(--ink-2);line-height:1.55;flex:1}
+.ix-foot{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:var(--fs-xs)}
+.ix-foot .fname{font:400 12px/1 var(--f-mono);color:var(--ink-3);margin-left:auto}
+.ix-done{--k:var(--c-done)} .ix-soon{--k:var(--ink-3)}
+a.ix-card:hover,.ix-card.go:hover{border-color:var(--line-2);box-shadow:var(--shadow-2)}
+.ix-card.soon{background:transparent;box-shadow:none;border-style:dashed}
+.ix-card.soon h3{color:var(--ink-2)}
+.ix-open{display:inline-flex;align-items:center;gap:4px;color:var(--primary);font-weight:500;font-size:var(--fs-sm)}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="content" id="content">
+  <div class="head">
+    <div>
+      <h1 data-t="ix.title"></h1>
+      <p data-t="ix.sub"></p>
+    </div>
+  </div>
+  <div id="ix"></div>
+</main>
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+(function(){
+  var T=I18N.t, esc=App.esc;
+  var PAGES=[
+    ['list','tasks-list.html',1],['board','tasks-board.html',1],['task','task.html?id=26-0033',1],['form','task-form.html',1],
+    ['dash','dashboard.html',1],['hd','helpdesk.html',1],['rep','reports.html',1],['reptasks','reports-tasks.html',1],
+    ['people','people.html',1],['perm','permissions.html',1],['logs','logs.html',1],['settings','settings.html',1],
+    ['profile','profile.html',1],['notif','notifications.html',1],['auth','login.html',1],['pwd','password.html?mode=first',1],['err','errors.html?type=404',1]
+  ];
+  function other(k){var o=I18N.lang==='vi'?'en':'vi';return I18N.M[o][k]}
+  function card(x){
+    var done=!!x[2], st='<span class="stat '+(done?'ix-done':'ix-soon')+'"><span class="sdot" aria-hidden="true"></span><span>'+esc(T(done?'ix.done':'ix.soon'))+'</span></span>';
+    return '<li><div class="card ix-card'+(done?' go':' soon')+'">'+
+      '<h3>'+(done?'<a href="'+x[1]+'">'+esc(T('ix.p.'+x[0]))+'</a>':esc(T('ix.p.'+x[0])))+'</h3><span class="alt" lang="'+(I18N.lang==='vi'?'en':'vi')+'">'+esc(other('ix.p.'+x[0]))+'</span>'+
+      '<p>'+esc(T('ix.d.'+x[0]))+'</p><div class="ix-foot">'+st+(done?'<span class="ix-open" aria-hidden="true">'+esc(T('ix.open'))+ic('chev-r','i-xs')+'</span>':'')+'<span class="fname">'+esc(x[1].split('?')[0])+'</span></div></div></li>';
+  }
+  function render(){
+    var d=PAGES.filter(function(x){return x[2]}), s=PAGES.filter(function(x){return !x[2]});
+    document.getElementById('ix').innerHTML=
+      '<section class="ix-sec"><h2>'+esc(T('ix.done'))+'<span class="n">'+d.length+'</span></h2><ul class="ix-grid">'+d.map(card).join('')+'</ul></section>'+
+      (s.length?'<section class="ix-sec"><h2>'+esc(T('ix.soon'))+'<span class="n">'+s.length+'</span></h2><ul class="ix-grid">'+s.map(card).join('')+'</ul></section>':'')+
+      '<p class="hint">'+esc(T('ix.count',{a:d.length,n:PAGES.length}))+' · '+esc(T('ix.spec'))+'</p>';
+    document.title=T('app.name')+' · '+T('pv.index');
+  }
+  App.shell({active:null,crumbs:[{t:'pv.index'}],title:'pv.index'});
+  document.addEventListener('langchange',render);
+  render();
+})();
+</script>
+</body>
+</html>

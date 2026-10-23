@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xem thử chi tiết task</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; }
+  .content h4 { font-weight: 700; margin: .4rem 0; color: #334155; }
+  .content ol { list-style: decimal; padding-left: 1.25rem; }
+  .content li { margin: .25rem 0; }
+  .fade-bottom { -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent); mask-image: linear-gradient(to bottom, #000 75%, transparent); }
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden">
+
+<!-- Thanh chọn phương án (chỉ có trong bản xem thử) -->
+<div class="shrink-0 z-40 bg-amber-50 border-b border-amber-200 px-4 py-2 flex flex-wrap items-center gap-2 text-sm">
+  <b class="text-amber-800">XEM THỬ — Mục 4:</b> <a href="task-list-v2.html" class="underline text-indigo-700 mr-2">→ Xem danh sách Quan trọng / Chưa xem</a>
+  <button data-opt="B" class="opt-btn px-3 py-1 rounded-md border">B. Giữ bố cục, nội dung cao hơn + “Xem toàn bộ”</button>
+  <button data-opt="A" class="opt-btn px-3 py-1 rounded-md border">A. Nội dung thành 1 tab</button>
+  <span class="text-amber-700 ml-auto">Mục 3: bấm vào nội dung báo cáo ở cột phải để mở popup</span>
+</div>
+
+<div class="flex flex-1 min-h-0">
+
+  <!-- Sidebar (minh hoạ mục 1 + 2) -->
+  <aside class="w-60 shrink-0 bg-gray-900 text-white flex flex-col">
+    <div class="px-4 py-4 font-bold text-lg">TechOps</div>
+    <nav class="px-2 space-y-1 text-sm">
+      <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-800">▦ <span>Dashboard</span></a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-indigo-600">☑ <span>Tasks</span></a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-800 pl-8">
+        <span class="text-amber-400">★</span><span class="flex-1">Quan trọng</span>
+        <span class="text-[11px] bg-amber-500 text-white rounded-full px-1.5">3</span>
+      </a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-800 pl-8">
+        <span class="text-emerald-400">✓</span><span class="flex-1">Hoàn thành – chưa xem</span>
+        <span class="text-[11px] bg-emerald-500 text-white rounded-full px-1.5">2</span>
+      </a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-800">☰ <span>Logs</span></a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-gray-800">☎ <span>Helpdesk</span></a>
+    </nav>
+    <p class="mt-auto p-4 text-[11px] text-slate-500">Mục “Hoàn thành – chưa xem” chỉ hiện với Boss/Admin.</p>
+  </aside>
+
+  <!-- Cột trái: chi tiết -->
+  <main class="flex-1 min-w-0 flex flex-col overflow-hidden bg-white border-r border-slate-200">
+
+    <!-- HERO -->
+    <section class="shrink-0 bg-gradient-to-br from-slate-50/80 to-white border-b border-slate-200 px-6 pt-4 pb-4">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-sm text-slate-500 font-medium">← Quay lại</span>
+      </div>
+      <p class="font-mono text-xs font-black text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded inline-block mb-1">#26-0458</p>
+      <h1 class="text-lg font-bold text-slate-900 mb-3 leading-snug flex items-center gap-2">
+        <button id="starBtn" class="text-xl leading-none text-amber-500 hover:scale-110 transition" title="Bỏ đánh dấu quan trọng">★</button>
+        Xử lý công văn 3448/VNIC – Rà soát tên miền ".vn" và đề xuất đăng ký bảo vệ thương hiệu PMH
+      </h1>
+      <div class="flex gap-2 mb-3 text-xs font-medium">
+        <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Hoàn Thành</span>
+        <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-200">Bình thường</span>
+        <span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">Trực tiếp</span>
+      </div>
+
+      <!-- Phương án B: nội dung trong hero, cao hơn + Xem toàn bộ -->
+      <div class="opt-B">
+        <div id="contentBox" class="content text-sm text-slate-600 leading-relaxed max-h-72 overflow-hidden fade-bottom transition-all"></div>
+        <div class="flex gap-3 mt-1">
+          <button id="toggleExpand" class="text-xs font-semibold text-indigo-600 hover:underline">▾ Xem toàn bộ</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TIẾN TRÌNH -->
+    <section class="shrink-0 px-6 py-2 border-b border-slate-200">
+      <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tiến trình</p>
+      <div class="flex items-center gap-2 text-[11px] text-indigo-600">
+        <span class="w-5 h-5 rounded-full bg-indigo-600 text-white grid place-items-center">✓</span>Đang thực hiện
+        <span class="flex-1 h-px bg-indigo-300"></span>
+        <span class="w-5 h-5 rounded-full bg-indigo-600 text-white grid place-items-center">✓</span>Chờ review
+        <span class="flex-1 h-px bg-indigo-300"></span>
+        <span class="w-5 h-5 rounded-full border-2 border-indigo-600 grid place-items-center"><span class="w-2 h-2 rounded-full bg-indigo-600"></span></span>Hoàn thành
+      </div>
+    </section>
+
+    <!-- TAB PANEL -->
+    <section class="flex-1 min-h-0 flex">
+      <div class="flex-[6] min-w-0 flex flex-col border-r border-slate-200">
+        <div class="flex items-center gap-1 px-4 py-2.5 border-b border-slate-200 text-sm">
+          <button data-tab="content" class="tab opt-A px-3 py-1.5 rounded-md">📄 Nội dung</button>
+          <button data-tab="comments" class="tab px-3 py-1.5 rounded-md">💬 Bình luận</button>
+          <button data-tab="ext" class="tab px-3 py-1.5 rounded-md">📅 Gia hạn</button>
+        </div>
+        <div class="flex-1 overflow-y-auto">
+          <div data-pane="content" class="pane content p-6 text-sm text-slate-600 leading-relaxed"></div>
+          <div data-pane="comments" class="pane p-6 text-sm text-slate-500">
+            <p class="font-semibold text-slate-700 mb-6">💬 Bình luận (0)</p>
+            <p class="text-center">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+          </div>
+          <div data-pane="ext" class="pane p-6 text-sm text-slate-500">Chưa có yêu cầu gia hạn.</div>
+        </div>
+      </div>
+      <div class="flex-[4] min-w-0 flex flex-col">
+        <div class="px-4 py-2.5 border-b border-slate-200 text-sm text-indigo-600">🕘 Lịch sử <span class="text-[11px] bg-amber-100 text-amber-700 rounded-full px-1.5">5</span></div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
+          <div class="ml-auto w-56 border rounded-lg p-3"><b>Lê Hoài Nam</b> <span class="text-slate-400">EMPLOYEE</span><br><span class="inline-block mt-1 px-2 rounded-full bg-emerald-50 text-emerald-700">Hoàn thành</span><p class="text-slate-500 mt-1">↳ Đã gửi báo cáo hoàn thành</p></div>
+          <div class="ml-auto w-56 border rounded-lg p-3"><b>Lê Minh</b> <span class="text-slate-400">EMPLOYEE</span><br><span class="inline-block mt-1 px-2 rounded-full bg-emerald-50 text-emerald-700">Hoàn thành</span><p class="text-slate-500 mt-1">↳ Đã gửi báo cáo hoàn thành</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Cột phải -->
+  <aside class="w-96 shrink-0 overflow-y-auto bg-slate-50/60 p-4 space-y-4">
+    <div class="bg-white rounded-lg border border-slate-200 border-l-4 border-l-indigo-500 p-4 text-sm">
+      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">ⓘ Thông tin</h3>
+      <p class="text-xs text-slate-400">Người tạo</p><p class="font-semibold mb-2">Cao Thuận</p>
+      <p class="text-xs text-slate-400">Hạn hoàn thành</p><p class="font-semibold mb-2">10/10/2026</p>
+      <p class="text-xs text-slate-400">Hoàn thành lúc</p><p class="font-semibold text-emerald-600">07/10/2026</p>
+    </div>
+    <div class="bg-white rounded-lg border border-slate-200 border-l-4 border-l-emerald-500 p-4">
+      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">👥 Người thực hiện</h3>
+      <div id="reports" class="space-y-3"></div>
+    </div>
+  </aside>
+</div>
+
+<!-- POPUP (dùng chung cho báo cáo mục 3 và nội dung mục 4) -->
+<div id="modal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-slate-900/50" data-close></div>
+  <div class="relative mx-auto mt-[6vh] w-[min(760px,92vw)] max-h-[86vh] bg-white rounded-xl shadow-2xl flex flex-col">
+    <div class="flex items-start gap-3 px-5 py-4 border-b">
+      <div class="flex-1">
+        <p id="mSub" class="text-xs text-slate-400"></p>
+        <h2 id="mTitle" class="font-bold text-slate-900"></h2>
+      </div>
+      <button data-close class="text-slate-400 hover:text-slate-700 text-xl leading-none">×</button>
+    </div>
+    <div id="mBody" class="content flex-1 overflow-y-auto px-5 py-4 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap"></div>
+    <div id="mFiles" class="border-t divide-y text-sm"></div>
+  </div>
+</div>
+
+<script>
+const CONTENT = `<p>Công văn đến #261038 của VNNIC (Bộ KH&CN) ngày 15/09/2026 khuyến nghị PMH rà soát và đăng ký bảo vệ tên miền ".vn" gắn với thương hiệu (file đính kèm). Đây là khuyến nghị, không bắt buộc – mục tiêu là đánh giá và đề xuất phương án hợp lý, không mua tràn lan. Phân công:</p>
+<h4>Minh (hoàn thành và chuyển cho anh Nam thứ Tư 07/10):</h4>
+<ol><li>Kiểm tra 6 tên miền PMH đang sở hữu tại P.A Việt Nam (Phụ lục I: phumyhung.com.vn, phumyhung.vn, pmh.com.vn, crescentmall.com.vn, thewaterfront.vn): ngày hết hạn, chủ thể đứng tên có đúng là công ty không, đã bật khóa chuyển nhượng chưa.</li>
+<li>Tra WHOIS 5 tên miền do chủ thể khác giữ (phumyhung.edu.vn, phumyhung.id.vn, phumyhung.io.vn, pmh.vn, pmh.id.vn): ai giữ, đăng ký khi nào, hết hạn khi nào, hiện có trỏ về website nào.</li>
+<li>Lập bảng Excel tổng hợp theo mẫu Phụ lục II, đánh dấu mức rủi ro (cao / trung bình / thấp) cho từng tên miền.</li>
+<li>Chụp màn hình các website giả mạo (nếu có) và lưu bằng chứng kèm thời điểm truy cập.</li></ol>
+<h4>Anh Nam (hoàn thành trước thứ Sáu 10/10):</h4>
+<ol><li>Rà soát bảng của Minh, đối chiếu với danh sách thương hiệu đang khai thác.</li>
+<li>Lấy báo giá đăng ký các tên miền còn trống từ 2 nhà đăng ký (P.A Việt Nam, Mắt Bão).</li>
+<li>Soạn tờ trình đề xuất: tên miền nên đăng ký thêm, tên miền nên khiếu nại/thu hồi, chi phí dự kiến 3 năm.</li>
+<li>Gửi tờ trình cho Ban Giám đốc duyệt và phản hồi VNNIC trước 15/10.</li></ol>
+<p>Lưu ý: không trao đổi với bên đang giữ tên miền khi chưa có ý kiến Ban Giám đốc.</p>`;
+
+const REPORTS = [
+  { name: 'Lê Minh', user: 'leminh', time: '08:44 07/10/26', v: 'v1',
+    text: 'Đã hoàn thành thống kê tên miền PMH và các trang nghi vấn giả mạo',
+    files: [['Tên miền PMH.xlsx', '3.8MB']] },
+  { name: 'Lê Hoài Nam', user: 'hoainam', time: '09:25 07/10/26', v: 'v1',
+    text: 'Em và Minh đã hoàn thành file Excel "Bang_Theo_Doi_Ten_Mien_PMH" để theo dõi thông tin và tình trạng các tên miền của PMH.\n\nĐồng thời em đã lấy báo giá đăng ký tên miền từ 2 nhà cung cấp:\n- P.A Việt Nam: 1.250.000đ/năm/tên miền .vn\n- Mắt Bão: 1.180.000đ/năm/tên miền .vn\n\nĐề xuất đăng ký thêm 3 tên miền: phumyhung.com, pmh.com.vn (gia hạn sớm), phumyhung.net.vn.\nTên miền phumyhung.edu.vn do một cá nhân giữ, đang trỏ về trang bán hàng – đề xuất gửi khiếu nại tới VNNIC.\n\nChi phí dự kiến 3 năm: khoảng 11.000.000đ.\nTờ trình em đã soạn xong, nhờ anh xem và chuyển Ban Giám đốc.',
+    files: [['Bang_Theo_Doi_Ten_Mien_PMH.xlsx', '2.7MB'], ['CTy PMH _ Báo giá đăng ký tên miền PA.pdf', '204KB'], ['CTy PMH _ Báo giá đăng ký tên miền MatBao.pdf', '180KB']] },
+];
+
+document.getElementById('contentBox').innerHTML = CONTENT;
+document.querySelector('[data-pane="content"]').innerHTML = CONTENT;
+
+// Người thực hiện + báo cáo (mục 3)
+document.getElementById('reports').innerHTML = REPORTS.map((r, i) => `
+  <div class="rounded-lg border border-slate-200 bg-slate-50">
+    <div class="flex items-center gap-3 p-3">
+      <div class="w-8 h-8 rounded-full bg-indigo-100 grid place-items-center text-xs font-bold text-indigo-600">${r.name.split(' ').pop()[0]}</div>
+      <div class="flex-1"><p class="font-semibold text-sm">${r.name}</p><p class="text-xs text-slate-500">${r.user}</p></div>
+      <span class="text-xs font-medium px-2 py-1 rounded bg-emerald-100 text-emerald-700">Hoàn thành</span>
+    </div>
+    <div class="px-3 pb-3 border-t border-slate-100">
+      <div class="mt-3 rounded-lg border border-slate-200 bg-white overflow-hidden">
+        <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100 bg-slate-50">
+          <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">${r.v}</span>
+          <span class="text-[10px] text-slate-400">${r.time}</span>
+        </div>
+        <button data-report="${i}" class="block w-full text-left group">
+          <p class="px-3 pt-2 text-xs text-slate-600 leading-relaxed whitespace-pre-wrap line-clamp-3 group-hover:text-slate-900">${r.text}</p>
+          <p class="px-3 pb-2 pt-1 text-[11px] font-semibold text-indigo-600 group-hover:underline">⤢ Xem đầy đủ báo cáo</p>
+        </button>
+        <div class="border-t border-slate-100 divide-y divide-slate-100">
+          ${r.files.map(f => `<div class="flex items-center gap-2 px-3 py-1.5 text-[11px] text-slate-600"><span class="text-red-400">▤</span><span class="flex-1 truncate">${f[0]}</span><span class="text-slate-400">${f[1]}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`).join('');
+
+// Popup
+const modal = document.getElementById('modal');
+function openModal({ sub, title, html, text, files = [] }) {
+  document.getElementById('mSub').textContent = sub;
+  document.getElementById('mTitle').textContent = title;
+  const body = document.getElementById('mBody');
+  if (html) { body.innerHTML = html; body.classList.remove('whitespace-pre-wrap'); }
+  else { body.textContent = text; body.classList.add('whitespace-pre-wrap'); }
+  document.getElementById('mFiles').innerHTML = files.map(f =>
+    `<div class="flex items-center gap-3 px-5 py-2"><span class="text-red-400">▤</span><span class="flex-1 truncate">${f[0]}</span><span class="text-xs text-slate-400">${f[1]}</span><a class="text-xs text-indigo-600 hover:underline cursor-pointer">Xem</a><a class="text-xs text-slate-500 hover:underline cursor-pointer">Tải về</a></div>`).join('');
+  modal.classList.remove('hidden');
+}
+modal.addEventListener('click', e => { if (e.target.closest('[data-close]')) modal.classList.add('hidden'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.add('hidden'); });
+document.querySelectorAll('[data-report]').forEach(b => b.addEventListener('click', () => {
+  const r = REPORTS[b.dataset.report];
+  openModal({ sub: `Báo cáo hoàn thành ${r.v} · ${r.time}`, title: r.name, text: r.text, files: r.files });
+}));
+// Mục 1: bật/tắt ★ ngay trên trang chi tiết (người tạo / Boss / Admin)
+const star = document.getElementById('starBtn');
+star.addEventListener('click', () => {
+  const on = star.textContent === '★';
+  star.textContent = on ? '☆' : '★';
+  star.classList.toggle('text-amber-500', !on); star.classList.toggle('text-slate-300', on);
+  star.title = on ? 'Đánh dấu quan trọng' : 'Bỏ đánh dấu quan trọng';
+});
+
+// Mục 4 – B: Xem toàn bộ / Thu gọn
+const box = document.getElementById('contentBox'), tg = document.getElementById('toggleExpand');
+tg.addEventListener('click', () => {
+  const collapsed = box.classList.contains('max-h-72');
+  box.classList.toggle('max-h-72', !collapsed);
+  box.classList.toggle('max-h-[55vh]', collapsed);
+  box.classList.toggle('overflow-hidden', !collapsed);
+  box.classList.toggle('overflow-y-auto', collapsed);
+  box.classList.toggle('fade-bottom', !collapsed);
+  tg.textContent = collapsed ? '▴ Thu gọn' : '▾ Xem toàn bộ';
+});
+
+// Tabs + chuyển phương án
+function setTab(t) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('bg-indigo-50', b.dataset.tab === t));
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('text-indigo-700', b.dataset.tab === t));
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('hidden', p.dataset.pane !== t));
+}
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+function setOpt(o) {
+  document.querySelectorAll('.opt-B').forEach(el => el.classList.toggle('hidden', o !== 'B'));
+  document.querySelectorAll('.opt-A').forEach(el => el.classList.toggle('hidden', o !== 'A'));
+  document.querySelectorAll('.opt-btn').forEach(b => {
+    const on = b.dataset.opt === o;
+    b.classList.toggle('bg-amber-500', on); b.classList.toggle('text-white', on); b.classList.toggle('border-amber-500', on);
+    b.classList.toggle('bg-white', !on);
+  });
+  setTab(o === 'A' ? 'content' : 'comments');
+}
+document.querySelectorAll('.opt-btn').forEach(b => b.addEventListener('click', () => setOpt(b.dataset.opt)));
+setOpt('B');
+</script>
+</body>
+</html>

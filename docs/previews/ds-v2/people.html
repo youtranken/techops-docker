@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Nhân sự</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+/* ---------- Riêng trang Nhân sự ---------- */
+.subnav{display:flex;gap:22px;border-bottom:1px solid var(--line);margin:0 0 16px}
+.subnav a{position:relative;height:40px;display:inline-flex;align-items:center;font-size:var(--fs-md);font-weight:500;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.subnav a:hover{color:var(--ink)}
+.subnav a[aria-current="page"]{color:var(--ink);font-weight:600}
+.subnav a[aria-current="page"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--primary);border-radius:2px 2px 0 0}
+.ctl{display:flex;align-items:center;gap:8px;min-height:44px;margin-bottom:12px;flex-wrap:wrap}
+.ctl .search{width:260px}
+.ctl .select{width:auto;height:34px;font-size:var(--fs-sm);padding-left:10px}
+.ctl .clr{margin-left:2px}
+.ctl .cnt{margin-left:auto;font-size:var(--fs-sm);color:var(--ink-3);white-space:nowrap}
+/* thanh hàng loạt thay hàng lọc khi đang chọn */
+.bulk{display:flex;align-items:center;gap:8px;min-height:44px;margin-bottom:12px;padding:5px 6px 5px 14px;background:var(--surface-2);border-radius:var(--r-ctl);flex-wrap:wrap}
+.bulk b{font-weight:600;font-size:var(--fs-sm);margin-right:6px;white-space:nowrap}
+.bulk .sp{flex:1}
+.bulk .btn{background:var(--surface)}
+.empnote{display:flex;gap:8px;align-items:center;margin:0 0 12px;font-size:var(--fs-sm);color:var(--ink-2)}
+.empnote .i{color:var(--ink-3)}
+/* bảng */
+.tbl{--cols:18px minmax(0,1fr) 112px 140px 128px 168px 92px 32px;overflow:visible}
+.tbl.nosel{--cols:minmax(0,1fr) 112px 140px 128px 168px 92px 32px}
+.thead,.tr{column-gap:16px}
+.tbody .tr:last-child{border-radius:0 0 var(--r-card) var(--r-card)}
+.th.r,.td.r{justify-content:flex-end}
+.c-sel input{width:16px;height:16px;margin:0;accent-color:var(--primary);cursor:pointer}
+.c-sel label{display:grid;place-items:center;width:32px;height:32px;margin:-7px;border-radius:6px;cursor:pointer}
+.who{display:flex;align-items:center;gap:12px;min-width:0}
+.who .av{width:32px;height:32px;font-size:11px}
+.who .tx{min-width:0;display:flex;flex-direction:column}
+.who b{font-weight:500;font-size:var(--fs-md);line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who small{font-size:var(--fs-xs);color:var(--ink-3);line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who .me{font-weight:400;color:var(--ink-3)}
+.tr.off .who b,.tr.off .c-role,.tr.off .c-dept{color:var(--ink-3)}
+.tr.off .who .av{opacity:.55}
+.c-role,.c-dept,.c-last{font-size:var(--fs-sm);color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.c-last{color:var(--ink-3)}
+.c-n{font:500 13px/1 var(--f-mono);color:var(--ink-2)}
+.st-act{--k:var(--c-done)} .st-pending{--k:var(--c-review)} .st-locked{--k:var(--ink-3)}
+.st-pending .sdot{background:transparent;box-shadow:inset 0 0 0 1.5px var(--k)}
+.c-st{font-size:var(--fs-sm);color:var(--ink-2);gap:4px 8px;white-space:nowrap;flex-wrap:wrap}
+.th .phase-b{margin-left:6px}
+.kv .phase-b,.note .phase-b{margin-left:6px}
+/* Tạm thời: agent lõi sẽ đưa .phase-b vào app.css; rule dưới chỉ là dự phòng */
+.phase-b{display:inline-flex;align-items:center;height:18px;padding:0 6px;border:1px dashed var(--amber);border-radius:var(--r-pill);font:500 11px/1 var(--f-body);color:var(--ink-2);white-space:nowrap;vertical-align:middle;letter-spacing:0}
+.c-more .icon-btn{width:32px;height:32px}
+.mc{display:inline-flex;align-items:center;gap:4px;color:var(--c-review)}
+.tr .mc{margin-left:6px}
+/* skeleton */
+.tbl .tr{min-height:48px}
+.skr{display:flex;align-items:center;gap:12px;height:48px;padding:0 20px;border-bottom:1px solid var(--line)}
+.skr:last-child{border-bottom:0}
+/* ngăn hồ sơ */
+.pf{display:flex;gap:14px;align-items:center;margin-bottom:22px}
+.pf .av{width:48px;height:48px;font-size:16px}
+.pf h2{margin:0;font:600 19px/1.3 var(--f-head);letter-spacing:-.01em;overflow-wrap:anywhere}
+.pf p{margin:2px 0 0;font-size:var(--fs-sm);color:var(--ink-2);overflow-wrap:anywhere}
+.pf p .mono{font-size:12px;color:var(--ink-3)}
+.dr-b .note{margin:0 0 20px}
+.hist .act{color:var(--ink);font-weight:500}
+.hist .meta{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1px}
+.lnk{display:inline-block;margin-top:4px;font-size:var(--fs-sm);color:var(--primary);text-decoration:none;font-weight:500}
+.lnk:hover{text-decoration:underline}
+/* hộp thoại tạo / mật khẩu */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.ways{display:grid;gap:8px;margin:0 0 16px;border:0;padding:0}
+.ways legend{font-size:var(--fs-sm);font-weight:500;margin:0 0 6px;padding:0}
+.way{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line-2);border-radius:var(--r-ctl);cursor:pointer}
+.way:has(input:checked){border-color:var(--primary);background:color-mix(in srgb,var(--primary-soft) 55%,var(--surface))}
+.way input{margin:3px 0 0;accent-color:var(--primary);flex:none}
+.way b{display:block;font-weight:500;font-size:var(--fs-md)}
+.way span{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-top:1px}
+.way.dis{opacity:.5;cursor:not-allowed}
+.pwc{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:3px}
+.pwc li{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);color:var(--ink-3)}
+.pwc li.ok{color:var(--c-done)}
+.pwc .i{width:14px;height:14px}
+.pwhint{display:block;margin-top:2px;font-size:var(--fs-xs);color:var(--ink-3)}
+.input.mono{font-size:13px}
+
+@media (max-width:1023px){
+  .tbl{--cols:18px minmax(0,1fr) 100px 120px 32px}
+  .tbl.nosel{--cols:minmax(0,1fr) 100px 120px 32px}
+  .td-dept,.td-n,.th-dept,.th-n,.td-last,.th-last{display:none}
+  .thead,.tr{padding:0 12px 0 16px}
+  .ctl .search{flex:1 1 220px;width:auto}
+}
+@media (max-width:680px){
+  .subnav{margin:0 -16px 12px;padding:0 16px}
+  .ctl{gap:8px}
+  .ctl .search{flex:1 1 100%}
+  .ctl .select{flex:1 1 0;min-width:0}
+  .ctl .cnt{display:none}
+  .bulk{padding:8px 10px}
+  .bulk b{flex:1 1 100%}
+  .bulk .sp{display:none}
+  .tr{padding:12px 48px 12px 16px;row-gap:4px}
+  .tbl:not(.nosel) .tr{padding-left:52px}
+  .tr .c-sel{position:absolute;left:16px;top:18px}
+  .tr .c-more{position:absolute;right:8px;top:12px}
+  .tr .td-main{flex:1 1 100%}
+  .tr .c-role-td{order:2}
+  .tr .c-st{order:3;font-size:var(--fs-xs)}
+  .tr .c-role{font-size:var(--fs-xs)}
+  .tr .c-role-td::after{content:"·";color:var(--ink-3);margin-left:10px}
+  .who .av{width:28px;height:28px;font-size:10px}
+  .g2{grid-template-columns:1fr}
+  .pf .av{width:40px;height:40px;font-size:14px}
+}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="content" id="content">
+  <div class="head">
+    <div>
+      <h1 data-t="pp.title"></h1>
+      <p id="sub"></p>
+    </div>
+    <div class="head-act" id="headAct"></div>
+  </div>
+  <nav class="subnav" data-t-label="pp.subnav">
+    <a href="people.html" aria-current="page" data-t="pp.tab.users"></a>
+    <a href="permissions.html" id="permTab" data-t="pp.tab.perms"></a>
+  </nav>
+  <div id="mount"></div>
+</main>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="pp-data.js"></script>
+<script>
+(function(){
+  var T=I18N.t, L=I18N.L, esc=App.esc, $=App.$, $$=App.$$, mi=App.mi, AV=PPDATA.av;
+  var USERS=PPDATA.users(), POL=PPDATA.POLICY;
+  var S={screen:'loading',q:'',role:'',st:'',sel:[],open:null,boot:true};
+
+  /* Vai trò V1: ADMIN | BOSS | EMPLOYEE (PPDATA.myRole). boss() = đặc quyền ADMIN/BOSS (api/hr/users/[id]/route.ts:41) */
+  function role(){return PPDATA.myRole()}
+  function boss(){return role()!=='EMPLOYEE'}
+  function isAdm(){return role()==='ADMIN'}
+  function meId(){return PPDATA.meId()}
+  /* Nhân viên: quyền menu hr theo từng người (requireMenuAccess('hr'); hr/users/page.tsx:31-38) */
+  function myMenu(){return PPDATA.myMenu()}
+  function hrOpen(){var m=myMenu();return !m||m.menus.indexOf('hr')>-1}
+  function canEditSelf(){var m=myMenu();return !m||(m.feat.hr||[]).indexOf('edit')>-1}
+  var PB=PPDATA.pb;
+  function byId(id){return USERS.filter(function(u){return u.id===id})[0]}
+  function priv(u){return u.r==='ADMIN'||u.r==='BOSS'}
+  /* V1: EMPLOYEE chỉ thấy chính mình + EMPLOYEE khác (api/hr/users/route.ts:42) */
+  function pool(){return boss()?USERS:USERS.filter(function(u){return u.id===meId()||u.r==='EMPLOYEE'})}
+  function fold(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase()}
+  function rows(){
+    var q=fold(S.q.trim());
+    return pool().filter(function(u){
+      if(S.role&&u.r!==S.role)return false;
+      if(S.st&&u.st!==S.st)return false;
+      return !q||fold(u.n+' '+u.u+' '+(u.e||'')+' '+L(u.d)).indexOf(q)>-1;
+    });
+  }
+  function roleL(r){return T('pp.role.'+r)}
+  function stHtml(u,cls){return '<span class="stat st-'+(u.st==='active'?'act':u.st)+' '+(cls||'')+'"><span class="sdot" aria-hidden="true"></span><span>'+esc(T('pp.st.'+u.st))+'</span></span>'}
+  function lastL(u){return u.last?App.when(u.last):T('pp.never')}
+  function selectable(u){return boss()&&u.id!==meId()}
+
+  /* ---------- đầu trang ---------- */
+  function renderHead(){
+    var p=pool(), act=p.filter(function(u){return u.st==='active'}).length;
+    $('#sub').innerHTML=App.fill(boss()?'pp.sub':'pp.subEmp',{n:'<b>'+p.length+'</b>',a:'<b>'+act+'</b>'});
+    /* V1: Xuất CSV = ADMIN/BOSS (export/route.ts:7); Tạo người dùng = chỉ ADMIN (users/route.ts:57, page.tsx:126) */
+    $('#headAct').innerHTML=(boss()?'<button type="button" class="btn" data-x="export">'+ic('download','i-sm')+'<span>'+esc(T('pp.export'))+'</span></button>':'')+
+      (isAdm()?'<button type="button" class="btn btn-p" data-x="create">'+ic('user-plus','i-sm')+'<span>'+esc(T('pp.create'))+'</span></button>':'');
+    $('#permTab').hidden=!boss();
+  }
+
+  /* ---------- hàng lọc / hàng loạt ---------- */
+  function opt(v,l,cur){return '<option value="'+v+'"'+(v===cur?' selected':'')+'>'+esc(l)+'</option>'}
+  function ctlHtml(){
+    if(S.sel.length)return bulkHtml();
+    var p=pool(), cnt=function(k,v){return p.filter(function(u){return u[k]===v}).length};
+    var roles=boss()?PPDATA.ROLES:['EMPLOYEE'];
+    var f=S.q||S.role||S.st;
+    return '<div class="ctl" role="search">'+
+      '<label class="search">'+ic('search','i-sm')+'<span class="sr">'+esc(T('pp.search'))+'</span><input type="search" id="q" value="'+esc(S.q)+'" placeholder="'+esc(T('pp.search'))+'"></label>'+
+      (boss()?'<select class="select" id="fRole" aria-label="'+esc(T('pp.f.role'))+'">'+opt('',T('pp.f.allRoles'),S.role)+roles.map(function(r){return opt(r,roleL(r)+' ('+cnt('r',r)+')',S.role)}).join('')+'</select>':'')+
+      '<select class="select" id="fSt" aria-label="'+esc(T('pp.f.status'))+'">'+opt('',T('pp.f.allSt'),S.st)+['active','pending','locked'].map(function(s){return opt(s,T('pp.st.'+s)+' ('+cnt('st',s)+')'+(s==='pending'?' · '+T('pp.phaseB'):''),S.st)}).join('')+'</select>'+
+      (f?'<button type="button" class="btn btn-ghost btn-sm clr" data-x="clear">'+esc(T('pp.f.clear'))+'</button>':'')+
+      '<span class="cnt" aria-live="polite">'+esc(T('pp.shown',{n:rows().length}))+'</span></div>';
+  }
+  function bulkHtml(){
+    var n=S.sel.length;
+    return '<div class="bulk" role="toolbar" aria-label="'+esc(T('pp.bulk.label'))+'"><b aria-live="polite">'+esc(T('pp.bulk.n',{n:n}))+'</b>'+
+      '<button type="button" class="btn btn-sm" data-bulk="role" aria-haspopup="menu" aria-expanded="false">'+esc(T('pp.bulk.role'))+ic('chev-d','i-xs')+'</button>'+
+      '<button type="button" class="btn btn-sm" data-bulk="force">'+esc(T('pp.bulk.force'))+'</button>'+
+      '<button type="button" class="btn btn-sm" data-bulk="unlock">'+esc(T('pp.bulk.unlock'))+'</button>'+
+      '<button type="button" class="btn btn-sm btn-neg" data-bulk="lock">'+esc(T('pp.bulk.lock'))+'</button>'+
+      '<span class="sp"></span><button type="button" class="btn btn-ghost btn-sm" data-bulk="none">'+esc(T('pp.bulk.clear'))+'</button></div>';
+  }
+
+  /* ---------- bảng ---------- */
+  function rowHtml(u){
+    var self=u.id===meId(), selb=selectable(u), on=S.sel.indexOf(u.id)>-1, canMenu=boss()||self; /* NV xem người khác: không có thao tác (UserTable.tsx:239-245) */
+    return '<div class="tr'+(u.st==='locked'?' off':'')+(S.open===u.id?' sel':'')+'" role="row" tabindex="0" aria-haspopup="dialog" data-id="'+u.id+'">'+
+      (boss()?'<div class="td c-sel" role="cell">'+(selb?'<label><input type="checkbox" data-pick="'+u.id+'"'+(on?' checked':'')+' aria-label="'+esc(T('pp.pick',{n:u.n}))+'"></label>':'')+'</div>':'')+
+      '<div class="td td-main" role="cell"><span class="who">'+AV(u)+'<span class="tx"><b>'+esc(u.n)+(self?' <span class="me">'+esc(T('pp.you'))+'</span>':'')+'</b><small>'+esc(u.e||u.u)+'</small></span></span></div>'+
+      '<div class="td c-role-td" role="cell"><span class="c-role">'+esc(roleL(u.r))+'</span></div>'+
+      '<div class="td td-dept" role="cell"><span class="c-dept" title="'+esc(L(u.d))+'">'+esc(L(u.d))+'</span></div>'+
+      '<div class="td c-st" role="cell">'+stHtml(u)+(u.st==='pending'?PB(T('pp.pbPending')):'')+(u.mc&&u.st==='active'?'<span class="mc" title="'+esc(T('pp.mc'))+'">'+ic('key','i-xs')+'<span class="sr">'+esc(T('pp.mc'))+'</span></span>':'')+'</div>'+
+      '<div class="td td-last" role="cell"><span class="c-last">'+esc(lastL(u))+'</span></div>'+
+      '<div class="td td-n" role="cell"><span class="c-last mono">'+App.dt(u.at)+'</span></div>'+
+      '<div class="td r c-more" role="cell">'+(canMenu?'<span class="mwrap"><button type="button" class="icon-btn" data-more="'+u.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="'+esc(T('pp.more',{n:u.n}))+'">'+ic('more')+'</button></span>':'')+'</div></div>';
+  }
+  function headHtml(r){
+    var sels=r.filter(selectable).map(function(u){return u.id}), all=sels.length&&sels.every(function(id){return S.sel.indexOf(id)>-1});
+    return '<div class="thead" role="row">'+(boss()?'<div class="th c-sel" role="columnheader"><label><input type="checkbox" id="pickAll"'+(all?' checked':'')+' aria-label="'+esc(T('pp.pickAll'))+'"></label></div>':'')+
+      '<div class="th" role="columnheader">'+esc(T('pp.col.user'))+'</div><div class="th" role="columnheader">'+esc(T('pp.col.role'))+'</div>'+
+      '<div class="th th-dept" role="columnheader">'+esc(T('pp.col.dept'))+'</div><div class="th" role="columnheader">'+esc(T('pp.col.status'))+'</div>'+
+      '<div class="th th-last" role="columnheader">'+esc(T('pp.col.last'))+PB(T('pp.pbLast'))+'</div><div class="th th-n" role="columnheader">'+esc(T('pp.k.created'))+'</div>'+
+      '<div class="th" role="columnheader"><span class="sr">'+esc(T('pp.col.act'))+'</span></div></div>';
+  }
+  function skeleton(){
+    var r='';for(var i=0;i<7;i++)r+='<div class="skr"><span class="sk circle" style="width:32px;height:32px"></span><span style="flex:1;display:grid;gap:6px"><span class="sk line" style="width:'+(28+i*7%30)+'%"></span><span class="sk line" style="width:'+(18+i*5%20)+'%;height:10px"></span></span><span class="sk line td-dept" style="width:90px"></span><span class="sk line" style="width:70px"></span></div>';
+    return '<div class="ctl"><span class="sk" style="width:260px;height:34px;border-radius:8px"></span><span class="sk" style="width:140px;height:34px;border-radius:8px"></span></div><div class="tbl" aria-busy="true" aria-label="'+esc(T('app.loading'))+'">'+r+'</div>';
+  }
+  function render(){
+    renderHead();
+    var m=$('#mount');
+    if(S.screen==='loading'){m.innerHTML=skeleton();return;}
+    if(!hrOpen()){m.innerHTML='<div class="state page">'+ic('lock')+'<h1>'+esc(T('pp.na.t'))+'</h1><p>'+esc(T('set.na.d'))+'</p></div>';return;}
+    if(S.screen==='error'){m.innerHTML='<div class="tbl"><div class="state bad" role="alert">'+ic('wifi-off')+'<b>'+esc(T('pp.err.t'))+'</b><span>'+esc(T('pp.err.d'))+'</span><div class="acts"><button type="button" class="btn btn-p" data-x="retry">'+ic('refresh','i-sm')+'<span>'+esc(T('app.retry'))+'</span></button></div></div></div>';return;}
+    var r=rows(), foc=document.activeElement&&document.activeElement.id;
+    var h=ctlHtml()+(boss()?'':'<p class="empnote">'+ic('info','i-sm')+'<span>'+esc(T('pp.empNote'))+'</span></p>')+
+      '<div class="tbl'+(boss()?'':' nosel')+'" role="table" aria-label="'+esc(T('pp.title'))+'">'+headHtml(r)+'<div class="tbody" role="rowgroup">';
+    if(!r.length)h+='<div class="state" role="row"><div role="cell">'+ic('search')+'<b>'+esc(T('pp.nomatch.t'))+'</b><span>'+esc(T('pp.nomatch.d'))+'</span><div class="acts"><button type="button" class="btn" data-x="clear">'+esc(T('pp.f.clear'))+'</button></div></div></div>';
+    else h+=r.map(rowHtml).join('');
+    m.innerHTML=h+'</div></div>';
+    var pa=$('#pickAll'); if(pa){var sels=r.filter(selectable),k=sels.filter(function(u){return S.sel.indexOf(u.id)>-1}).length;pa.indeterminate=k>0&&k<sels.length;}
+    if(foc&&$('#'+foc)){var el=$('#'+foc);el.focus();if(el.id==='q'){var v=el.value.length;el.setSelectionRange(v,v);}}
+  }
+  function load(ms){S.screen='loading';render();setTimeout(function(){S.screen='data';S.boot=false;render();App.refreshPv();openFromHash();},ms)}
+
+  /* ---------- menu ⋯ của từng dòng (UserActionsMenu.tsx, theo chính mình / đã khoá / chờ kích hoạt) ---------- */
+  function menuHtml(u){
+    var self=u.id===meId(), h='';
+    /* Chính mình: Sửa (nếu có quyền) + Lịch sử; đổi mật khẩu ở Hồ sơ (UserTable.tsx:236-239) */
+    if(self)return (canEditSelf()?mi('edit','edit',T('pp.m.editMe')):'')+mi('mypw','key',T('pp.m.myPw'))+mi('hist','history',T('pp.m.hist'));
+    if(!boss())return '';
+    if(u.st==='locked')h+=mi('unlock','user-check',T('pp.m.unlock'))+mi('edit','edit',T('pp.m.edit'));
+    else{
+      h+=mi('edit','edit',T('pp.m.edit'));
+      if(u.st==='pending')h+=mi('resend','mail',T('pp.m.resend'));
+      else h+=mi('pw','key',T('pp.m.pw'))+(u.mc?'':mi('force','refresh',T('pp.m.force')));
+    }
+    /* Quyền menu V1 chỉ áp cho Nhân viên đang hoạt động (sidebar-permissions/route.ts:65) */
+    if(u.r==='EMPLOYEE'&&u.st!=='locked')h+=mi('perm','shield',T('pp.m.perm'));
+    h+=mi('hist','history',T('pp.m.hist'));
+    /* Xoá: không phải ADMIN và chưa có việc (UserActionsMenu.tsx:72; deleteHard → USER_HAS_TASKS) */
+    var tail=(u.st!=='locked'?mi('lock','user-x',T('pp.m.lock'),{danger:1}):'')+(u.tasks===0&&u.r!=='ADMIN'?mi('del','trash',T('pp.m.del'),{danger:1}):'');
+    return h+(tail?'<hr>'+tail:'');
+  }
+  function doAct(u,k){
+    if(k==='edit')return editDlg(u);
+    if(k==='pw')return pwDlg(u);
+    if(k==='mypw'){App.toast(T('pp.t.myPw'),'info');return;}
+    if(k==='perm'){location.href='permissions.html#user='+u.id;return;}
+    if(k==='hist'){openUser(u.id,true);return;}
+    if(k==='lock')return lockDlg([u]);
+    if(k==='unlock')return App.confirm({title:T('pp.d.unlock.t',{n:u.n}),text:T('pp.d.unlock.d'),ok:T('pp.m.unlock'),onOk:function(){u.st='active';done(T('pp.t.unlock',{n:u.n}))}});
+    if(k==='force')return App.confirm({title:T('pp.d.force1.t',{n:u.n}),text:T('pp.d.force.d'),ok:T('pp.d.force.ok'),onOk:function(){u.mc=1;done(T('pp.t.force',{n:1}))}});
+    if(k==='resend')return App.confirm({title:T('pp.d.resend.t'),text:T('pp.d.resend.d',{e:u.e}),ok:T('pp.d.resend.ok'),onOk:function(){done(T('pp.t.sent',{e:u.e}))}});
+    if(k==='del')return App.confirm({title:T('pp.d.del.t',{n:u.n}),text:T('pp.d.del.d',{u:u.u}),ok:T('pp.d.del.ok'),danger:1,onOk:function(){
+      USERS=USERS.filter(function(x){return x!==u});S.sel=S.sel.filter(function(id){return id!==u.id});if(S.open===u.id)App.drawer.close();done(T('pp.t.del',{n:u.n}))}});
+  }
+  function done(msg){App.toast(msg);setTimeout(function(){render();if(S.open)App.drawer.set(drawerHtml(byId(S.open)))},0)}
+  function lockDlg(list){
+    var n=list.length, busy=list.reduce(function(s,u){return s+(u.st==='active'?Math.min(u.tasks,3):0)},0);
+    App.confirm({title:n===1?T('pp.d.lock1.t',{n:list[0].n}):T('pp.d.lock.t',{n:n}),text:T('pp.d.lock.d')+(busy?' '+T('pp.d.lock.tasks',{n:busy}):''),ok:T('pp.d.lock.ok'),danger:1,
+      onOk:function(){list.forEach(function(u){u.st='locked'});S.sel=[];done(n===1?T('pp.t.lock1',{n:list[0].n}):T('pp.t.lock',{n:n}))}});
+  }
+
+  /* ---------- hàng loạt (useBulkAction.ts: deactivate · activate · changeRole · forceChangePassword) ---------- */
+  function selUsers(){return S.sel.map(byId).filter(Boolean)}
+  function bulk(k,btn){
+    var list=selUsers(), n=list.length;
+    if(k==='none'){S.sel=[];render();var q=$('#q');q&&q.focus();return;}
+    if(k==='lock'){var a=list.filter(function(u){return u.st!=='locked'});if(!a.length){App.toast(T('pp.t.noop'),'info');return;}return lockDlg(a);}
+    if(k==='unlock'){var b=list.filter(function(u){return u.st==='locked'});if(!b.length){App.toast(T('pp.t.noop'),'info');return;}
+      return App.confirm({title:T('pp.d.unlockN.t',{n:b.length}),text:T('pp.d.unlock.d'),ok:T('pp.bulk.unlock'),onOk:function(){b.forEach(function(u){u.st='active'});S.sel=[];done(T('pp.t.unlockN',{n:b.length}))}});}
+    if(k==='force')return App.confirm({title:T('pp.d.force.t',{n:n}),text:T('pp.d.force.d'),ok:T('pp.d.force.ok'),onOk:function(){list.forEach(function(u){u.mc=1});S.sel=[];done(T('pp.t.force',{n:n}))}});
+    if(k==='role')App.menu(btn,PPDATA.ROLES.map(function(r){return mi(r,r==='EMPLOYEE'?'user':'shield',roleL(r))}).join(''),function(el){
+      var r=el.dataset.mi;
+      App.confirm({title:T('pp.d.role.t',{n:n}),text:T('pp.d.role.d',{r:roleL(r)}),ok:T('pp.d.role.ok'),onOk:function(){list.forEach(function(u){u.r=r});S.sel=[];done(T('pp.t.role',{n:n,r:roleL(r)}))}});
+    });
+  }
+
+  /* ---------- ngăn hồ sơ + lịch sử hoạt động (UserHistoryModal.tsx → gộp vào ngăn) ---------- */
+  function drawerHtml(u){
+    if(!u)return '';
+    var self=u.id===meId(), full=boss()||self;
+    var kv=[['pp.col.role',esc(roleL(u.r))],['pp.col.status',stHtml(u)],['pp.f.dept',esc(L(u.d))],['pp.f.pos',esc(L(u.p))]];
+    if(full)kv=kv.concat([['pp.f.phone',u.ph?'<span class="mono">'+esc(u.ph)+'</span>':'<span class="muted">—</span>'],['pp.col.last','<span class="tx">'+esc(lastL(u))+'</span>'+PB(T('pp.pbLast'))],
+      ['pp.k.created','<span class="mono">'+App.dt(u.at)+'</span>'],['pp.k.pw',u.pw?'<span class="mono">'+App.dt(u.pw)+'</span>':'<span class="muted">'+esc(T('pp.k.pwNone'))+'</span>'],
+      ['pp.k.user','<span class="mono">'+esc(u.u)+'</span>']]);
+    var kvh=kv.map(function(r){return '<div><dt>'+esc(T(r[0]))+'</dt><dd>'+r[1]+'</dd></div>'}).join('');
+    var note=u.st==='locked'?'<div class="note">'+ic('lock','i-sm')+'<span>'+esc(T('pp.n.locked'))+'</span></div>':
+      u.st==='pending'?'<div class="note warn">'+ic('mail','i-sm')+'<span>'+esc(T('pp.n.pending',{e:u.e}))+PB(T('pp.pbPending'))+'</span></div>':
+      u.mc?'<div class="note warn">'+ic('key','i-sm')+'<span>'+esc(T('pp.n.mc'))+'</span></div>':'';
+    var hs=full?PPDATA.hist(u).map(function(h){
+      var by=h[2]&&h[2]!==u.id?' · '+esc(T('pp.h.by',{n:(byId(h[2])||{}).n||''})):'';
+      return '<li><span class="hd-dot"></span><p><span class="act">'+esc(T('pp.a.'+h[0]))+'</span><span class="meta">'+(h[3]?'<span class="mono">'+h[3]+'</span>':'')+by+'</span></p><time>'+esc(App.when(h[1]))+'</time></li>';
+    }).join(''):'';
+    var foot='';
+    if(boss()&&!self){
+      foot=u.st==='locked'?'<button type="button" class="btn btn-p" data-dr="unlock">'+ic('user-check','i-sm')+'<span>'+esc(T('pp.m.unlock'))+'</span></button>':
+        '<button type="button" class="btn" data-dr="'+(u.st==='pending'?'resend':'pw')+'">'+esc(T(u.st==='pending'?'pp.m.resend':'pp.m.pw'))+'</button><button type="button" class="btn btn-p" data-dr="edit">'+ic('edit','i-sm')+'<span>'+esc(T('pp.m.edit'))+'</span></button>';
+    } else if(self&&canEditSelf())foot='<button type="button" class="btn btn-p" data-dr="edit">'+ic('edit','i-sm')+'<span>'+esc(T('pp.m.editMe'))+'</span></button>';
+    return '<header class="dr-h"><button type="button" class="dr-back" data-dr="close">'+ic('chev-l')+'<span>'+esc(T('pp.back'))+'</span></button><span class="sp"></span>'+
+      ((boss()||self)?'<span class="mwrap"><button type="button" class="icon-btn" data-more="'+u.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="'+esc(T('pp.more',{n:u.n}))+'">'+ic('more')+'</button></span><span class="dr-sep"></span>':'')+
+      '<button type="button" class="icon-btn dr-close" data-dr="close" aria-label="'+esc(T('app.close'))+'">'+ic('x')+'</button></header>'+
+      '<div class="dr-b"><div class="pf">'+AV(u)+'<div><h2 id="drTitle" tabindex="-1">'+esc(u.n)+'</h2><p>'+(u.e?esc(u.e):'<span class="muted">'+esc(T('pp.noEmail'))+'</span>')+'</p></div></div>'+note+
+      '<dl class="kv">'+kvh+'</dl>'+
+      (full?'<section class="sec" id="drHist"><h3 class="sec-h">'+esc(T('pp.m.hist'))+'</h3><ol class="hist">'+hs+'</ol><a class="lnk" href="logs.html">'+esc(T('pp.h.all'))+'</a></section>':'<p class="note">'+ic('info','i-sm')+'<span>'+esc(T('pp.n.limited'))+'</span></p>')+
+      '</div>'+(foot?'<div class="dr-f"><span style="flex:1"></span>'+foot+'</div>':'');
+  }
+  function openUser(id,hist){
+    var u=byId(id); if(!u)return;
+    S.open=id; App.drawer.open({html:drawerHtml(u),label:u.n,onClose:function(){var was=S.open;S.open=null;render();var r=$('.tr[data-id="'+was+'"]');if(r)r.focus();}});
+    render();
+    if(hist){var h=$('#drHist');if(h)h.scrollIntoView({block:'start'});}
+  }
+  function openFromHash(){var m=/user=([\w-]+)/.exec(location.hash);if(m&&byId(m[1]))openUser(m[1]);}
+
+  /* ---------- chính sách mật khẩu: 1 nguồn (SecurityConfig.passwordPolicy) cho mọi form ---------- */
+  function checks(pw){
+    var c=[['len',pw.length>=POL.minLength,T('pp.pw.len',{n:POL.minLength})]];
+    if(POL.upper)c.push(['up',/[A-Z]/.test(pw),T('pp.pw.up')]);
+    if(POL.lower)c.push(['lo',/[a-z]/.test(pw),T('pp.pw.lo')]);
+    if(POL.number)c.push(['num',/\d/.test(pw),T('pp.pw.num')]);
+    if(POL.special)c.push(['sp',/[^A-Za-z0-9]/.test(pw),T('pp.pw.sp')]);
+    return c;
+  }
+  function pwFields(id){
+    return '<div class="field"><label class="lbl" for="'+id+'P">'+esc(T('pp.f.pw'))+' <span class="req" aria-hidden="true">*</span></label>'+
+      '<input class="input" type="password" id="'+id+'P" autocomplete="new-password" aria-describedby="'+id+'PC '+id+'PE">'+
+      '<ul class="pwc" id="'+id+'PC" aria-label="'+esc(T('pp.pw.policy'))+'">'+checks('').map(function(c){return '<li data-c="'+c[0]+'">'+ic('circle')+'<span>'+esc(c[2])+'</span><span class="sr"> — '+esc(T('pp.pw.no'))+'</span></li>'}).join('')+'</ul>'+
+      '<span class="pwhint">'+esc(T('pp.pw.src'))+'</span><p class="err" id="'+id+'PE" hidden></p></div>'+
+      '<div class="field"><label class="lbl" for="'+id+'C">'+esc(T('pp.f.pw2'))+' <span class="req" aria-hidden="true">*</span></label><input class="input" type="password" id="'+id+'C" autocomplete="new-password" aria-describedby="'+id+'CE"><p class="err" id="'+id+'CE" hidden></p></div>';
+  }
+  function wirePw(w,id){
+    var p=$('#'+id+'P',w);
+    p.addEventListener('input',function(){checks(p.value).forEach(function(c){var li=$('[data-c="'+c[0]+'"]',w);li.classList.toggle('ok',c[1]);li.querySelector('use').setAttribute('href','#i-'+(c[1]?'check-circle':'circle'));li.lastChild.textContent=' — '+T(c[1]?'pp.pw.yes':'pp.pw.no');});});
+  }
+  function err(w,id,msg){var i=$('#'+id,w),e=$('#'+id+'E',w);if(i)i.setAttribute('aria-invalid',msg?'true':'false');if(e){e.hidden=!msg;e.innerHTML=msg?ic('alert','i-xs')+'<span>'+esc(msg)+'</span>':''}return !msg}
+  function checkPw(w,id){
+    var p=$('#'+id+'P',w).value, c=$('#'+id+'C',w).value, bad=checks(p).filter(function(x){return !x[1]});
+    var a=err(w,id+'P',!p?T('pp.e.req'):bad.length?T('pp.e.pwPolicy'):'');
+    var b=err(w,id+'C',!c?T('pp.e.req'):c!==p?T('pp.e.pwMatch'):'');
+    return a&&b;
+  }
+  function fld(id,label,o){o=o||{};
+    return '<div class="field"><label class="lbl" for="'+id+'">'+esc(label)+(o.req?' <span class="req" aria-hidden="true">*</span><span class="sr">('+esc(T('app.req'))+')</span>':o.opt?' <span class="opt">('+esc(T('app.opt'))+')</span>':'')+'</label>'+
+      (o.sel?'<select class="select" id="'+id+'" aria-describedby="'+id+'E">'+o.sel+'</select>':'<input class="input'+(o.mono?' mono':'')+'" id="'+id+'" type="'+(o.type||'text')+'" value="'+esc(o.v||'')+'"'+(o.ph?' placeholder="'+esc(o.ph)+'"':'')+' autocomplete="off" aria-describedby="'+id+(o.hint?'H ':' ')+id+'E">')+
+      (o.hint?'<p class="hint" id="'+id+'H">'+esc(o.hint)+'</p>':'')+'<p class="err" id="'+id+'E" hidden></p></div>';
+  }
+  function roleOpts(cur,ph){return (ph?'<option value="">'+esc(T('pp.f.pickRole'))+'</option>':'')+PPDATA.ROLES.map(function(r){return opt(r,roleL(r),cur)}).join('')}
+  var EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  /* ---------- Tạo người dùng (CreateUserModal.tsx: đặt mật khẩu tay HOẶC gửi link thiết lập) ---------- */
+  function createDlg(){
+    App.dialog({title:T('pp.c.title'),form:1,ok:T('pp.c.ok'),size:'md',
+      body:fld('cU',T('pp.f.user'),{req:1,mono:1,ph:'vd: nvan',hint:T('pp.f.userHint')})+fld('cN',T('pp.f.name'),{req:1,ph:T('pp.f.namePh')})+
+        '<div class="g2">'+fld('cR',T('pp.col.role'),{req:1,sel:roleOpts('',1)})+fld('cD',T('pp.f.dept'),{opt:1})+'</div>'+
+        '<fieldset class="ways"><legend>'+esc(T('pp.c.how'))+'</legend>'+
+          '<label class="way"><input type="radio" name="cW" value="pw" checked><span><b>'+esc(T('pp.c.wPw'))+'</b><span>'+esc(T('pp.c.wPwD'))+'</span></span></label>'+
+          '<label class="way"><input type="radio" name="cW" value="link"><span><b>'+esc(T('pp.c.wLink'))+'</b><span>'+esc(T('pp.c.wLinkD'))+'</span></span></label></fieldset>'+
+        fld('cE',T('pp.f.email'),{type:'email',opt:1,ph:'ten.ho@pmh.com.vn'})+
+        '<div id="cPw">'+pwFields('cp')+'</div>'+
+        '<div class="note bad" id="cSrv" role="alert" hidden></div>',
+      init:function(w,api){
+        wirePw(w,'cp');
+        function mode(){var link=$('[name="cW"]:checked',w).value==='link';$('#cPw',w).hidden=link;
+          $('label[for="cE"]',w).innerHTML=esc(T('pp.f.email'))+(link?' <span class="req" aria-hidden="true">*</span><span class="sr">('+esc(T('app.req'))+')</span>':' <span class="opt">('+esc(T('app.opt'))+')</span>');
+          $('[data-dlg-ok]',w).textContent=T(link?'pp.c.okLink':'pp.c.ok');}
+        $$('[name="cW"]',w).forEach(function(r){r.addEventListener('change',mode)});
+        $$('input,select',w).forEach(function(x){x.addEventListener('input',function(){if(api.tried)validate(w,true)})});
+      },
+      onOk:function(w){
+        if(!validate(w))return false;
+        var link=$('[name="cW"]:checked',w).value==='link', g=function(id){return $('#'+id,w).value.trim()};
+        var nu={id:'n'+Date.now(),n:g('cN'),u:g('cU'),e:g('cE')||null,r:g('cR'),d:g('cD')||'—',p:'—',ph:'',st:'active',last:null,tasks:0,at:DATA.TODAY,pw:DATA.TODAY,mc:link?1:0,c:'#3b5bdb'}; /* V1: link → mustChangePassword=true; đặt tay → mặc định false */
+        var ws=nu.n.split(/\s+/);nu.ini=(ws.length>2?ws[1][0]+ws[ws.length-1][0]:ws.length===2?ws[0][0]+ws[1][0]:nu.n.slice(0,2)).toUpperCase();
+        USERS.unshift(nu); S.q='';S.role='';S.st='';
+        done(link?T('pp.t.createdLink',{e:nu.e}):T('pp.t.created',{n:nu.n}));
+      }
+    });
+  }
+  function validate(w,live){
+    var link=$('[name="cW"]:checked',w).value==='link', g=function(id){return $('#'+id,w).value.trim()};
+    var u=g('cU'), ok=true, srv=$('#cSrv',w);
+    ok=err(w,'cU',!u?T('pp.e.req'):!/^[a-zA-Z0-9_]{3,50}$/.test(u)?T('pp.e.user'):'')&&ok;
+    ok=err(w,'cN',!g('cN')?T('pp.e.req'):'')&&ok;
+    ok=err(w,'cR',!g('cR')?T('pp.e.role'):'')&&ok;
+    var e=g('cE'); ok=err(w,'cE',link&&!e?T('pp.e.emailLink'):e&&!EMAIL.test(e)?T('pp.e.email'):'')&&ok;
+    if(!link)ok=checkPw(w,'cp')&&ok;
+    srv.hidden=true;
+    if(ok&&!live){ /* lỗi phía máy chủ: trùng tên đăng nhập / email (user-mutation.service.ts: dupErr) */
+      var dupU=USERS.filter(function(x){return x.u.toLowerCase()===u.toLowerCase()})[0], dupE=e&&USERS.filter(function(x){return x.e&&x.e.toLowerCase()===e.toLowerCase()})[0];
+      if(dupU){err(w,'cU',T('pp.e.dupUser'));$('#cU',w).focus();return false;}
+      if(dupE){err(w,'cE',T('pp.e.dupEmail'));$('#cE',w).focus();return false;}
+    }
+    if(!ok&&!live){var f=$('[aria-invalid="true"]',w);if(f)f.focus();}
+    return ok;
+  }
+
+  /* ---------- Sửa (EditUserModal.tsx — mật khẩu tách ra hộp riêng) ---------- */
+  function editDlg(u){
+    var self=u.id===meId(), canRole=boss(); /* V1: canChangeRole={isPrivileged} (hr/users/page.tsx:100), kể cả khi sửa chính mình */
+    App.dialog({title:T(self?'pp.e.titleMe':'pp.e.title'),sub:'<span class="mono">'+esc(u.u)+'</span>',form:1,ok:T('pp.e.ok'),
+      body:fld('eN',T('pp.f.name'),{req:1,v:u.n})+fld('eE',T('pp.f.email'),{type:'email',opt:1,v:u.e||''})+
+        (canRole?fld('eR',T('pp.col.role'),{req:1,sel:roleOpts(u.r)}):'')+
+        '<div class="g2">'+fld('eD',T('pp.f.dept'),{opt:1,v:typeof u.d==='string'?u.d:L(u.d)})+fld('eP',T('pp.f.pos'),{opt:1,v:typeof u.p==='string'?u.p:L(u.p)})+'</div>'+
+        fld('ePh',T('pp.f.phone'),{opt:1,v:u.ph,type:'tel'})+
+        (self?'<p class="hint">'+esc(T(canRole?'pp.e.selfRoleW':'pp.e.selfRole'))+'</p>':''),
+      onOk:function(w){
+        var n=$('#eN',w).value.trim(), e=$('#eE',w).value.trim();
+        var ok=err(w,'eN',n?'':T('pp.e.req')); ok=err(w,'eE',e&&!EMAIL.test(e)?T('pp.e.email'):'')&&ok;
+        if(!ok){$('[aria-invalid="true"]',w).focus();return false;}
+        u.n=n;u.e=e||null;if(canRole)u.r=$('#eR',w).value;u.d=$('#eD',w).value.trim()||'—';u.p=$('#eP',w).value.trim()||'—';u.ph=$('#ePh',w).value.trim();
+        done(T('pp.t.saved',{n:n}));
+      }});
+  }
+
+  /* ---------- Đặt lại mật khẩu (ChangePasswordModal.tsx + gửi link reset) ---------- */
+  function pwDlg(u){
+    App.dialog({title:T('pp.p.title',{n:u.n}),form:1,ok:T('pp.p.okSet'),
+      body:'<fieldset class="ways"><legend>'+esc(T('pp.p.how'))+'</legend>'+
+          '<label class="way"><input type="radio" name="pW" value="set" checked><span><b>'+esc(T('pp.p.wSet'))+'</b><span>'+esc(T('pp.p.wSetD'))+'</span></span></label>'+
+          '<label class="way'+(u.e?'':' dis')+'"><input type="radio" name="pW" value="link"'+(u.e?'':' disabled')+'><span><b>'+esc(T('pp.p.wLink'))+'</b><span>'+esc(u.e?T('pp.p.wLinkD',{e:u.e}):T('pp.p.noEmail'))+'</span></span></label></fieldset>'+
+        '<div id="pSet">'+pwFields('rp')+'</div><p class="hint">'+esc(T('pp.p.mcNote'))+'</p>',
+      init:function(w,api){wirePw(w,'rp');
+        $$('[name="pW"]',w).forEach(function(r){r.addEventListener('change',function(){var l=$('[name="pW"]:checked',w).value==='link';$('#pSet',w).hidden=l;$('[data-dlg-ok]',w).textContent=T(l?'pp.p.okLink':'pp.p.okSet');})});
+        $$('#pSet input',w).forEach(function(x){x.addEventListener('input',function(){if(api.tried)checkPw(w,'rp')})});},
+      onOk:function(w){
+        if($('[name="pW"]:checked',w).value==='link'){done(T('pp.t.sent',{e:u.e}));return;}
+        if(!checkPw(w,'rp')){$('[aria-invalid="true"]',w).focus();return false;}
+        u.pw=DATA.TODAY;done(T('pp.t.pw',{n:u.n})); /* V1 PATCH password: không đổi mustChangePassword */
+      }});
+  }
+
+  /* ---------- thanh xem trước ---------- */
+  function pv(){
+    var cur=S.boot?'data':S.screen;
+    return '<label class="pvl" for="pvScreen">'+esc(T('pp.pv.screen'))+'</label><select id="pvScreen">'+
+      [['data','pp.pv.data'],['loading','pp.pv.loading'],['nomatch','pp.pv.nomatch'],['error','pp.pv.error']].map(function(x){return opt(x[0],T(x[1]),cur==='data'&&S.q==='kế toán trưởng'?'nomatch':cur)}).join('')+'</select>';
+  }
+
+  App.shell({active:'people',crumbs:[{t:'nav.people'},{t:'pp.tab.users'}],title:'pp.title',pv:pv,onNav:function(k){if(k==='people'){S.q='';S.role='';S.st='';render();return true;}}});
+
+  document.addEventListener('click',function(e){
+    var el;
+    if((el=e.target.closest('[data-pick]'))){e.stopPropagation();return;}
+    if((el=e.target.closest('.c-sel label'))&&el.closest('.tr')){return;}
+    if((el=e.target.closest('[data-more]'))){var u=byId(el.dataset.more);App.menu(el,menuHtml(u),function(it){doAct(u,it.dataset.mi)});return;}
+    if((el=e.target.closest('[data-bulk]'))){bulk(el.dataset.bulk,el);return;}
+    if((el=e.target.closest('[data-dr]'))){var k=el.dataset.dr;if(k==='close'){App.drawer.close();return;}doAct(byId(S.open),k);return;}
+    if((el=e.target.closest('[data-x]'))){var x=el.dataset.x;
+      if(x==='create')createDlg();
+      else if(x==='export')App.toast(T('pp.t.export',{n:rows().length}),'info');
+      else if(x==='clear'){S.q='';S.role='';S.st='';render();$('#q')&&$('#q').focus();}
+      else if(x==='retry')load(700);
+      return;}
+    if((el=e.target.closest('.tr[data-id]'))){openUser(el.dataset.id);return;}
+    if(e.target.closest('#drScrim')){App.drawer.close();}
+  });
+  document.addEventListener('change',function(e){
+    var el=e.target;
+    if(el.dataset.pick){var id=el.dataset.pick,i=S.sel.indexOf(id);if(el.checked&&i<0)S.sel.push(id);if(!el.checked&&i>-1)S.sel.splice(i,1);render();var c=$('[data-pick="'+id+'"]');c&&c.focus();return;}
+    if(el.id==='pickAll'){var ids=rows().filter(selectable).map(function(u){return u.id});S.sel=el.checked?ids:[];render();$('#pickAll').focus();return;}
+    if(el.id==='fRole'){S.role=el.value;S.sel=[];render();$('#fRole').focus();return;}
+    if(el.id==='fSt'){S.st=el.value;S.sel=[];render();$('#fSt').focus();return;}
+    if(el.id==='pvScreen'){var v=el.value;S.boot=false;
+      if(v==='nomatch'){S.screen='data';S.q='kế toán trưởng';S.role='';S.st='';}else{S.screen=v;if(S.q==='kế toán trưởng')S.q='';}
+      render();App.refreshPv();$('#pvScreen').focus();return;}
+  });
+  document.addEventListener('input',function(e){if(e.target.id==='q'){S.q=e.target.value;S.sel=[];render();}});
+  document.addEventListener('keydown',function(e){
+    if(App.dialogOpen()||App.drawer.isOpen())return;
+    var row=e.target.classList&&e.target.classList.contains('tr')&&e.target;
+    if(row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openUser(row.dataset.id);return;}
+    if(row&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();var n=e.key==='ArrowDown'?row.nextElementSibling:row.previousElementSibling;if(n)n.focus();}
+  });
+  function rerender(){render();if(S.open){var u=byId(S.open);if(u&&(boss()||u.r==='EMPLOYEE'||u.id===meId()))App.drawer.set(drawerHtml(u));else App.drawer.close();}}
+  document.addEventListener('langchange',function(){rerender();App.refreshPv()});
+  document.addEventListener('rolechange',function(){S.sel=[];if(!boss()&&S.role&&S.role!=='EMPLOYEE')S.role='';rerender();});
+  addEventListener('hashchange',openFromHash);
+  load(350);
+})();
+</script>
+</body>
+</html>

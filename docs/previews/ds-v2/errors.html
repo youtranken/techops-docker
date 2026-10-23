@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Lỗi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+/* ---------- Riêng trang Lỗi: dùng .state.page, thêm mã lỗi và mã HTTP nhỏ ---------- */
+.er .state.page{max-width:560px;margin:0 auto}
+.state p.er-k{font:500 12px/1 var(--f-mono);color:var(--ink-3);letter-spacing:.06em;margin:0 0 10px}
+.er-code{display:inline-flex;align-items:center;gap:6px;margin-top:18px;padding:4px 4px 4px 12px;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--surface);font-size:var(--fs-sm);color:var(--ink-2);max-width:100%}
+.er-code .mono{color:var(--ink);font-size:13px;overflow-wrap:anywhere}
+.er-code .icon-btn{width:30px;height:30px}
+.er-at{display:block;margin-top:8px;font-size:var(--fs-xs);color:var(--ink-3)}
+.er-at .mono{font-size:var(--fs-xs)}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid color-mix(in srgb,currentColor 35%,transparent);border-top-color:currentColor;animation:spin .8s linear infinite;flex:none}
+.state .btn span{color:inherit;font-size:inherit;max-width:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:680px){
+  .er .state .acts{flex-direction:column;align-items:stretch;width:100%;max-width:320px}
+}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="content er" id="content"><div id="mount"></div></main>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+(function(){
+  /* V1 trả thẳng message tiếng Anh từ API (vd. 'Insufficient permissions' — src/lib/auth-utils.ts, 'Too many requests. Please try again later.' — src/lib/rate-limit.ts).
+     V2: mỗi mã lỗi có màn/toast riêng, nói chuyện gì xảy ra + làm gì tiếp; mã lỗi kỹ thuật chỉ hiện để gửi phòng IT. */
+  var T=I18N.t, esc=App.esc, $=App.$;
+  var TYPES=['404','403','offline','500'];
+  var qs=new URLSearchParams(location.search);
+  var S={type:TYPES.indexOf(qs.get('type'))>-1?qs.get('type'):'404',busy:false,toastI:0};
+  var CODE='ERR-7F3A21', AT='2026-10-22 14:32';
+  var ICON={'404':'file-q','403':'lock',offline:'wifi-off','500':'server-x'};
+
+  function render(focus){
+    var t=S.type, retry=t==='offline'||t==='500';
+    var acts=retry
+      ?'<button type="button" class="btn btn-p" id="retry"'+(S.busy?' disabled':'')+'>'+(S.busy?'<span class="spin" aria-hidden="true"></span><span>'+esc(T('er.retrying'))+'</span>':ic('refresh','i-sm')+'<span>'+esc(T('app.retry'))+'</span>')+'</button><a class="btn" href="tasks-list.html">'+esc(T('er.home'))+'</a>'
+      :'<a class="btn btn-p" href="tasks-list.html">'+ic('arrow-l','i-sm')+'<span>'+esc(T('er.home'))+'</span></a>'+(t==='404'?'<button type="button" class="btn" id="back">'+esc(T('er.back'))+'</button>':'');
+    var code=t==='500'?'<div class="er-code"><span>'+esc(T('er.code'))+':</span><span class="mono" id="code">'+CODE+'</span><button type="button" class="icon-btn" id="copy" aria-label="'+esc(T('er.copy'))+'" title="'+esc(T('er.copy'))+'">'+ic('copy','i-sm')+'</button></div><span class="er-at mono">'+esc(App.dtt(AT))+'</span>':'';
+    $('#mount').innerHTML='<div class="state page'+(t==='500'||t==='offline'?' bad':'')+'" role="'+(t==='500'||t==='offline'?'alert':'status')+'">'+ic(ICON[t])+
+      (/^\d+$/.test(t)?'<p class="er-k" aria-hidden="true">'+t+'</p>':'')+
+      '<h1 id="erT" tabindex="-1">'+esc(T('er.'+t+'.t'))+'</h1><p>'+esc(T('er.'+t+'.d'))+'</p>'+code+'<div class="acts">'+acts+'</div></div>';
+    document.title=T('app.name')+' · '+T('er.'+t+'.t');
+    if(focus){var f=$(focus);if(f)f.focus();}
+  }
+  function pv(){
+    return '<label class="pvl" for="pvType">'+esc(T('er.pv.type'))+'</label><select id="pvType">'+TYPES.map(function(k){return '<option value="'+k+'"'+(k===S.type?' selected':'')+'>'+esc(T('er.pv.'+k))+'</option>'}).join('')+'</select>'+
+      '<button type="button" class="pv-btn" id="pvToast">'+ic('alert','i-sm')+'<span>'+esc(T('er.pv.toast'))+'</span></button>';
+  }
+  var TOASTS=[['er.toast.403'],['er.toast.429',{n:30}],['er.toast.500'],['er.toast.net']];
+
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#back')){if(history.length>1)history.back();else location.href='tasks-list.html';return;}
+    if(e.target.closest('#retry')){
+      if(S.busy)return; S.busy=true; render('#retry');
+      setTimeout(function(){
+        S.busy=false;
+        if(S.type==='offline'&&navigator.onLine){location.reload();return;}
+        render('#retry'); App.toast(T('er.still'),'error');
+      },900);
+      return;
+    }
+    if(e.target.closest('#copy')){
+      var done=function(){App.toast(T('er.copied'),'info')};
+      try{navigator.clipboard.writeText(CODE).then(done,done);}catch(x){done();}
+      return;
+    }
+    if(e.target.closest('#pvToast')){var x=TOASTS[S.toastI++%TOASTS.length];App.toast(T(x[0],x[1]),'error');return;}
+  });
+  document.addEventListener('change',function(e){
+    if(e.target.id==='pvType'){S.type=e.target.value;S.busy=false;history.replaceState(null,'','?type='+S.type);render();App.refreshPv();$('#pvType').focus();}
+  });
+  addEventListener('online',function(){if(S.type==='offline')location.reload();});
+  document.addEventListener('langchange',function(){render();});
+
+  App.shell({active:'none',crumbs:[{t:'er.crumb'}],title:function(){return T('er.'+S.type+'.t')},pv:pv});
+  render();
+})();
+</script>
+</body>
+</html>

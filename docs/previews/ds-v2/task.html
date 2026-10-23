@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Chi tiết công việc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body data-no-pvbar>
+<main class="content" id="content"><div id="mount" aria-live="polite"></div></main>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+(function(){
+  /* Trang chi tiết: toàn bộ giao diện dựng bằng App.taskDetail(task,{mode:'page'}) — cùng bộ dựng với ngăn trượt ở Danh sách/Bảng. */
+  var T=I18N.t, esc=App.esc, $=App.$;
+  /* Mã việc V1: YY-NNNN (26-0033). Link cũ ?id=CV-1033 vẫn mở được (DATA.normId). */
+  var id=DATA.normId(new URLSearchParams(location.search).get('id')||'26-0033');
+  var BASE=DATA.tasks().filter(function(x){return x.id===id})[0]||null;
+  var S={screen:'loading',state:BASE?BASE.s:'IN_PROGRESS',mode:BASE?(BASE.approval?'approval':'direct'):'approval',t:BASE};
+  var STATES=['PENDING_APPROVAL','WAITING_ACKNOWLEDGE','IN_PROGRESS','PENDING_REVIEW','COMPLETED','CANCELLED'];
+
+  function statesFor(m){return m==='direct'?STATES.filter(function(s){return s!=='PENDING_APPROVAL'&&s!=='PENDING_REVIEW'}):STATES}
+  function opt(v,label,cur){return '<option value="'+v+'"'+(v===cur?' selected':'')+'>'+esc(label)+'</option>'}
+  function pv(){
+    var dis=S.screen!=='normal'||!BASE?' disabled':'';
+    return '<label class="pvl" for="pvScreen">'+esc(T('td.pv.screen'))+'</label><select id="pvScreen">'+
+        [['normal','td.pv.normal'],['loading','td.pv.loading'],['nf','td.pv.nf'],['na','td.pv.na'],['ne','td.pv.ne']].map(function(x){return opt(x[0],T(x[1]),S.screen==='loading'&&S.boot?'normal':S.screen)}).join('')+'</select>'+
+      '<label class="pvl" for="pvState">'+esc(T('td.pv.state'))+'</label><select id="pvState"'+dis+'>'+statesFor(S.mode).map(function(s){return opt(s,T('st.'+s),S.state)}).join('')+'</select>'+
+      '<label class="pvl" for="pvMode">'+esc(T('td.pv.mode'))+'</label><select id="pvMode"'+dis+'>'+
+        opt('approval',T('td.mode.approval'),S.mode)+opt('force',T('td.pv.forceMode'),S.mode)+opt('direct',T('td.mode.direct'),S.mode)+'</select>';
+  }
+  function stateScreen(icon,title,desc,retry,bad){
+    return '<div class="state page'+(bad?' bad':'')+'" role="'+(bad?'alert':'status')+'">'+ic(icon)+'<h1>'+esc(title)+'</h1><p>'+esc(desc)+'</p><div class="acts">'+
+      (retry?'<button type="button" class="btn btn-p" data-retry>'+ic('refresh','i-sm')+'<span>'+esc(T('app.retry'))+'</span></button><a class="btn" href="tasks-list.html">'+esc(T('td.backList'))+'</a>'
+        :'<a class="btn btn-p" href="tasks-list.html">'+ic('arrow-l','i-sm')+'<span>'+esc(T('td.backList'))+'</span></a>')+'</div></div>';
+  }
+  function render(){
+    var m=$('#mount'), sc=S.screen;
+    if(sc==='normal'&&!BASE)sc='nf';
+    if(sc==='normal'&&!App.task.visible(S.t))sc='na'; /* task-query.service.ts:195-210 */
+    m.parentElement.classList.toggle('is-state',sc!=='normal');
+    if(sc==='loading')m.innerHTML=App.taskSkeleton();
+    else if(sc==='nf')m.innerHTML=stateScreen('file-q',T('td.nf.t',{id:id}),T('td.nf.d'));
+    else if(sc==='na')m.innerHTML=stateScreen('lock',T('td.na.t'),T('td.na.d'));
+    else if(sc==='ne')m.innerHTML=stateScreen('wifi-off',T('td.ne.t'),T('td.ne.d'),true,true);
+    else{
+      m.innerHTML=App.taskDetail(S.t,{mode:'page',rerender:render});
+      App.mountTask(m);
+    }
+    if(window.dsIcons)dsIcons(m);
+    document.title=T('app.name')+' · '+id+(sc==='normal'?' · '+I18N.title(S.t):'');
+  }
+  function load(ms){
+    S.screen='loading'; S.boot=true; render();
+    setTimeout(function(){S.boot=false;S.screen='normal';
+      if(BASE&&BASE.unseen&&App.isBoss())App.markSeen(BASE.id); /* mở trang chi tiết = đã xem */
+      render();App.refreshPv();
+      if(location.hash){var h=$(location.hash);if(h)h.scrollIntoView({block:'start'});}
+    },ms);
+  }
+  function applySample(){
+    if(!BASE)return;
+    var same=S.state===BASE.s&&S.mode===(BASE.approval?'approval':'direct');
+    S.t=same?BASE:DATA.scenario(BASE,S.state,S.mode);
+    render();
+  }
+
+  App.shell({active:'tasks',crumbs:[{t:'nav.tasks',href:'tasks-list.html'},{text:id,mono:1}],pv:pv});
+  document.addEventListener('change',function(e){
+    var el=e.target;
+    if(el.id==='pvScreen'){S.boot=false;S.screen=el.value;render();App.refreshPv();$('#pvScreen').focus();return;}
+    if(el.id==='pvMode'){S.mode=el.value;if(statesFor(S.mode).indexOf(S.state)<0)S.state='IN_PROGRESS';applySample();App.refreshPv();$('#pvMode').focus();return;}
+    if(el.id==='pvState'){S.state=el.value;applySample();$('#pvState').focus();return;}
+  });
+  document.addEventListener('click',function(e){if(e.target.closest('[data-retry]'))load(900);});
+  document.addEventListener('langchange',render);
+  document.addEventListener('rolechange',render);
+  var rw=innerWidth; addEventListener('resize',function(){if(Math.abs(innerWidth-rw)>40){rw=innerWidth;if(S.screen==='normal')App.mountTask($('#mount'));}});
+  load(350);
+})();
+</script>
+</body>
+</html>

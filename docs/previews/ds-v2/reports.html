@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Báo cáo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+/* ---------- Báo cáo: phần dùng chung 2 trang (tabs con + thanh kỳ) ---------- */
+.rp-nav{border-bottom:1px solid var(--line);margin:0 0 16px}
+.rp-nav .tab{text-decoration:none}
+.rp-nav .tab[aria-current="page"]{color:var(--ink);font-weight:600}
+.rp-nav .tab[aria-current="page"]::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--primary);border-radius:2px 2px 0 0}
+.pbar{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin:0 0 16px}
+.pbar .seg{flex:none}
+.pbar .select{height:34px;width:auto;min-width:150px;font-size:var(--fs-sm)}
+.pbar .dates{display:flex;align-items:center;gap:6px;min-width:0}
+.pbar .dates .input{height:34px;width:148px;min-width:0;font-size:var(--fs-sm);padding:0 8px}
+.pbar .err{flex-basis:100%;margin:0}
+.pbar .aside{margin:0 0 0 auto;font-size:var(--fs-sm);color:var(--ink-2)}
+.pbar .aside b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn[aria-busy="true"]{opacity:.75;pointer-events:none}
+.mt{padding:28px 16px;text-align:center;color:var(--ink-3);font-size:var(--fs-sm)}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:0 0 16px}
+.kpi{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-1);text-align:left;font:inherit;color:inherit}
+button.kpi:hover{border-color:var(--line-2)}
+button.kpi:hover .go,button.kpi:focus-visible .go{opacity:1}
+.kpi:focus-visible{border-radius:var(--r-card)}
+.kl{display:flex;align-items:center;gap:7px;width:100%;font-size:var(--fs-sm);color:var(--ink-2);min-width:0}
+.kl .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.kl .go{position:absolute;top:10px;right:10px;color:var(--ink-3);opacity:0;transition:opacity .15s}
+.kval{font:600 28px/1.15 var(--f-head);letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink);margin-top:2px}
+.ks{font-size:var(--fs-xs);color:var(--ink-3);line-height:1.4}
+.ks.warn{color:var(--c-review);font-weight:500}
+.kbar{width:100%;height:3px;border-radius:2px;background:var(--surface-2);overflow:hidden;margin:3px 0 1px}
+.kbar i{display:block;height:100%;background:var(--c-done);border-radius:2px}
+.kd{display:inline-flex;align-items:center;gap:3px;margin-top:auto;padding-top:4px;font:500 12px/1.2 var(--f-mono);color:var(--ink-3)}
+.kd svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.kd.good{color:var(--c-done)} .kd.bad{color:var(--danger)}
+
+/* ---------- Thẻ biểu đồ ---------- */
+.rsec{margin:0 0 16px}
+.ch-h{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;padding:14px 16px 0}
+.ch-h h2{margin:0;font:600 var(--fs-md)/1.3 var(--f-head)}
+.ch-h .select{margin-left:auto;height:32px;width:auto;min-width:96px;font-size:var(--fs-sm)}
+.lg{display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;font-size:var(--fs-xs);color:var(--ink-2);list-style:none;margin:0;padding:0}
+.lg li{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:3px;background:var(--k);flex:none}
+.sw.ln{width:14px;height:3px;border-radius:2px}
+.chart{position:relative;padding:10px 8px 0 4px;min-height:200px}
+.chart svg{display:block;overflow:visible}
+.chart text{font:400 11px var(--f-body);fill:var(--ink-3)}
+.chart text.num{font-family:var(--f-mono);font-size:10.5px}
+.chart text.fut{opacity:.55}
+.gl{stroke:var(--line);stroke-width:1;shape-rendering:crispEdges}
+.gl0{stroke:var(--line-2)}
+.b-cr{fill:var(--primary)} .b-dn{fill:var(--c-done)}
+.ln-ot{fill:none;stroke:var(--c-review);stroke-width:2;stroke-linejoin:round}
+.dt-ot{fill:var(--surface);stroke:var(--c-review);stroke-width:2}
+.band{fill:transparent}
+.band.on{fill:var(--surface-2)}
+.band.kf{stroke:var(--primary);stroke-width:2}
+.hit{fill:transparent;outline:none}
+.tip{position:absolute;z-index:5;pointer-events:none;min-width:168px;padding:8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-ctl);box-shadow:var(--shadow-pop);font-size:var(--fs-xs);color:var(--ink-2)}
+.tip b{display:block;font:600 13px/1.3 var(--f-body);color:var(--ink);margin-bottom:4px}
+.tip .r{display:flex;align-items:center;gap:6px;line-height:1.75}
+.tip .r .v{margin-left:auto;padding-left:14px;font-family:var(--f-mono);color:var(--ink)}
+.ch-note{margin:0;padding:8px 16px 14px;font-size:var(--fs-xs);color:var(--ink-3);line-height:1.5}
+
+/* ---------- Hiệu suất theo người ---------- */
+.sec-t{display:flex;align-items:flex-end;gap:8px 16px;flex-wrap:wrap;margin:0 0 12px}
+.sec-t h2{margin:0;font:600 16px/1.3 var(--f-head)}
+.sec-t p{margin:2px 0 0;font-size:var(--fs-sm);color:var(--ink-3)}
+.msort{display:none;margin-left:auto}
+.msort .select{height:34px;width:auto;font-size:var(--fs-sm)}
+.perf{--cols:minmax(0,1fr) 72px 150px 76px 72px 64px 64px 84px 16px}
+.perf .thead,.perf .tr{column-gap:16px}
+.perf .th.r,.perf .td.r{justify-content:flex-end;text-align:right}
+.perf .th.r button{margin:0 -6px 0 0}
+.perf .td.r .mono{font-size:13px}
+.pn{gap:10px}
+.pn .tx{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.z{color:var(--ink-3)}
+.bad-n{color:var(--danger);font-weight:500}
+.pdone{gap:8px}
+.pb{flex:1;max-width:56px;min-width:20px;height:4px;border-radius:2px;background:var(--surface-2);overflow:hidden}
+.pb i{display:block;height:100%;background:var(--c-done);border-radius:2px}
+.pc{font:400 12px/1 var(--f-mono);color:var(--ink-3);min-width:40px;text-align:right}
+.ml{display:none}
+.c-chev{color:var(--ink-3);justify-content:flex-end}
+
+/* ---------- Lưới 3 thẻ ---------- */
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+.g3>.card{min-width:0;position:relative}
+.dn-seg{padding:12px 16px 0}
+.dn-seg .seg{display:flex}
+.dn-seg .seg button{flex:1;justify-content:center;min-width:0;padding:0 6px}
+.dn{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px}
+.dn-fig{position:relative;width:128px;height:128px;flex:none;margin:0 auto}
+.dn-fig svg{width:128px;height:128px;transform:rotate(-90deg);overflow:visible}
+.dn-c{position:absolute;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}
+.dn-c b{font:600 22px/1.1 var(--f-head);font-variant-numeric:tabular-nums}
+.dn-c span{font-size:var(--fs-xs);color:var(--ink-3);max-width:96px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sg{fill:none;stroke:var(--k);stroke-width:16;transition:stroke-width .15s;cursor:default}
+.sg.on{stroke-width:21}
+.dn-lg{flex:1 1 150px;list-style:none;margin:0;padding:0;display:grid;gap:2px;min-width:0}
+.dn-lg li{display:flex;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--ink-2);padding:3px 6px;margin:0 -6px;border-radius:6px;min-width:0}
+.dn-lg li .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.dn-lg li.on{background:var(--surface-2);color:var(--ink)}
+.dn-lg .v{margin-left:auto;font:500 12px/1 var(--f-mono);color:var(--ink)}
+.dn-lg .p{width:44px;text-align:right;font:400 12px/1 var(--f-mono);color:var(--ink-3)}
+.dn-note{margin:-4px 16px 16px;font-size:var(--fs-xs);color:var(--ink-3)}
+.bars{list-style:none;margin:0;padding:14px 16px 4px;display:grid;gap:12px}
+.bars li{min-width:0}
+.bh{display:flex;align-items:baseline;gap:8px;font-size:var(--fs-sm);color:var(--ink-2);margin-bottom:5px;min-width:0}
+.bh .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.bh .v{margin-left:auto;font:500 13px/1 var(--f-mono);color:var(--ink);white-space:nowrap}
+.bh .p{width:40px;text-align:right;font:400 12px/1 var(--f-mono);color:var(--ink-3)}
+.bh small{font-size:var(--fs-xs);color:var(--ink-3);white-space:nowrap}
+.trk{height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.trk i{display:block;height:100%;border-radius:4px;background:var(--k,var(--primary));min-width:2px}
+
+/* ---------- Hộp thoại drill-down ---------- */
+.dd-t{--cols:minmax(0,1fr) 76px 132px 104px;box-shadow:none}
+.dd-t .thead,.dd-t .tr{column-gap:14px;padding:0 12px 0 14px}
+.dd-tt{display:flex;flex-direction:column;min-width:0;width:100%}
+.dd-tt .tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;font-size:var(--fs-md)}
+.dd-tt .mono{font-size:12px;color:var(--ink-3)}
+.dd-due{flex-direction:column;align-items:flex-start;font-size:var(--fs-sm);color:var(--ink-2);white-space:nowrap}
+.dd-due small{font-size:var(--fs-xs)}
+.dd-f{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:var(--fs-sm);color:var(--ink-3)}
+.dd-f .pg{margin-left:auto;display:flex;align-items:center;gap:2px}
+.dd-f .pg span{font-family:var(--f-mono);font-size:12px;padding:0 6px;color:var(--ink-2)}
+
+/* ---------- Phase B (tạm, chờ app.css có .pb-zone) ---------- */
+.pb-zone{outline:1px dashed color-mix(in srgb,var(--amber) 70%,transparent);outline-offset:2px;border-radius:var(--r-sm)}
+.phase-b.pb-s{height:16px;padding:0 4px;margin-left:4px}
+.seg .pb-zone{outline-offset:-3px}
+/* ---------- Research (V1 /analytics/research) ---------- */
+.rs-f{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 16px}
+.rs-f .search{flex:1 1 220px;max-width:320px}
+.rs-f .input{height:34px;font-size:var(--fs-sm)}
+.rs-f .num{width:150px}
+.rs-f .dates{display:flex;align-items:center;gap:6px;min-width:0}
+.rs-f .dates .input{width:148px;padding:0 8px}
+.ov{--cols:minmax(0,1fr) 136px 96px 88px 168px 16px}
+.ov .tr{cursor:pointer}
+.ov-tt{display:flex;flex-direction:column;min-width:0;width:100%}
+.ov-tt .tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.ov-tt small{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);color:var(--ink-3)}
+.ov .late{color:var(--danger);font-weight:500;font-variant-numeric:tabular-nums}
+.ov .who{font-size:var(--fs-sm);color:var(--ink-2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.wl .dn-fig{width:148px;height:148px}.wl .dn-fig svg{width:148px;height:148px}
+.wl .dn-lg li .l{white-space:normal}
+.wl .dn-lg small{color:var(--ink-3);font-size:var(--fs-xs);white-space:nowrap}
+@media (max-width:1023px){.ov{--cols:minmax(0,1fr) 120px 88px 80px 16px}.ov .c-who{display:none}}
+@media (max-width:680px){
+  .rs-f .search{max-width:none;flex-basis:100%}.rs-f .num{flex:1}.rs-f .dates{width:100%}.rs-f .dates .input{flex:1;width:auto}
+  .ov .tr{padding:12px 16px;row-gap:4px;column-gap:12px}.ov .td{font-size:var(--fs-xs)}.ov .c-who{display:none}
+}
+/* ---------- Skeleton ---------- */
+.sk-kpi{min-height:116px;gap:10px}
+.sk-bars{display:flex;align-items:flex-end;gap:4%;height:190px;padding:20px 24px 16px 40px}
+.sk-bars .sk{flex:1}
+
+@media (max-width:1199px){
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .perf{--cols:minmax(0,1fr) 56px 116px 60px 56px 56px 56px 64px 16px}
+  .perf .thead,.perf .tr{column-gap:12px;padding:0 12px 0 16px}
+  .perf .thead{height:auto;min-height:40px;padding-top:6px;padding-bottom:6px}
+  .perf .th button{white-space:normal;text-align:right;line-height:1.25}
+  .pb{display:none}
+  .g3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g3>:last-child{grid-column:1/-1}
+}
+@media (max-width:680px){
+  .pbar .seg{width:100%}
+  .pbar .seg button{flex:1;justify-content:center;padding:0 4px}
+  .pbar .select{flex:1}
+  .pbar .dates{width:100%}
+  .pbar .dates .input{flex:1;width:auto}
+  .pbar .aside{margin:0;flex-basis:100%}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .kpi{padding:12px 14px}
+  .kval{font-size:24px}
+  .kl .go{display:none}
+  .ch-h .select{margin-left:0}
+  .ch-h h2{flex-basis:100%}
+  .msort{display:block}
+  .perf .tr{column-gap:14px;row-gap:4px;padding:12px 16px}
+  .perf .td.r{justify-content:flex-start;font-size:var(--fs-xs);flex:0 0 calc((100% - 28px)/3);min-width:0;white-space:nowrap}
+  .perf .td.pdone{flex-basis:calc((100% - 28px)*2/3 + 14px)}
+  .perf .td.r .mono{font-size:12px}
+  .ml{display:inline;color:var(--ink-3);margin-right:4px;font-size:var(--fs-xs)}
+  .pc{min-width:0}
+  .g3{grid-template-columns:minmax(0,1fr)}
+  .dd-tt .tx{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .dd-due{flex-direction:row;gap:6px}
+}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="content" id="content"><div id="mount" aria-live="polite"></div></main>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="reports-data.js"></script>
+<script>
+(function(){
+  var T=I18N.t, esc=App.esc, $=App.$, $$=App.$$, av=App.av, nm=App.nm;
+  var TASKS=DATA.tasks();
+  var QS=new URLSearchParams(location.search);
+  var S={P:RP.fromQuery(),Pbar:null,err:false,pv:'normal',busy:true,exp:null,year:null,sort:'done',dir:-1,dist:'status',sel:null,
+    tab:QS.get('tab')==='research'?'research':'overview',rs:{q:'',min:'',a:'',b:''}};
+  /* V1: menu Báo cáo = ADMIN/BOSS hoặc nhân viên được cấp menu analytics (requireMenuAccess('analytics')) */
+  function canSee(){return App.canSeeMenu?App.canSeeMenu('analytics'):App.isBoss()}
+  function pb(sm){return '<span class="phase-b'+(sm?' pb-s':'')+'" title="'+esc(T('rp.pb.tip'))+'">'+esc(T(sm?'rp.pb.s':'rp.pb'))+'</span>'}
+  var PBOPT={keys:['month','quarter','custom'],pb:['year']};
+  function yOf(P){return P.pr==='custom'?+P.b.slice(0,4):P.y}
+  S.year=yOf(S.P);
+  function byId(id){return TASKS.filter(function(x){return x.id===id})[0]}
+  function qs(){return RP.toQuery(S.P)}
+  function screen(){return S.busy||S.pv==='loading'?'loading':S.pv==='error'?'error':'data'}
+  var UP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>', DOWN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
+
+  /* ---------- khung trang ---------- */
+  function headHtml(){
+    var dis=screen()!=='data';
+    function eb(k,label,cls){
+      var b=S.exp===k;
+      return '<button type="button" class="btn '+cls+'" data-exp="'+k+'"'+(b?' aria-busy="true"':'')+(dis&&!b?' disabled':'')+'>'+
+        (b?'<span class="spin" aria-hidden="true"></span><span>'+esc(T('rp.exporting'))+'</span>':ic('download','i-sm')+'<span>'+esc(T(label))+'</span>')+'</button>';
+    }
+    if(S.tab==='research')return '<div class="head"><div><h1>'+esc(T('rp.title'))+'</h1><p>'+esc(T('rp.rs.sub'))+'</p></div></div>';
+    return '<div class="head"><div><h1>'+esc(T('rp.title'))+'</h1><p>'+esc(T('rp.sub',{p:RP.label(S.P),q:RP.label(RP.prev(S.P))}))+'</p></div>'+
+      '<div class="head-act" id="hact">'+eb('xlsx','rp.exportXlsx','')+eb('pdf','rp.exportPdf','btn-p')+'</div></div>';
+  }
+  function navHtml(){
+    function a(k,href,lab){return '<a class="tab" href="'+href+'"'+(S.tab===k?' aria-current="page"':'')+'>'+esc(T(lab))+'</a>'}
+    return '<nav class="rp-nav" aria-label="'+esc(T('rp.tabs'))+'"><div class="tabs">'+
+      a('overview','reports.html?'+qs(),'rp.tab.overview')+a('tasks','reports-tasks.html?'+qs(),'rp.tab.tasks')+a('research','reports.html?tab=research&'+qs(),'rp.tab.research')+'</div></nav>';
+  }
+  function asideHtml(){
+    if(screen()!=='data')return '';
+    var K=RP.kpi(S.P); if(!K.total)return '';
+    return '<p class="aside">'+App.fill('rp.sum',{a:'<b>'+esc(RP.pct(K.onTime,0))+'</b>',b:'<b>'+esc(T('rp.days',{n:RP.num1(K.avgDays)}))+'</b>'})+'</p>';
+  }
+  function naHtml(){
+    return '<div class="state page" role="status">'+ic('lock')+'<h1>'+esc(T('rp.na.t'))+'</h1><p>'+esc(T('rp.na.d'))+'</p>'+
+      '<div class="acts"><a class="btn btn-p" href="tasks-list.html">'+ic('arrow-l','i-sm')+'<span>'+esc(T('rp.na.back'))+'</span></a></div></div>';
+  }
+
+  /* ---------- KPI (kpi.query.ts + KpiCard) ---------- */
+  /* Như V1 (KpiCard.tsx:58-61): chênh lệch = 0 thì không hiện; tăng luôn màu xanh, giảm luôn màu đỏ (kể cả Quá hạn, Gia hạn).
+     (Bản đề xuất tô màu theo "tốt/xấu" của từng chỉ số đã bỏ, trả về V1.) */
+  function delta(v,p){
+    var d=v-p; if(d===0)return '';
+    var sign=d>0?'+':'−', cls=d>0?'good':'bad', full=T('rp.k.vs',{d:sign+RP.n(Math.abs(d)),v:RP.n(p)});
+    return '<span class="kd '+cls+'" title="'+esc(full)+'">'+(d>0?UP:DOWN)+'<span aria-hidden="true">'+sign+RP.n(Math.abs(d))+'</span><span class="sr">'+esc(full)+'</span></span>';
+  }
+  function kpiHtml(K,K0){
+    var rate=RP.rate(K.done,K.total);
+    var L=[
+      {k:'total',c:'var(--ink-3)',v:K.total,p:K0.total},
+      {k:'done',c:'var(--c-done)',v:K.done,p:K0.done,bar:rate,sub:T('rp.k.rate',{p:RP.pct1(rate)})},
+      {k:'prog',c:'var(--c-progress)',v:K.prog,p:K0.prog},
+      {k:'wait',c:'var(--c-review)',v:K.wait,p:K0.wait,sub:T('rp.k.waitSub',{a:RP.n(K.waitAck),b:RP.n(K.waitRev)})},
+      {k:'over',c:'var(--danger)',v:K.over,p:K0.over,sub:T('rp.k.overSub')},
+      {k:'ext',c:'var(--amber)',v:K.ext,p:K0.ext,sub:K.extRate>20?T('rp.k.extWarn',{p:RP.pct(K.extRate,0)}):T('rp.k.extSub',{p:RP.pct(K.extRate,0)}),warn:K.extRate>20,nod:1}
+    ];
+    return '<section class="kpis" aria-label="KPI">'+L.map(function(o){
+      var tag=o.nod?'div':'button', lab=T('rp.k.'+o.k);
+      return '<'+tag+(o.nod?' class="kpi" title="'+esc(T('rp.k.noDrill'))+'"':' type="button" class="kpi" data-dd="'+o.k+'" aria-haspopup="dialog" title="'+esc(T('rp.k.open',{k:lab}))+'"')+'>'+
+        '<span class="kl"><span class="sdot" style="--k:'+o.c+'" aria-hidden="true"></span><span class="t">'+esc(lab)+'</span>'+(o.nod?'':ic('chev-r','i-xs go'))+'</span>'+
+        '<span class="kval">'+RP.n(o.v)+'</span>'+
+        (o.bar!==undefined?'<span class="kbar" aria-hidden="true"><i style="width:'+Math.min(100,o.bar)+'%"></i></span>':'')+
+        (o.sub?'<span class="ks'+(o.warn?' warn':'')+'">'+esc(o.sub)+'</span>':'')+
+        delta(o.v,o.p)+'</'+tag+'>';
+    }).join('')+'</section>';
+  }
+
+  /* ---------- Biểu đồ theo tháng (MonthlyOverviewChart) ---------- */
+  function monthlyCard(){
+    var ys=[];for(var y=+RP.TODAY.slice(0,4);y>=2025;y--)ys.push(y);
+    return '<section class="card rsec" aria-labelledby="mT"><div class="ch-h"><h2 id="mT">'+esc(T('rp.m.title'))+'</h2>'+
+      '<ul class="lg"><li><span class="sw" style="--k:var(--primary)"></span>'+esc(T('rp.m.created'))+'</li><li><span class="sw" style="--k:var(--c-done)"></span>'+esc(T('rp.m.done'))+'</li><li><span class="sw ln" style="--k:var(--c-review)"></span>'+esc(T('rp.m.ontime'))+' %</li></ul>'+
+      '<label class="sr" for="mYear">'+esc(T('rp.m.year'))+'</label><select class="select" id="mYear">'+ys.map(function(y){return '<option value="'+y+'"'+(y===S.year?' selected':'')+'>'+y+'</option>'}).join('')+'</select></div>'+
+      '<div class="chart" id="mChart" role="group" aria-label="'+esc(T('rp.m.aria',{y:S.year}))+'"></div>'+
+      '<p class="ch-note">'+esc(T('rp.m.note'))+'</p></section>';
+  }
+  function nice(x){if(x<=4)return 1;var p=Math.pow(10,Math.floor(Math.log10(x))),f=x/p;return Math.ceil((f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p)}
+  function drawMonthly(){
+    var el=$('#mChart'); if(!el)return;
+    var data=RP.monthly(S.year), has=data.some(function(o){return o.created||o.done});
+    if(!has){el.innerHTML='<div class="mt">'+esc(T('rp.m.empty',{y:S.year}))+'</div>';return;}
+    var W=Math.max(260,el.clientWidth-12), H=W<520?220:250, ml=30, mr=40, mt=12, mb=26, pw=W-ml-mr, ph=H-mt-mb;
+    var max=Math.max.apply(null,data.map(function(o){return Math.max(o.created,o.done)})), step=nice(max/4), top=step*4;
+    var M=RP.months(), bw=pw/12, barW=Math.max(4,Math.min(14,bw*.26)), s='';
+    function Y(v){return mt+ph-v/top*ph}
+    for(var i=0;i<=4;i++){var y=Math.round(Y(i*step))+.5;
+      s+='<line class="gl'+(i?'':' gl0')+'" x1="'+ml+'" x2="'+(ml+pw)+'" y1="'+y+'" y2="'+y+'"/>'+
+        '<text class="num" x="'+(ml-6)+'" y="'+(y+3.5)+'" text-anchor="end">'+RP.n(i*step)+'</text>'+
+        '<text class="num" x="'+(ml+pw+6)+'" y="'+(y+3.5)+'">'+(i*25)+'%</text>';}
+    var bands='',bars='',hits='',pts=[];
+    data.forEach(function(o,i){
+      var x=ml+i*bw, cx=x+bw/2;
+      bands+='<rect class="band" data-b="'+i+'" x="'+(x+1)+'" y="'+mt+'" width="'+(bw-2)+'" height="'+ph+'" rx="4"/>';
+      if(!o.future){
+        if(o.created)bars+='<rect class="b-cr" x="'+(cx-barW-1)+'" y="'+Y(o.created)+'" width="'+barW+'" height="'+(mt+ph-Y(o.created))+'" rx="2"/>';
+        if(o.done)bars+='<rect class="b-dn" x="'+(cx+1)+'" y="'+Y(o.done)+'" width="'+barW+'" height="'+(mt+ph-Y(o.done))+'" rx="2"/>';
+        if(o.onTime!==null)pts.push([cx,mt+ph-o.onTime/100*ph]);
+        hits+='<rect class="hit" data-i="'+i+'" tabindex="0" x="'+x+'" y="'+mt+'" width="'+bw+'" height="'+ph+'" aria-label="'+esc(tipText(o))+'"/>';
+      }
+      if(bw>=28||i%2===0)s+='<text x="'+cx+'" y="'+(H-8)+'" text-anchor="middle"'+(o.future?' class="fut"':'')+'>'+esc(M[i])+'</text>';
+    });
+    var line=pts.length>1?'<polyline class="ln-ot" points="'+pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1)}).join(' ')+'"/>':'';
+    var dots=pts.map(function(p){return '<circle class="dt-ot" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3"/>'}).join('');
+    el.innerHTML='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" aria-hidden="false">'+bands+s+bars+line+dots+hits+'</svg><div class="tip" id="mTip" hidden></div>';
+    el.dataset.w=el.clientWidth;
+  }
+  function monthLong(i){return I18N.t('rp.monthsLong').split(',')[i]}
+  function tipText(o){
+    return monthLong(o.m-1)+' '+S.year+': '+T('rp.m.created')+' '+RP.n(o.created)+', '+T('rp.m.done')+' '+RP.n(o.done)+', '+T('rp.m.cancel')+' '+RP.n(o.cancelled)+(o.onTime!==null?', '+T('rp.m.ontime')+' '+RP.pct(o.onTime):'');
+  }
+  function showMTip(i,kbd){
+    var el=$('#mChart'), tip=$('#mTip'); if(!el||!tip)return;
+    var o=RP.monthly(S.year)[i];
+    $$('#mChart .band').forEach(function(b){b.classList.toggle('on',+b.dataset.b===i);b.classList.toggle('kf',!!kbd&&+b.dataset.b===i)});
+    function row(c,l,v){return '<div class="r"><span class="sw'+(c==='ln'?' ln':'')+'" style="--k:'+(c==='ln'?'var(--c-review)':c)+'"></span>'+esc(l)+'<span class="v">'+esc(v)+'</span></div>'}
+    tip.innerHTML='<b>'+esc(T('rp.lbl.month',{n:o.m,y:S.year,mon:monthLong(o.m-1)}))+'</b>'+row('var(--primary)',T('rp.m.created'),RP.n(o.created))+row('var(--c-done)',T('rp.m.done'),RP.n(o.done))+
+      row('var(--ink-3)',T('rp.m.cancel'),RP.n(o.cancelled))+row('ln',T('rp.m.ontime'),o.onTime===null?'—':RP.pct(o.onTime));
+    tip.hidden=false;
+    var hit=$('#mChart .hit[data-i="'+i+'"]'), r=hit.getBoundingClientRect(), cr=el.getBoundingClientRect(), tw=tip.offsetWidth;
+    var left=r.right-cr.left+6; if(left+tw>cr.width-4)left=r.left-cr.left-tw-6; if(left<4)left=4;
+    tip.style.left=left+'px'; tip.style.top='18px';
+  }
+  function hideMTip(){var t=$('#mTip');if(t)t.hidden=true;$$('#mChart .band').forEach(function(b){b.classList.remove('on','kf')})}
+
+  /* ---------- Hiệu suất theo người (PerformanceTable + performance.query) ---------- */
+  var PCOLS=[['name','filter.assignee',0],['total','rp.p.total',1],['done','rp.p.done',1],['onTime','rp.p.ontime',1],['prog','rp.p.prog',1],['over','rp.p.over',1],['rej','rp.p.rej',1],['trans','rp.p.trans',1]];
+  function perfSorted(){
+    var L=RP.perf(S.P), k=S.sort, d=S.dir;
+    return L.sort(function(a,b){
+      if(k==='name')return nm(a.c).localeCompare(nm(b.c),'vi')*d;
+      var x=a[k]===null?-1:a[k], y=b[k]===null?-1:b[k];
+      return (x-y)*d||nm(a.c).localeCompare(nm(b.c),'vi');
+    });
+  }
+  function perfHtml(){
+    var L=perfSorted();
+    var head=PCOLS.map(function(c){
+      var st=S.sort===c[0]?(S.dir>0?'ascending':'descending'):'none', lab=T(c[1]);
+      return '<div class="th'+(c[2]?' r':'')+'" role="columnheader" aria-sort="'+st+'"><button type="button" data-ps="'+c[0]+'" aria-label="'+esc(T('tl.sortBy',{c:lab}))+'">'+(c[2]?ic('chev-d','i-xs ar'):'')+esc(lab)+(c[2]?'':ic('chev-d','i-xs ar'))+'</button></div>';
+    }).join('')+'<div class="th" role="columnheader"><span class="sr">'+esc(T('act.open'))+'</span></div>';
+    var body=L.length?L.map(function(o){
+      function cell(lab,v,cls){return '<div class="td r'+(cls?' '+cls:'')+'" role="cell"><span class="ml">'+esc(lab)+'</span>'+v+'</div>'}
+      function num(v,bad){return '<span class="mono'+(v===0?' z':bad&&v>0?' bad-n':'')+'">'+RP.n(v)+'</span>'}
+      return '<div class="tr" role="row" tabindex="0" data-u="'+o.c+'" title="'+esc(T('rp.p.view',{n:nm(o.c)}))+'">'+
+        '<div class="td td-main pn" role="cell">'+av(o.c,'av-lg')+'<span class="tx">'+esc(nm(o.c))+'</span></div>'+
+        cell(T('rp.p.total'),num(o.total))+
+        cell(T('rp.p.done'),num(o.done)+'<span class="pb" aria-hidden="true"><i style="width:'+o.rate+'%"></i></span><span class="pc" title="'+esc(T('rp.p.rateOf',{p:RP.pct(o.rate)}))+'">'+RP.pct(o.rate)+'</span>','pdone')+
+        cell(T('rp.p.ontime'),'<span class="mono'+(o.onTime===null?' z':'')+'">'+(o.onTime===null?'—':RP.pct(o.onTime))+'</span>')+
+        cell(T('rp.p.prog'),num(o.prog))+cell(T('rp.p.over'),num(o.over,1))+cell(T('rp.p.rej'),num(o.rej))+cell(T('rp.p.trans'),num(o.trans))+
+        '<div class="td td-hide c-chev" role="cell" aria-hidden="true">'+ic('chev-r','i-sm')+'</div></div>';
+    }).join(''):'<div class="state" role="row"><div role="cell"><b>'+esc(T('rp.p.empty'))+'</b></div></div>';
+    var opts=PCOLS.map(function(c){return '<option value="'+c[0]+'"'+(S.sort===c[0]?' selected':'')+'>'+esc(T(c[1]))+'</option>'}).join('');
+    return '<section class="rsec" aria-labelledby="pT"><div class="sec-t"><div><h2 id="pT">'+esc(T('rp.p.title'))+'</h2><p>'+esc(T('rp.p.sub'))+'</p></div>'+
+      '<label class="msort"><span class="sr">'+esc(T('rp.p.sort'))+'</span><select class="select" id="pSort" aria-label="'+esc(T('rp.p.sort'))+'">'+opts+'</select></label></div>'+
+      '<div class="tbl perf" role="table" aria-labelledby="pT"><div class="thead" role="rowgroup"><div role="row" style="display:contents">'+head+'</div></div><div class="tbody" role="rowgroup" id="pRows">'+body+'</div></div></section>';
+  }
+
+  /* ---------- Phân bố (KpiData.tasksByStatus / tasksByPriority / tasksByWorkflowMode + ForceModeStat) ---------- */
+  var STO=['DRAFT','PENDING_APPROVAL','WAITING_ACKNOWLEDGE','IN_PROGRESS','PENDING_REVIEW','COMPLETED','CANCELLED'];
+  var STC={DRAFT:'--c-draft',PENDING_APPROVAL:'--c-approval',WAITING_ACKNOWLEDGE:'--c-pickup',IN_PROGRESS:'--c-progress',PENDING_REVIEW:'--c-review',COMPLETED:'--c-done',CANCELLED:'--ink-3'};
+  function distData(K){
+    if(S.dist==='priority')return ['urgent','high','normal','low'].map(function(p){return {l:T('pr.'+p),v:K.byPriority[p],c:{urgent:'--danger',high:'--c-review',normal:'--primary',low:'--c-draft'}[p]}});
+    if(S.dist==='flow')return [{l:T('td.mode.direct'),v:K.flow.direct,c:'--c-pickup'},{l:T('td.mode.approval'),v:K.flow.approval,c:'--c-approval'}];
+    return STO.filter(function(s){return K.byStatus[s]}).map(function(s){return {l:T('st.'+s),v:K.byStatus[s],c:STC[s]}});
+  }
+  function distBody(K){
+    var D=distData(K).filter(function(x){return x.v>0}), tot=D.reduce(function(s,x){return s+x.v},0);
+    if(!tot)return '<div class="mt">'+esc(T('rp.empty'))+'</div>';
+    var r=52, C=2*Math.PI*r, off=0, gap=D.length>1?2:0, segs='';
+    D.forEach(function(x,i){var len=x.v/tot*C;segs+='<circle class="sg" data-si="'+i+'" style="--k:var('+x.c+')" cx="64" cy="64" r="'+r+'" stroke-dasharray="'+Math.max(.5,len-gap).toFixed(2)+' '+C.toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'"/>';off+=len;});
+    var title=T('rp.d.'+S.dist);
+    var h='<div class="dn"><div class="dn-fig"><svg viewBox="0 0 128 128" role="img" aria-label="'+esc(T('rp.d.aria',{t:title}))+'">'+segs+'</svg><div class="dn-c"><b>'+RP.n(tot)+'</b><span>'+esc(T('rp.d.unit'))+'</span></div></div>'+
+      '<ul class="dn-lg">'+D.map(function(x,i){return '<li data-si="'+i+'"><span class="sdot" style="--k:var('+x.c+')" aria-hidden="true"></span><span class="l">'+esc(x.l)+'</span><span class="v">'+RP.n(x.v)+'</span><span class="p">'+RP.pct(RP.rate(x.v,tot))+'</span></li>'}).join('')+'</ul></div>';
+    if(S.dist==='flow')h+='<p class="dn-note pb-zone" title="'+esc(T('rp.pb.force'))+'">'+esc(T('rp.d.force',{n:RP.n(K.force),p:RP.pct(RP.r0(K.force,K.flow.approval),0)}))+pb(1)+'</p>';
+    return h;
+  }
+  function distCard(K){
+    return '<section class="card" aria-labelledby="dT"><div class="ch-h"><h2 id="dT">'+esc(T('rp.d.title'))+'</h2></div>'+
+      '<div class="dn-seg"><div class="seg" role="group" aria-label="'+esc(T('rp.d.title'))+'">'+['status','priority','flow'].map(function(k){return '<button type="button" data-dist="'+k+'" aria-pressed="'+(S.dist===k)+'">'+esc(T('rp.d.'+k))+'</button>'}).join('')+'</div></div>'+
+      '<div id="dBody">'+distBody(K)+'</div></section>';
+  }
+  /* ---------- Phễu (FunnelChart) ---------- */
+  function funnelCard(){
+    var F=RP.funnel(S.P), max=F[0].count;
+    var body=max?'<ul class="bars">'+F.map(function(s){return '<li><div class="bh"><span class="l">'+esc(T('rp.f.'+s.k))+'</span><span class="v">'+RP.n(s.count)+'</span><span class="p">'+RP.pct(s.pct,0)+'</span></div>'+
+      '<div class="trk" aria-hidden="true"><i style="width:'+(s.count/max*100)+'%;--k:var('+(s.k==='done'?'--c-done':'--primary')+')"></i></div></li>'}).join('')+'</ul><p class="ch-note">'+esc(T('rp.f.note'))+'</p>'
+      :'<div class="mt">'+esc(T('rp.empty'))+'</div>';
+    return '<section class="card" aria-labelledby="fT"><div class="ch-h"><h2 id="fT">'+esc(T('rp.f.title'))+'</h2></div>'+body+'</section>';
+  }
+  /* ---------- Thời gian TB theo loại (TaskTypeTimeChart) ---------- */
+  function typeCard(){
+    var L=RP.typeTime(S.P), max=L.length?L[0].avg:0;
+    var body=L.length?'<ul class="bars">'+L.map(function(o){return '<li><div class="bh"><span class="l">'+esc(RP.type(o.tk))+'</span><small>'+esc(T('rp.t.row',{n:RP.n(o.count)}))+'</small><span class="v">'+esc(o.avg===1?T('rp.day1'):T('rp.days',{n:RP.n(o.avg)}))+'</span></div>'+
+      '<div class="trk" aria-hidden="true"><i style="width:'+(o.avg/max*100)+'%;--k:var(--c-progress)"></i></div></li>'}).join('')+'</ul><p class="ch-note">'+esc(T('rp.t.note'))+'</p>'
+      :'<div class="mt">'+esc(T('rp.empty'))+'</div>';
+    return '<section class="card" aria-labelledby="tT"><div class="ch-h"><h2 id="tT">'+esc(T('rp.t.title'))+'</h2></div>'+body+'</section>';
+  }
+
+  /* ---------- Skeleton đúng hình ---------- */
+  function skel(){
+    var l=function(w,h,c){return '<span class="sk '+(c||'line')+'" style="width:'+w+';height:'+(h||12)+'px"></span>'};
+    var k='';for(var i=0;i<6;i++)k+='<div class="kpi sk-kpi">'+l('64%',12)+l('48%',26)+l('80%',10)+l('36%',10)+'</div>';
+    var bars='';[42,55,48,62,58,51,60,57,64,46,8,8].forEach(function(h){bars+='<span class="sk" style="height:'+h+'%"></span>'});
+    var rows='';for(i=0;i<5;i++)rows+='<div class="tr"><div class="td td-main" style="gap:10px">'+l('32px',32,'circle')+l('40%',12)+'</div><div class="td">'+l('100%',12)+'</div></div>';
+    var card=function(){return '<div class="card"><div class="card-b" style="display:grid;gap:14px;padding:16px">'+l('50%',14)+l('100%',10)+l('86%',10)+l('70%',10)+l('92%',10)+l('60%',10)+'</div></div>'};
+    return '<div aria-busy="true"><span class="sr">'+esc(T('app.loading'))+'</span><div class="kpis">'+k+'</div>'+
+      '<div class="card rsec"><div class="ch-h">'+l('180px',14)+'</div><div class="sk-bars">'+bars+'</div></div>'+
+      '<div class="rsec"><div class="sec-t">'+l('200px',16)+'</div><div class="tbl" style="--cols:minmax(0,1fr) 30%">'+rows+'</div></div>'+
+      '<div class="g3">'+card()+card()+card()+'</div></div>';
+  }
+
+  /* ---------- Research: Việc quá hạn + Phân bố khối lượng (V1 analytics/research/page.tsx + research.service.ts) ---------- */
+  var WLC=['--primary','--c-done','--c-review','--danger','--c-approval','--c-pickup','--c-progress','--amber','--c-draft'];
+  function rsFilters(){
+    var f=S.rs;
+    return '<div class="rs-f" role="search" aria-label="'+esc(T('rp.rs.f'))+'">'+
+      '<label class="search">'+ic('search','i-sm')+'<span class="sr">'+esc(T('rp.rs.q'))+'</span><input type="search" id="rsQ" value="'+esc(f.q)+'" placeholder="'+esc(T('rp.rs.q'))+'"></label>'+
+      '<label class="sr" for="rsMin">'+esc(T('rp.rs.min'))+'</label><input class="input num" type="number" min="0" id="rsMin" value="'+esc(f.min)+'" placeholder="'+esc(T('rp.rs.min'))+'">'+
+      '<span class="dates"><label class="sr" for="rsA">'+esc(T('rp.from'))+'</label><input class="input" type="date" id="rsA" value="'+f.a+'" max="'+RP.TODAY+'" title="'+esc(T('rp.rs.created'))+'">'+
+      '<span class="faint" aria-hidden="true">–</span><label class="sr" for="rsB">'+esc(T('rp.to'))+'</label><input class="input" type="date" id="rsB" value="'+f.b+'" max="'+RP.TODAY+'" title="'+esc(T('rp.rs.created'))+'"></span></div>';
+  }
+  function rsOverdue(){
+    var f=S.rs, all=RP.overdue(f.a,f.b), q=f.q.trim().toLowerCase(), min=+f.min||0;
+    var L=all.filter(function(x){return (!q||RP.title(x.t).toLowerCase().indexOf(q)>-1||x.t.a.some(function(a){return nm(a.c).toLowerCase().indexOf(q)>-1}))&&(!min||x.days>=min)});
+    var cnt=L.length!==all.length?RP.n(L.length)+'/'+RP.n(all.length):RP.n(L.length);
+    var body=!L.length?'<div class="state" role="status">'+ic('check-circle')+'<b>'+esc(T('rp.rs.none'))+'</b></div>':
+      '<div class="tbl ov" role="table" aria-labelledby="ovT"><div class="thead" role="rowgroup"><div role="row" style="display:contents">'+
+        ['tl.colTask','filter.status','filter.due','rp.rs.late','filter.assignee'].map(function(k,i){return '<div class="th'+(i===4?' c-who':'')+'" role="columnheader">'+esc(T(k))+'</div>'}).join('')+'<div class="th" role="columnheader"><span class="sr">'+esc(T('act.open'))+'</span></div></div></div>'+
+      '<div class="tbody" role="rowgroup" id="ovRows">'+L.slice(0,60).map(function(x){var t=x.t;
+        return '<div class="tr" role="row" tabindex="0" data-go="'+t.id+'" title="'+t.id+' · '+esc(RP.title(t))+'">'+
+          '<div class="td td-main" role="cell"><span class="ov-tt"><span class="tx">'+esc(RP.title(t))+'</span><small><span class="pr-'+t.p+'">'+esc(T('pr.'+t.p))+'</span><span class="mono">'+t.id+'</span></small></span></div>'+
+          '<div class="td stat s-'+t.s+'" role="cell"><span class="sdot" aria-hidden="true"></span><span>'+esc(T('st.'+t.s))+'</span></div>'+
+          '<div class="td mono due-overdue" role="cell">'+App.dt(t.due,true)+'</div>'+
+          '<div class="td" role="cell"><span class="late">'+esc(T('rp.rs.days',{n:x.days}))+'</span></div>'+
+          '<div class="td c-who" role="cell"><span class="who">'+esc(t.a.map(function(a){return nm(a.c)}).join(', ')||'—')+'</span></div>'+
+          '<div class="td td-hide c-chev" role="cell" aria-hidden="true">'+ic('chev-r','i-sm')+'</div></div>'}).join('')+'</div></div>'+
+        (L.length>60?'<p class="ch-note">'+esc(T('rp.rs.more',{n:RP.n(L.length-60)}))+'</p>':'');
+    return '<section class="card rsec" aria-labelledby="ovT"><div class="ch-h"><h2 id="ovT">'+esc(T('rp.rs.ovT'))+' <span class="mono" style="color:var(--ink-3);font-weight:500">('+cnt+')</span></h2></div><div class="card-b" style="padding:12px 16px 16px">'+body+'</div></section>';
+  }
+  function rsWorkload(){
+    var W=RP.workload(), tot=W.reduce(function(s,o){return s+o.total},0);
+    var body;
+    if(!tot)body='<div class="mt">'+esc(T('rp.rs.wlNone'))+'</div>';
+    else{
+      var r=52,C=2*Math.PI*r,off=0,gap=W.length>1?2:0,segs='';
+      W.forEach(function(o,i){var len=o.total/tot*C;segs+='<circle class="sg" style="--k:var('+WLC[i%WLC.length]+')" cx="64" cy="64" r="'+r+'" stroke-dasharray="'+Math.max(.5,len-gap).toFixed(2)+' '+C.toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'"/>';off+=len;});
+      body='<div class="dn wl"><div class="dn-fig"><svg viewBox="0 0 128 128" role="img" aria-label="'+esc(T('rp.rs.wlT'))+'">'+segs+'</svg><div class="dn-c"><b>'+RP.n(tot)+'</b><span>'+esc(T('rp.rs.active'))+'</span></div></div>'+
+        '<ul class="dn-lg">'+W.map(function(o,i){return '<li><span class="sdot" style="--k:var('+WLC[i%WLC.length]+')" aria-hidden="true"></span><span class="l">'+esc(nm(o.c))+' <small>'+esc(T('rp.rs.wlRow',{a:o.prog,b:o.wait}))+'</small></span><span class="v">'+RP.n(o.total)+'</span></li>'}).join('')+'</ul></div>'+
+        '<p class="ch-note">'+esc(T('rp.rs.wlNote'))+'</p>';
+    }
+    return '<section class="card rsec" aria-labelledby="wlT"><div class="ch-h"><h2 id="wlT">'+esc(T('rp.rs.wlT'))+'</h2></div>'+body+'</section>';
+  }
+  function rsBody(){
+    var sc=screen();
+    if(sc==='loading')return '<div aria-busy="true"><span class="sr">'+esc(T('app.loading'))+'</span><div class="card rsec"><div class="card-b" style="display:grid;gap:12px;padding:16px">'+[60,90,80,70,85].map(function(w){return '<span class="sk line" style="width:'+w+'%;height:12px"></span>'}).join('')+'</div></div></div>';
+    if(sc==='error')return '<div class="state page bad" role="alert">'+ic('wifi-off')+'<h1>'+esc(T('rp.err.t'))+'</h1><p>'+esc(T('rp.err.d'))+'</p><div class="acts"><button type="button" class="btn btn-p" data-retry>'+ic('refresh','i-sm')+'<span>'+esc(T('app.retry'))+'</span></button></div></div>';
+    return rsOverdue()+rsWorkload();
+  }
+  function renderRs(){var b=$('#rsBody');if(b)b.innerHTML=rsBody();}
+
+  /* ---------- dựng ---------- */
+  function bodyHtml(){
+    var sc=screen();
+    if(sc==='loading')return skel();
+    if(sc==='error')return '<div class="state page bad" role="alert">'+ic('wifi-off')+'<h1>'+esc(T('rp.err.t'))+'</h1><p>'+esc(T('rp.err.d'))+'</p><div class="acts"><button type="button" class="btn btn-p" data-retry>'+ic('refresh','i-sm')+'<span>'+esc(T('app.retry'))+'</span></button></div></div>';
+    var K=RP.kpi(S.P), K0=RP.kpi(RP.prev(S.P));
+    if(!K.total)return '<div class="card rsec state" role="status">'+ic('inbox')+'<b>'+esc(T('rp.empty.t'))+'</b><span>'+esc(T('rp.empty.d'))+'</span></div>'+monthlyCard();
+    return kpiHtml(K,K0)+monthlyCard()+perfHtml()+'<div class="g3">'+distCard(K)+funnelCard()+typeCard()+'</div>';
+  }
+  function renderBar(focusSel){
+    var b=$('#pbar'); if(!b)return;
+    b.innerHTML=RP.pbarHtml(S.Pbar||S.P,S.err,PBOPT)+asideHtml();
+    if(focusSel){var f=$(focusSel,b);if(f)f.focus();}
+  }
+  function renderBody(){if(S.tab==='research'){renderRs();return;}var b=$('#body');if(!b)return;b.innerHTML=bodyHtml();drawMonthly();}
+  function renderHead(focusSel){
+    var h=$('#hwrap'); if(!h)return; h.innerHTML=headHtml();
+    if(focusSel){var f=$(focusSel);if(f)f.focus();}
+  }
+  function render(){
+    var m=$('#mount');
+    if(!canSee()){m.innerHTML=naHtml();document.title=T('app.name')+' · '+T('rp.title');return;}
+    if(S.tab==='research'){m.innerHTML='<div id="hwrap">'+headHtml()+'</div>'+navHtml()+rsFilters()+'<div id="rsBody"></div>';renderRs();document.title=T('app.name')+' · '+T('rp.title')+' · '+T('rp.tab.research');return;}
+    m.innerHTML='<div id="hwrap">'+headHtml()+'</div>'+navHtml()+'<div class="pbar" id="pbar"></div><div id="body"></div>';
+    renderBar(); renderBody();
+    document.title=T('app.name')+' · '+T('rp.title');
+  }
+  function load(ms,focusSel){
+    S.busy=true; renderHead(); renderBar(focusSel); renderBody();
+    clearTimeout(load.t); load.t=setTimeout(function(){S.busy=false;renderHead();renderBar();renderBody();if(focusSel){var f=$(focusSel);if(f)f.focus();}},ms);
+  }
+
+  /* ---------- drill-down (DrillDownModal) ---------- */
+  function openDrill(k){
+    var list=RP.drill(S.P,k), PS=10, page=0, pages=Math.max(1,Math.ceil(list.length/PS)), api;
+    function due(t){
+      if(!t.due)return '<span class="faint">'+esc(T('due.none'))+'</span>';
+      var o=RP.isOver(t);
+      return App.dt(t.due)+(o?'<small class="due-overdue">'+esc(T('rp.dd.over',{n:RP.diff(t.due,RP.TODAY)}))+'</small>':'');
+    }
+    function people(t){var a=t.a.filter(function(x){return x.st!=='DECLINED'&&x.st!=='TRANSFERRED'}).map(function(x){return x.c});
+      if(!a.length)return '<span class="faint">'+esc(T('card.unassigned'))+'</span>';
+      return '<span class="avs">'+a.slice(0,3).map(function(c){return av(c)}).join('')+(a.length>3?'<span class="av more">+'+(a.length-3)+'</span>':'')+'</span>';}
+    function draw(w){
+      var box=$('#dd',w), sl=list.slice(page*PS,page*PS+PS);
+      if(!list.length){box.innerHTML='<div class="state">'+ic('inbox')+'<b>'+esc(T('lane.empty'))+'</b></div>';return;}
+      box.innerHTML='<p class="hint" style="margin:0 0 10px">'+esc(T('rp.dd.hint'))+'</p><div class="tbl dd-t" role="table" aria-label="'+esc(T('rp.k.'+k))+'">'+
+        '<div class="thead" role="rowgroup"><div role="row" style="display:contents"><div class="th" role="columnheader">'+esc(T('tl.colTask'))+'</div><div class="th" role="columnheader">'+esc(T('filter.assignee'))+'</div><div class="th" role="columnheader">'+esc(T('filter.status'))+'</div><div class="th" role="columnheader">'+esc(T('filter.due'))+'</div></div></div>'+
+        '<div class="tbody" role="rowgroup">'+sl.map(function(t){
+          return '<div class="tr" role="row" tabindex="0" data-go="'+t.id+'" title="'+t.id+' · '+esc(RP.title(t))+'">'+
+            '<div class="td td-main" role="cell"><span class="dd-tt"><span class="tx">'+esc(RP.title(t))+'</span><span class="mono">'+t.id+' · '+esc(RP.type(t.tk))+'</span></span></div>'+
+            '<div class="td td-end" role="cell">'+people(t)+'</div>'+
+            '<div class="td stat s-'+t.s+'" role="cell"><span class="sdot" aria-hidden="true"></span><span>'+esc(T('st.'+t.s))+'</span></div>'+
+            '<div class="td dd-due" role="cell">'+due(t)+'</div></div>';
+        }).join('')+'</div></div>'+
+        '<div class="dd-f"><span>'+esc(T('rp.dd.page',{a:page+1,b:pages}))+'</span><div class="pg" role="group" aria-label="'+esc(T('rp.l.pages'))+'">'+
+        '<button type="button" class="icon-btn sm" data-pg="-1" aria-label="'+esc(T('rp.dd.prev'))+'"'+(page?'':' disabled')+'>'+ic('chev-l','i-sm')+'</button>'+
+        '<button type="button" class="icon-btn sm" data-pg="1" aria-label="'+esc(T('rp.dd.next'))+'"'+(page<pages-1?'':' disabled')+'>'+ic('chev-r','i-sm')+'</button></div></div>';
+    }
+    function go(id){if(byId(id)){api.close(true);openTask(id);}else location.href='task.html?id='+encodeURIComponent(id);}
+    api=App.dialog({title:T('rp.k.'+k),sub:esc(T(k==='done'?'rp.dd.subDone':'rp.dd.sub',{n:RP.n(list.length),p:RP.label(S.P)})),size:'lg',body:'<div id="dd"></div>',init:function(w){
+      draw(w);
+      w.addEventListener('click',function(e){
+        var b=e.target.closest('[data-pg]');if(b){page=Math.max(0,Math.min(pages-1,page+ +b.dataset.pg));draw(w);var nb=$('[data-pg="'+b.dataset.pg+'"]',w);(nb&&!nb.disabled?nb:$('[data-pg]:not([disabled])',w)).focus();return;}
+        var r=e.target.closest('[data-go]');if(r)go(r.dataset.go);
+      });
+      w.addEventListener('keydown',function(e){var r=e.target.closest&&e.target.closest('[data-go]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopPropagation();go(r.dataset.go);}},true);
+    }});
+  }
+
+  /* ---------- ngăn chi tiết (App.taskDetail) ---------- */
+  function drHtml(t){return App.taskDetail(t,{mode:'drawer',nav:{i:0,n:1},rerender:refreshDr,onStep:function(){}})}
+  function refreshDr(){var t=byId(S.sel);if(t&&App.drawer.isOpen())App.drawer.set(drHtml(t));}
+  function openTask(id){var t=byId(id);if(!t){location.href='task.html?id='+encodeURIComponent(id);return;}S.sel=id;App.drawer.open({html:drHtml(t),label:T('td.detail')});}
+
+  /* ---------- xuất (useExportPdf + /api/analytics/export) ---------- */
+  function doExport(kind){
+    if(S.exp)return;
+    if(!RP.kpi(S.P).total){App.toast(T('rp.exportEmpty'),'info');return;}
+    S.exp=kind; renderHead('[data-exp="'+kind+'"]');
+    setTimeout(function(){if(S.pv==='exporting')return;S.exp=null;renderHead('[data-exp="'+kind+'"]');App.toast(T('rp.done.pdf',{f:'analytics-'+RP.fileTag(S.P)+'.'+kind}));},1500);
+  }
+
+  /* ---------- thanh preview ---------- */
+  function pv(){
+    var o=[['normal','td.pv.normal'],['loading','td.pv.loading'],['empty','rp.pv.empty'],['error','rp.pv.error'],['exporting','rp.pv.exporting']];
+    return '<label class="pvl" for="pvScreen">'+esc(T('td.pv.screen'))+'</label><select id="pvScreen">'+o.map(function(x){return '<option value="'+x[0]+'"'+(S.pv===x[0]?' selected':'')+'>'+esc(T(x[1]))+'</option>'}).join('')+'</select>';
+  }
+
+  App.shell({active:'reports',crumbs:S.tab==='research'?[{t:'nav.reports',href:'reports.html'},{t:'rp.tab.research'}]:[{t:'nav.reports'}],title:'rp.title',pv:pv,onOpenTask:openTask});
+
+  RP.bindPeriod(function(){return S.Pbar||S.P},function(P,err,focusSel){
+    if(err){S.Pbar=P;S.err=true;renderBar(focusSel);return;}
+    S.P=P;S.Pbar=null;S.err=false;S.year=yOf(P);
+    history.replaceState(null,'','?'+qs());
+    $('.rp-nav').outerHTML=navHtml();
+    load(420,focusSel);
+  });
+  document.addEventListener('click',function(e){
+    var el;
+    if(e.target.closest('#drScrim')){App.drawer.close();return;}
+    if((el=e.target.closest('#ovRows [data-go]'))){openTask(el.dataset.go);return;}
+    if((el=e.target.closest('[data-dd]'))){openDrill(el.dataset.dd);return;}
+    if((el=e.target.closest('[data-exp]'))){doExport(el.dataset.exp);return;}
+    if(e.target.closest('[data-retry]')){S.pv='normal';App.refreshPv();load(700);return;}
+    if((el=e.target.closest('[data-ps]'))){var k=el.dataset.ps;if(S.sort===k)S.dir=-S.dir;else{S.sort=k;S.dir=k==='name'?1:-1;}
+      var sec=el.closest('section');sec.outerHTML=perfHtml();var nb=$('[data-ps="'+k+'"]');nb&&nb.focus();return;}
+    if((el=e.target.closest('#pRows .tr[data-u]'))){location.href='reports-tasks.html?'+qs()+'&u='+el.dataset.u;return;}
+    if((el=e.target.closest('[data-dist]'))){S.dist=el.dataset.dist;$$('[data-dist]').forEach(function(b){b.setAttribute('aria-pressed',b===el)});$('#dBody').innerHTML=distBody(RP.kpi(S.P));return;}
+  });
+  document.addEventListener('keydown',function(e){
+    if(App.dialogOpen()||App.drawer.isOpen())return;
+    var ov=e.target.closest&&e.target.closest('#ovRows [data-go]');
+    if(ov&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openTask(ov.dataset.go);return;}
+    var r=e.target.closest&&e.target.closest('#pRows .tr[data-u]');
+    if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();r.click();return;}
+    if(r&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();var n=e.key==='ArrowDown'?r.nextElementSibling:r.previousElementSibling;if(n)n.focus();return;}
+    var h=e.target.closest&&e.target.closest('#mChart .hit');
+    if(h&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){e.preventDefault();var hs=$$('#mChart .hit'),i=hs.indexOf(h)+(e.key==='ArrowRight'?1:-1);if(hs[i])hs[i].focus();}
+    if(h&&e.key==='Escape')hideMTip();
+  });
+  document.addEventListener('change',function(e){
+    var el=e.target;
+    if(el.id==='rsA'||el.id==='rsB'){S.rs[el.id==='rsA'?'a':'b']=el.value;renderRs();return;}
+    if(el.id==='mYear'){S.year=+el.value;$('#mChart').setAttribute('aria-label',T('rp.m.aria',{y:S.year}));drawMonthly();return;}
+    if(el.id==='pSort'){S.sort=el.value;S.dir=el.value==='name'?1:-1;el.closest('section').outerHTML=perfHtml();$('#pSort').focus();return;}
+    if(el.id==='pvScreen'){S.pv=el.value;RP.EMPTY=S.pv==='empty';S.exp=S.pv==='exporting'?'pdf':null;S.busy=false;render();App.refreshPv();$('#pvScreen').focus();return;}
+  });
+  var rsT=0;
+  document.addEventListener('input',function(e){
+    if(e.target.id!=='rsQ'&&e.target.id!=='rsMin')return;
+    S.rs[e.target.id==='rsQ'?'q':'min']=e.target.value; clearTimeout(rsT); rsT=setTimeout(renderRs,150);
+  });
+  /* tooltip biểu đồ tháng + vòng phân bố */
+  document.addEventListener('pointerover',function(e){
+    var h=e.target.closest&&e.target.closest('#mChart .hit'); if(h){showMTip(+h.dataset.i);return;}
+    var s=e.target.closest&&e.target.closest('#dBody [data-si]'); if(s)hlDist(+s.dataset.si,true);
+  });
+  document.addEventListener('pointerout',function(e){
+    var h=e.target.closest&&e.target.closest('#mChart .hit'); if(h&&!(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest('#mChart .hit')))hideMTip();
+    var s=e.target.closest&&e.target.closest('#dBody [data-si]'); if(s)hlDist(-1);
+  });
+  document.addEventListener('focusin',function(e){var h=e.target.closest&&e.target.closest('#mChart .hit');if(h)showMTip(+h.dataset.i,true);});
+  document.addEventListener('focusout',function(e){if(e.target.closest&&e.target.closest('#mChart .hit'))hideMTip();});
+  /* rê lên một phần → tâm vòng hiện số + tỉ lệ của phần đó (tooltip tại chỗ, không che biểu đồ) */
+  function hlDist(i){
+    $$('#dBody [data-si]').forEach(function(x){x.classList.toggle('on',+x.dataset.si===i)});
+    var c=$('#dBody .dn-c'); if(!c)return;
+    var li=$('#dBody li[data-si="'+i+'"]');
+    if(i<0||!li){if(c.dataset.def)c.innerHTML=c.dataset.def;return;}
+    if(!c.dataset.def)c.dataset.def=c.innerHTML;
+    c.innerHTML='<b>'+esc(li.querySelector('.v').textContent)+'</b><span>'+esc(li.querySelector('.l').textContent)+'</span><span>'+esc(li.querySelector('.p').textContent)+'</span>';
+  }
+  var rw=0; addEventListener('resize',function(){clearTimeout(rw);rw=setTimeout(function(){var c=$('#mChart');if(c&&+c.dataset.w!==c.clientWidth)drawMonthly();},120);});
+  document.addEventListener('langchange',function(){render();});
+  document.addEventListener('rolechange',function(){if(App.drawer.isOpen())App.drawer.close();render();});
+  render();
+  setTimeout(function(){S.busy=false;if(canSee()){renderHead();renderBar();renderBody();}},350);
+})();
+</script>
+</body>
+</html>

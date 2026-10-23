@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Công việc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="task-form.css">
+<style>
+/* ---------- Riêng trang Bảng ---------- */
+.content{padding:24px 24px 96px}
+
+/* Dải quy trình */
+.flow{display:flex;gap:4px;margin:0 0 20px;padding:2px 0;overflow-x:auto;scrollbar-width:none}
+.flow::-webkit-scrollbar{display:none}
+.step{--notch:14px;position:relative;flex:1 1 0;min-width:120px;height:84px;border:0;padding:0;background:var(--line);text-align:left;
+  clip-path:polygon(0 0,calc(100% - var(--notch)) 0,100% 50%,calc(100% - var(--notch)) 100%,0 100%,var(--notch) 50%);
+  margin-left:calc(var(--notch) * -1 + 4px);transition:background .15s}
+.step:first-child{margin-left:0;clip-path:polygon(0 0,calc(100% - var(--notch)) 0,100% 50%,calc(100% - var(--notch)) 100%,0 100%)}
+.step-in{position:absolute;inset:1px;background:var(--surface);clip-path:inherit;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:0 calc(var(--notch) + 8px) 0 calc(var(--notch) + 14px);transition:background .15s}
+.step:first-child .step-in{padding-left:16px}
+.step-name{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--ink-2);line-height:1.25;min-width:0}
+.step-name span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--k);flex:none}
+.step-row{display:flex;align-items:baseline;gap:8px;min-width:0}
+.step-num{font:500 28px/1.1 var(--f-head);font-variant-numeric:tabular-nums;color:var(--ink);letter-spacing:-.02em}
+.step.zero .step-num{color:var(--ink-3)}
+.step-mine{font-size:12px;font-weight:600;color:var(--k);white-space:nowrap}
+.step.mine .step-name{padding-right:16px}
+.step-ping{position:absolute;top:13px;right:calc(var(--notch) + 10px);width:8px;height:8px;border-radius:50%;background:var(--k)}
+.step-ping::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--k);opacity:.35;animation:ping 1.8s ease-out infinite}
+@keyframes ping{0%{transform:scale(.6);opacity:.5}80%,100%{transform:scale(1.5);opacity:0}}
+.step:hover .step-in{background:var(--surface-2)}
+.step.mine{background:var(--k)}
+.step.mine .step-in{inset:2px;background:color-mix(in srgb,var(--k) 7%,var(--surface))}
+.step.mine:hover .step-in{background:color-mix(in srgb,var(--k) 12%,var(--surface))}
+.step:focus-visible{outline:none}
+.step:focus-visible .step-in{box-shadow:inset 0 0 0 2px var(--primary)}
+
+/* Thanh công cụ */
+.tools{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tb-search{width:260px;max-width:100%}
+.tools .btn-q{background:transparent;border-color:transparent;padding:0 10px 0 12px}
+.tools .btn-q:hover{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.tools .seg{margin-left:auto}
+
+/* Bảng cột */
+.board{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;align-items:flex-start;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+.col{position:relative;flex:0 0 272px;background:var(--lane);border-radius:var(--r-card);display:flex;flex-direction:column;max-height:max(380px,calc(100dvh - 330px));transition:box-shadow .2s}
+.col.flash{box-shadow:0 0 0 2px var(--k)}
+.col-h{display:flex;align-items:center;gap:8px;padding:12px 14px 10px;position:relative}
+.col-h::before{content:"";position:absolute;left:14px;right:14px;top:0;height:2px;border-radius:0 0 2px 2px;background:var(--k);opacity:.9}
+.col-h h2{margin:0;font:500 14px/1.3 var(--f-head);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.col-h .n{font:500 12px/1 var(--f-mono);color:var(--ink-3);margin-left:2px}
+.col-b{overflow-y:auto;padding:4px 8px 10px;display:flex;flex-direction:column;gap:8px;min-height:64px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+.col-b:focus-visible{outline-offset:-2px}
+.lane-empty{padding:22px 8px;text-align:center;font-size:13px;color:var(--ink-3);border:1px dashed var(--line-2);border-radius:10px}
+
+/* Thẻ việc */
+.kcard{flex-shrink:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-1);position:relative;overflow:hidden;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.kcard:hover{border-color:var(--line-2);box-shadow:var(--shadow-2)}
+.kcard.unseen::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c-done)}
+.kc-main{padding:10px 12px 11px}
+.c-top{display:flex;align-items:center;gap:6px;height:22px}
+.c-id{font:400 12px/1 var(--f-mono);color:var(--ink-3)}
+.c-new{font-size:12px;font-weight:600;color:var(--c-done)}
+.c-tools{margin-left:auto;display:flex;align-items:center;gap:0;margin-right:-6px}
+.mini.star .i{width:16px;height:16px}
+.mini.star{opacity:.55}
+.kcard:hover .mini.star,.mini.star:focus-visible{opacity:1}
+.mini.star.on{opacity:1;color:var(--amber)}
+.mini.star.on .i{fill:var(--amber)}
+.mini.qa[aria-expanded="true"]{background:var(--surface-2);color:var(--ink)}
+.c-meta .pr{font-weight:500}
+.c-meta .pr-normal{color:var(--ink-2)}
+.c-title{margin:4px 0 6px;font:500 14px/1.4 var(--f-body);color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.c-meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;font-size:12px;color:var(--ink-2)}
+.c-meta .sep{color:var(--line-2)}
+.hd{font:500 11px/1 var(--f-mono);color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:3px 5px}
+.c-foot{display:flex;align-items:center;gap:8px;margin-top:10px}
+.c-foot .avs .av{width:22px;height:22px}
+.unas{font-size:12px;color:var(--ink-3)}
+.c-r{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink-3);white-space:nowrap}
+.c-r span{display:inline-flex;align-items:center;gap:3px}
+.c-r .i{width:13px;height:13px}
+.c-r .due{font-weight:500}
+.c-r .due-calm,.c-r .due-none{font-weight:400}
+.c-act{display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--line);background:color-mix(in srgb,var(--surface-2) 55%,var(--surface))}
+.c-act button{height:28px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink-2)}
+.c-act button:hover{color:var(--ink);border-color:var(--line-2)}
+.c-act .go{background:var(--primary);border-color:var(--primary);color:var(--primary-ink)}
+.c-act .go:hover{background:var(--primary-hover);color:var(--primary-ink)}
+.c-note{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;font-weight:500;color:var(--ink-2)}
+.c-note .i{width:14px;height:14px;color:var(--ink-3)}
+.pdots{display:inline-flex;gap:3px}
+.pdots i{width:7px;height:7px;border-radius:50%;background:var(--line-2)}
+.pdots i.on{background:var(--c-done)}
+
+/* Kéo thả có kiểm soát */
+.tip{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:6px 6px 6px 12px;border:1px solid color-mix(in srgb,var(--primary) 20%,var(--line));background:color-mix(in srgb,var(--primary-soft) 55%,var(--surface));border-radius:var(--r-ctl);font-size:13px;color:var(--ink-2)}
+.tip>.i{color:var(--primary)}
+.tip>span{flex:1;min-width:0}
+.kcard.dz{cursor:grab}
+.kcard:focus-visible{outline:2px solid var(--primary);outline-offset:1px;border-radius:10px}
+.kcard[tabindex="-1"]:focus{outline:none}
+.grip{position:absolute;left:1px;top:50%;width:10px;height:16px;margin-top:-8px;color:var(--ink-3);opacity:0;transition:opacity .12s;z-index:1}
+.kcard.dz:hover .grip,.kcard.dz:focus-visible .grip{opacity:1}
+.kcard.is-origin{opacity:.4;border-style:dashed;border-color:var(--line-2);box-shadow:none}
+.kcard.ghost{position:fixed;z-index:70;margin:0;pointer-events:none;border-color:var(--primary);box-shadow:var(--shadow-pop);will-change:transform;transform-origin:40% 40%;overflow:visible}
+.kcard.ghost .grip{opacity:1;color:var(--primary)}
+.kcard.ghost .c-act{border-radius:0 0 9px 9px}
+.g-lab{position:absolute;right:10px;top:-13px;display:none;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:999px;background:var(--primary);color:var(--primary-ink);font:600 12px/1 var(--f-body);box-shadow:var(--shadow-2);white-space:nowrap}
+.kcard.ghost.is-over .g-lab{display:inline-flex}
+.kcard.ghost.fly .g-lab{display:none}
+.kcard.ghost.fly{transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+body.dragging{user-select:none;-webkit-user-select:none}
+body.dragging,body.dragging *{cursor:grabbing!important}
+.board.dragging{scroll-behavior:auto}
+.board.dragging .col.drop-no,.board.dragging .col.drop-no *{cursor:not-allowed!important}
+.board.dragging .col{transition:opacity .15s,background .15s}
+.board.dragging .col.drop-no{opacity:.45}
+.board.dragging .col.drop-ok{background:var(--primary-soft);outline:2px dashed var(--primary);outline-offset:-2px;min-height:240px}
+.board.dragging .col.drop-ok.over{outline-style:solid;background:color-mix(in srgb,var(--primary) 14%,var(--surface))}
+.drop-lab{position:absolute;inset:44px 8px 8px;display:grid;place-items:center;pointer-events:none;border-radius:10px;background:color-mix(in srgb,var(--primary-soft) 80%,transparent);z-index:2}
+.drop-lab span{display:inline-flex;align-items:center;gap:6px;max-width:100%;font:600 17px/1.3 var(--f-head);color:var(--primary);text-align:center;padding:10px 18px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow-2);transition:transform .12s,background .12s,color .12s}
+.col.over .drop-lab span{background:var(--primary);color:var(--primary-ink);transform:scale(1.05)}
+.flow.dragging .step:not(.drop-target){opacity:.5}
+.step.drop-target{background:var(--primary)}
+.step.drop-target .step-in{inset:2px;background:var(--primary-soft)}
+.step.drop-target .step-name{color:var(--primary)}
+@keyframes landed{0%{box-shadow:0 0 0 3px var(--primary)}100%{box-shadow:0 0 0 3px transparent}}
+.kcard.landed{animation:landed 1.2s ease-out}
+
+@media (max-width:1023px){
+  .content{padding:20px 16px 96px}
+}
+@media (max-width:680px){
+  .head-act .btn{justify-content:center}
+  .flow{scroll-snap-type:x mandatory;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px;scroll-padding-left:16px}
+  .step{flex:0 0 152px;scroll-snap-align:start}
+  .tb-search{flex:1 1 100%;width:auto}
+  .tools .seg span{display:none}
+  .tools .btn-q{padding:0 8px}
+  .board{scrollbar-width:none;scroll-snap-type:x mandatory;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px;scroll-padding-left:16px}
+  .col{flex:0 0 calc(100vw - 48px);scroll-snap-align:start;max-height:none}
+  .col-b{max-height:none}
+}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="content" id="content">
+  <div class="head">
+    <div>
+      <h1 data-t="page.title"></h1>
+      <p id="sub"></p>
+    </div>
+    <div class="head-act">
+      <button type="button" class="btn boss-only" data-soon><i data-i="download" class="i-sm"></i><span data-t="page.export"></span><span id="exportTag"></span></button>
+      <a class="btn btn-p" href="task-form.html" data-tf-new><i data-i="plus" class="i-sm"></i><span data-t="page.new"></span></a>
+    </div>
+  </div>
+
+  <nav class="flow" id="flow" data-t-label="flow.label"></nav>
+
+  <div class="tools">
+    <label class="search tb-search"><i data-i="search" class="i-sm"></i><span class="sr" data-t="filter.search"></span><input type="search" id="q" data-t-ph="filter.search"></label>
+    <button type="button" class="btn btn-q"><i data-i="flag" class="i-xs"></i><span data-t="filter.priority"></span><i data-i="chev-d" class="i-xs"></i></button>
+    <button type="button" class="btn btn-q boss-only"><i data-i="user" class="i-xs"></i><span data-t="filter.assignee"></span><i data-i="chev-d" class="i-xs"></i></button>
+    <span id="viewToggle" style="margin-left:auto"></span>
+  </div>
+
+  <div class="tip" id="tip" hidden><i data-i="info" class="i-sm"></i><span data-t="dnd.hint"></span><button type="button" class="mini" id="tipX" data-t-label="dnd.hintClose"><i data-i="x" class="i-sm"></i></button></div>
+  <div class="board" id="board"></div>
+  <p class="sr" id="dndInstr" data-t="dnd.sr.instr"></p>
+  <div class="sr" id="live" aria-live="assertive" aria-atomic="true"></div>
+</main>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="task-form.js"></script>
+<script>
+(function(){
+  var T=I18N.t, esc=App.esc, av=App.av, $=App.$;
+  /* Kéo thả chỉ là lối tắt cho hành động có sẵn của NGƯỜI ĐANG XEM; trạng thái việc tính từ các người làm (App.task). */
+  /* Không còn cột Nháp: V1 không có luồng tạo việc DRAFT; nháp chỉ lưu trên trình duyệt (Danh sách → tab Nháp trên máy này) */
+  var STEPS=['PENDING_APPROVAL','WAITING_ACKNOWLEDGE','IN_PROGRESS','PENDING_REVIEW','COMPLETED'];
+  var tasks=TaskForm.store.merge(DATA.tasks()); /* + việc mới / nháp đã lưu trong phiên (task-form.js) */
+  var q='';
+  var tipOff=App.ls('b2-tip','')==='off';
+  var board, live, dnd=null, press=null, justDragged=false, S={sel:null,nav:[]};
+  var GRIP='<svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true"><g fill="currentColor"><circle cx="2.5" cy="3" r="1.4"/><circle cx="7.5" cy="3" r="1.4"/><circle cx="2.5" cy="8" r="1.4"/><circle cx="7.5" cy="8" r="1.4"/><circle cx="2.5" cy="13" r="1.4"/><circle cx="7.5" cy="13" r="1.4"/></g></svg>';
+
+  function boss(){return App.isBoss()}
+  function find(id){return tasks.find(function(t){return t.id===id})}
+  function reduce(){return App.reduce()}
+  function dndOn(){return document.documentElement.classList.contains('dnd-on')}
+  function my(x){return App.task.mine(x)}
+  function acc(x){var a=App.task.active(x);return a.filter(function(c){return x.as[c].st!=='PENDING'})}
+  function rep(x){var a=App.task.active(x);return a.filter(function(c){return x.as[c].st==='COMPLETED'})}
+  function visible(){
+    return tasks.filter(function(x){
+      if(x.s==='CANCELLED'||TaskForm.hidden(x))return false;
+      if(!App.task.visible(x))return false; /* task-query.service.ts:195-210 */
+      if(q){var h=(I18N.title(x)+' '+x.id+' '+(x.hd||'')).toLowerCase(); if(h.indexOf(q)<0)return false;}
+      return true;
+    });
+  }
+  /* Hành động chính trên thẻ = nút chính hợp lệ theo luật V1 (App.task.actions ← taskActionMatrix.ts) */
+  function action(x){
+    var k=App.task.actions(x).main.filter(function(a){return ['approve','review','accept','report','reassign'].indexOf(a[0])>-1})[0];
+    return k?k[0]:null;
+  }
+  function target(x,a){
+    if(a==='reassign')return null;
+    if(a==='approve')return 'WAITING_ACKNOWLEDGE';
+    if(a==='review')return 'COMPLETED';
+    if(a==='accept')return x.s==='WAITING_ACKNOWLEDGE'?'IN_PROGRESS':null;
+    if(a==='report')return x.approval?'PENDING_REVIEW':'COMPLETED';
+    return null;
+  }
+  /* Kéo được khi có hành động TIẾN đúng 1 cột */
+  function dragInfo(x){var a=action(x); if(!a)return null; var to=target(x,a); if(!to||to===x.s)return null; return {a:a,to:to};}
+  function mine(x){return !!action(x)}
+  function announce(s){live.textContent='';setTimeout(function(){live.textContent=s},40)}
+  function isUnseen(x){return boss()&&x.unseen&&!App.isSeen(x.id)}
+
+  function renderCounts(){var v=tasks.filter(function(x){return x.s!=='CANCELLED'});App.navCounts({starred:v.filter(function(x){return x.star}).length,unseen:v.filter(isUnseen).length})}
+  function renderSub(){
+    var v=visible(), open=v.filter(function(x){return x.s!=='COMPLETED'}).length, m=v.filter(mine).length;
+    $('#sub').innerHTML=App.fill('page.sub',{n:'<b>'+open+'</b>',m:'<b>'+m+'</b>'});
+  }
+  function renderFlow(){
+    var v=visible();
+    $('#flow').innerHTML=STEPS.map(function(s){
+      var n=v.filter(function(x){return x.s===s}).length, m=v.filter(function(x){return x.s===s&&mine(x)}).length;
+      var lab=T('st.'+s)+', '+T('flow.count',{n:n})+(m?', '+T('flow.mine',{n:m}):'');
+      return '<button type="button" class="step s-'+s+(m?' mine':'')+(n?'':' zero')+'" data-step="'+s+'" aria-label="'+esc(lab)+'">'+
+        '<span class="step-in"><span class="step-name"><span class="dot"></span><span>'+esc(T('st.'+s))+'</span></span>'+
+        '<span class="step-row"><span class="step-num">'+n+'</span>'+(m?'<span class="step-mine">'+esc(T('flow.mine',{n:m}))+'</span>':'')+'</span>'+
+        '</span>'+(m?'<span class="step-ping" aria-hidden="true"></span>':'')+'</button>';
+    }).join('');
+  }
+  function note(x){
+    var A=App.task.active(x);
+    if(A.length<2||x.s!=='IN_PROGRESS')return '';
+    var ac=acc(x), rp=rep(x);
+    if(ac.length<A.length) return '<div class="c-note">'+ic('users')+'<span>'+esc(T('dnd.accepted',{x:ac.length,n:A.length}))+'</span></div>';
+    if(rp.length) return '<div class="c-note"><span class="pdots" aria-hidden="true">'+A.map(function(c){return '<i class="'+(rp.indexOf(c)>=0?'on':'')+'"></i>'}).join('')+'</span><span>'+esc(T('dnd.reported',{x:rp.length,n:A.length}))+'</span></div>';
+    return '';
+  }
+  function card(x){
+    var d=I18N.due(x.due), info=dndOn()?dragInfo(x):null, a=action(x), un=isUnseen(x);
+    var top='<span class="c-id">'+x.id+'</span>'+(un?'<span class="c-new">· '+esc(T('card.new'))+'</span>':'')+
+      '<span class="c-tools">'+
+      (boss()?'<button type="button" class="mini star'+(x.star?' on':'')+'" data-star="'+x.id+'" aria-pressed="'+(x.star?'true':'false')+'" aria-label="'+esc(T(x.star?'card.unstar':'card.star'))+'">'+ic('star')+'</button>':'')+
+      '<button type="button" class="mini qa" data-cardmore="'+x.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="'+esc(T('qa.menu',{id:x.id}))+'" title="'+esc(T('card.more'))+'">'+ic('more','i-sm')+'</button></span>';
+    var meta='<span>'+esc(I18N.type(x))+'</span><span class="sep">·</span>'+
+      '<span class="pr pr-'+x.p+'">'+ic('flag')+esc(T('pr.'+x.p))+'</span>'+
+      (x.hd?'<span class="sep">·</span><span class="hd">'+x.hd+'</span>':'');
+    var avs;
+    if(!x.a.length) avs='<span class="unas">'+esc(T('card.unassigned'))+'</span>';
+    else{ avs='<span class="avs">'+x.a.slice(0,3).map(function(c){return av(c)}).join('')+(x.a.length>3?'<span class="av more" title="'+esc(x.a.slice(3).map(App.nm).join(', '))+'">+'+(x.a.length-3)+'</span>':'')+'</span>'; }
+    var r=(x.c?'<span title="'+esc(T('card.comments',{n:x.c}))+'">'+ic('message')+'<span class="mono">'+x.c+'</span></span>':'')+
+      (x.f?'<span title="'+esc(T('card.files',{n:x.f}))+'">'+ic('clip')+'<span class="mono">'+x.f+'</span></span>':'')+
+      '<span class="due due-'+d.tone+'">'+ic('clock')+esc(d.label)+'</span>';
+    var act='';
+    if(a){
+      act='<button type="button" class="go" data-act="'+a+'" data-id="'+x.id+'">'+esc(T('act.'+a))+'</button>';
+      if(a==='accept'&&App.task.perm(x).canRejectTask) act+='<button type="button" data-act="decline" data-id="'+x.id+'">'+esc(T('act.decline'))+'</button>';
+      act='<div class="c-act">'+act+'</div>';
+    }
+    var attrs=' data-id="'+x.id+'"'+(info?' tabindex="0" aria-describedby="dndInstr" aria-label="'+esc(x.id+' · '+I18N.title(x))+'"':' tabindex="0" aria-label="'+esc(x.id+' · '+I18N.title(x))+'"');
+    return '<article class="kcard'+(info?' dz':'')+(un?' unseen':'')+'"'+attrs+' aria-haspopup="dialog">'+
+      (info?'<span class="grip" title="'+esc(T('dnd.grip'))+'">'+GRIP+'</span>':'')+
+      '<div class="kc-main"><div class="c-top">'+top+'</div>'+
+      '<h3 class="c-title">'+esc(I18N.title(x))+'</h3><div class="c-meta">'+meta+'</div>'+note(x)+
+      '<div class="c-foot">'+avs+'<span class="c-r">'+r+'</span></div></div>'+act+'</article>';
+  }
+  var fresh=null;
+  function colTasks(s,v){var list=v.filter(function(x){return x.s===s});list.sort(function(a,c){return (c.id===fresh?1:0)-(a.id===fresh?1:0)||(mine(c)?1:0)-(mine(a)?1:0)});return list}
+  function renderBoard(){
+    if(dnd)return;
+    var sl=board.scrollLeft, v=visible();
+    board.innerHTML=STEPS.map(function(s){
+      var list=colTasks(s,v);
+      return '<section class="col s-'+s+'" id="col-'+s+'" data-s="'+s+'" aria-labelledby="h-'+s+'">'+
+        '<div class="col-h"><span class="dot"></span><h2 id="h-'+s+'">'+esc(T('st.'+s))+'</h2><span class="n">'+list.length+'</span></div>'+
+        '<div class="col-b" tabindex="0" aria-labelledby="h-'+s+'">'+(list.length?list.map(card).join(''):'<div class="lane-empty">'+esc(T('lane.empty'))+'</div>')+'</div></section>';
+    }).join('');
+    board.scrollTo({left:sl,behavior:'instant'});
+  }
+  function renderTip(){$('#tip').hidden=tipOff||!dndOn()}
+  function renderAll(){
+    if(dnd||App.dialogOpen())return;
+    renderSub();renderFlow();renderBoard();renderTip();renderCounts();
+    $('#viewToggle').innerHTML=App.viewToggle('board');
+    if(innerWidth<=680){var m=document.querySelector('.step.mine'); if(m){var c=document.getElementById('col-'+m.dataset.step),f=$('#flow');
+      board.scrollTo({left:board.scrollLeft+c.getBoundingClientRect().left-board.getBoundingClientRect().left-16,behavior:'instant'}); f.scrollTo({left:f.scrollLeft+m.getBoundingClientRect().left-f.getBoundingClientRect().left-16,behavior:'instant'});}}
+  }
+  function goStep(s){
+    var col=document.getElementById('col-'+s); if(!col)return;
+    board.scrollTo({left:board.scrollLeft+col.getBoundingClientRect().left-board.getBoundingClientRect().left-(innerWidth<=680?16:0),behavior:reduce()?'auto':'smooth'});
+    var r=board.getBoundingClientRect(); if(r.top<70||r.top>innerHeight-120) window.scrollTo({top:scrollY+r.top-80,behavior:reduce()?'auto':'smooth'});
+    col.classList.remove('flash'); void col.offsetWidth; col.classList.add('flash');
+    clearTimeout(goStep.t); goStep.t=setTimeout(function(){col.classList.remove('flash')},1400);
+  }
+
+  /* ---------- Ngăn chi tiết: cùng App.taskDetail với trang Danh sách ---------- */
+  function drawerHtml(t){return App.taskDetail(t,{mode:'drawer',nav:{i:S.nav.indexOf(t.id),n:S.nav.length},rerender:refreshDrawer,onStep:step})}
+  function refreshDrawer(){var t=find(S.sel);if(!t||!App.drawer.isOpen()||TaskForm.drawerOpen())return;App.drawer.set(drawerHtml(t));renderSub();renderFlow();renderBoard();renderCounts();}
+  function openTask(id,keep){
+    var t=find(id); if(!t)return;
+    if(TaskForm.isMyDraft(t)){TaskForm.openDrawer({draftId:id,opener:board.querySelector('.kcard[data-id="'+id+'"]')});return;} /* nháp → mở lại biểu mẫu */
+    if(!keep||!App.drawer.isOpen()){var v=visible();S.nav=[];STEPS.forEach(function(s){colTasks(s,v).forEach(function(x){S.nav.push(x.id)})});if(S.nav.indexOf(id)<0)S.nav=[id];}
+    S.sel=id; if(t.unseen&&boss())App.markSeen(id);
+    App.drawer.open({html:drawerHtml(t),label:T('td.detail'),onClose:function(){renderAll();var c=board.querySelector('.kcard[data-id="'+S.sel+'"]');if(c)c.focus({preventScroll:true});}});
+    renderBoard(); renderCounts();
+  }
+  function step(d){var i=S.nav.indexOf(S.sel)+d;if(i<0||i>=S.nav.length)return;openTask(S.nav[i],true);var b=$('#dr [data-ta="dr-step"][data-d="'+d+'"]');if(b&&!b.disabled)b.focus();else $('#dr').focus();}
+
+  /* ---------- Bật/tắt kéo thả: chỉ chuột/bút chính xác và màn > 680px ---------- */
+  function evalDnd(){
+    if(dnd||App.dialogOpen())return;
+    var on=matchMedia('(pointer: fine)').matches&&matchMedia('(hover: hover)').matches&&innerWidth>680;
+    if(on===dndOn())return;
+    document.documentElement.classList.toggle('dnd-on',on);
+    renderBoard();renderTip();
+  }
+
+  /* ---------- Thực thi hành động: hộp thoại + luật dùng chung App.act ---------- */
+  function after(x,a,moved,focus){
+    renderSub();renderFlow();renderBoard();renderCounts();
+    var c=board.querySelector('.kcard[data-id="'+x.id+'"]');
+    if(c){ if(moved||a==='report'){c.classList.add('landed'); setTimeout(function(){c.classList.remove('landed')},1300);}
+      c.scrollIntoView({block:'nearest',inline:'nearest',behavior:reduce()?'auto':'smooth'});
+      if(focus)c.focus({preventScroll:true}); }
+  }
+  function run(x,a){
+    var viaDrag=!!dnd;
+    App.act(x,a,{
+      done:function(r){
+        if(viaDrag){ var done=function(){endDrag();after(x,a,r.moved,true)}; if(r.moved)done(); else flyBack(done); }
+        else after(x,a,r.moved,false);
+      },
+      cancel:function(){
+        if(viaDrag){ var d=dnd; flyBack(function(){endDrag(); d.card.focus({preventScroll:true}); announce(T('dnd.sr.cancel',{id:d.x.id,s:T('st.'+d.from)}));}); }
+      }
+    });
+  }
+
+  /* ---------- Kéo thả (pointer events) ---------- */
+  function colEl(s){return document.getElementById('col-'+s)}
+  function startDrag(card,x0,y0,kbd){
+    var x=find(card.dataset.id), info=dragInfo(x); if(!info)return;
+    var r=card.getBoundingClientRect(), g=card.cloneNode(true);
+    g.classList.add('ghost'); g.removeAttribute('data-id'); g.removeAttribute('tabindex'); g.removeAttribute('aria-describedby'); g.setAttribute('aria-hidden','true');
+    g.style.width=r.width+'px'; g.style.left=r.left+'px'; g.style.top=r.top+'px';
+    g.style.transform=kbd?'translate(0px,-6px) rotate(1deg)':'rotate(2deg)';
+    g.insertAdjacentHTML('beforeend','<span class="g-lab" aria-hidden="true">'+ic('check','i-xs')+esc(T('dnd.drop.'+info.a))+'</span>');
+    document.body.appendChild(g);
+    card.classList.add('is-origin');
+    dnd={x:x,info:info,card:card,ghost:g,r:r,sx:x0,sy:y0,px:x0,py:y0,kbd:kbd,over:null,from:x.s,settled:false};
+    document.body.classList.add('dragging'); board.classList.add('dragging');
+    $('#flow').classList.add('dragging');
+    var st=document.querySelector('.step[data-step="'+info.to+'"]'); if(st)st.classList.add('drop-target');
+    board.querySelectorAll('.col').forEach(function(c){
+      var ok=c.dataset.s===info.to; c.classList.toggle('drop-ok',ok); c.classList.toggle('drop-no',!ok);
+      if(ok)c.insertAdjacentHTML('beforeend','<div class="drop-lab" aria-hidden="true"><span>'+ic('chev-r','i-sm')+esc(T('dnd.drop.'+info.a))+'</span></div>');
+    });
+    reveal(colEl(info.to));
+    announce(T(kbd?'dnd.sr.lift':'dnd.sr.start',{id:x.id,s:T('st.'+info.to)}));
+    if(!kbd) dnd.raf=requestAnimationFrame(loop);
+  }
+  function reveal(col){
+    var br=board.getBoundingClientRect(), cr=col.getBoundingClientRect(), dx=0;
+    if(cr.right>br.right) dx=cr.right-br.right+12; else if(cr.left<br.left) dx=cr.left-br.left-12;
+    if(dx) board.scrollBy({left:dx,behavior:reduce()?'auto':'smooth'});
+  }
+  function loop(){
+    if(!dnd||dnd.settled||dnd.kbd)return;
+    dnd.ghost.style.transform='translate('+(dnd.px-dnd.sx)+'px,'+(dnd.py-dnd.sy)+'px) rotate(2deg)';
+    var br=board.getBoundingClientRect(), edge=64, v=0;
+    if(dnd.py>br.top-40&&dnd.py<br.bottom+40){
+      if(dnd.px<br.left+edge) v=-Math.ceil((br.left+edge-dnd.px)/5);
+      else if(dnd.px>br.right-edge) v=Math.ceil((dnd.px-(br.right-edge))/5);
+    }
+    if(v) board.scrollLeft+=v;
+    hit();
+    dnd.raf=requestAnimationFrame(loop);
+  }
+  function setOver(col){
+    if(col===dnd.over)return;
+    if(dnd.over)dnd.over.classList.remove('over');
+    dnd.over=col; dnd.ghost.classList.toggle('is-over',!!col);
+    if(col){col.classList.add('over'); announce(T('dnd.sr.over',{s:T('st.'+dnd.info.to),a:T('act.'+dnd.info.a).toLowerCase()}));}
+  }
+  function hit(){
+    var el=document.elementFromPoint(dnd.px,dnd.py), col=el&&el.closest?el.closest('.col'):null;
+    setOver(col&&col.dataset.s===dnd.info.to?col:null);
+  }
+  function settleInto(col){
+    var b=col.querySelector('.col-b').getBoundingClientRect(), d=dnd;
+    d.settled=true; cancelAnimationFrame(d.raf);
+    d.ghost.classList.add('fly');
+    d.ghost.style.transform='translate('+(b.left+8-d.r.left)+'px,'+(b.top+4-d.r.top)+'px)';
+  }
+  function flyBack(cb){
+    var d=dnd; d.settled=true; cancelAnimationFrame(d.raf);
+    var c=d.card.getBoundingClientRect();
+    d.ghost.classList.add('fly');
+    d.ghost.style.transform='translate('+(c.left-d.r.left)+'px,'+(c.top-d.r.top)+'px)';
+    setTimeout(cb,reduce()?0:240);
+  }
+  function endDrag(){
+    var d=dnd; if(!d)return;
+    cancelAnimationFrame(d.raf);
+    if(d.ghost.parentNode)d.ghost.parentNode.removeChild(d.ghost);
+    d.card.classList.remove('is-origin');
+    document.body.classList.remove('dragging'); board.classList.remove('dragging');
+    $('#flow').classList.remove('dragging');
+    document.querySelectorAll('.drop-target').forEach(function(e){e.classList.remove('drop-target')});
+    board.querySelectorAll('.drop-lab').forEach(function(e){e.remove()});
+    board.querySelectorAll('.col').forEach(function(c){c.classList.remove('drop-ok','drop-no','over')});
+    dnd=null;
+  }
+  function drop(){
+    var d=dnd;
+    if(d.over){ settleInto(d.over); run(d.x,d.info.a); return; }
+    var el=document.elementFromPoint(d.px,d.py), col=el&&el.closest?el.closest('.col'):null;
+    announce(col&&col.dataset.s===d.from?T('dnd.sr.cancel',{id:d.x.id,s:T('st.'+d.from)}):T('dnd.sr.invalid',{id:d.x.id}));
+    flyBack(function(){endDrag()});
+  }
+  function cancelDrag(){
+    var d=dnd; if(!d||(d.settled&&App.dialogOpen()))return;
+    announce(T('dnd.sr.cancel',{id:d.x.id,s:T('st.'+d.from)}));
+    flyBack(function(){endDrag(); if(d.kbd)d.card.focus({preventScroll:true});});
+  }
+  /* Bàn phím: chỉ dừng ở cột hợp lệ (cột đích) hoặc vị trí ban đầu */
+  function kbdMove(dir){
+    var d=dnd, fi=STEPS.indexOf(d.from), ti=STEPS.indexOf(d.info.to), cur=d.over?ti:fi, nxt=cur;
+    [fi,ti].forEach(function(i){ if(dir>0&&i>cur&&(nxt===cur||i<nxt))nxt=i; if(dir<0&&i<cur&&(nxt===cur||i>nxt))nxt=i; });
+    if(nxt===cur)return;
+    var g=d.ghost; g.classList.add('fly');
+    if(nxt===ti){
+      var col=colEl(d.info.to); reveal(col);
+      setTimeout(function(){ if(dnd!==d)return; var b=col.querySelector('.col-b').getBoundingClientRect(); g.style.transform='translate('+(b.left+8-d.r.left)+'px,'+(b.top+4-d.r.top)+'px)'; },reduce()?0:120);
+      setOver(col);
+    }else{
+      var c=d.card.getBoundingClientRect();
+      g.style.transform='translate('+(c.left-d.r.left)+'px,'+(c.top-d.r.top-6)+'px) rotate(1deg)';
+      setOver(null); announce(T('dnd.sr.origin',{s:T('st.'+d.from)}));
+    }
+  }
+
+  function bind(){
+    board.addEventListener('pointerdown',function(e){
+      if(e.button!==0||!dndOn()||dnd||App.dialogOpen()||e.pointerType==='touch')return;
+      var c=e.target.closest('.kcard.dz'); if(!c||e.target.closest('button,a,input'))return;
+      e.preventDefault(); c.focus({preventScroll:true});
+      press={card:c,x:e.clientX,y:e.clientY};
+    });
+    document.addEventListener('pointermove',function(e){
+      if(press&&!dnd){ if(Math.abs(e.clientX-press.x)+Math.abs(e.clientY-press.y)<6)return; startDrag(press.card,press.x,press.y,false); press=null; }
+      if(dnd&&!dnd.kbd&&!dnd.settled){dnd.px=e.clientX;dnd.py=e.clientY;}
+    });
+    document.addEventListener('pointerup',function(e){
+      press=null;
+      if(dnd&&!dnd.kbd&&!dnd.settled){dnd.px=e.clientX;dnd.py=e.clientY;hit();justDragged=true;setTimeout(function(){justDragged=false},0);drop();}
+    });
+    document.addEventListener('pointercancel',function(){press=null; if(dnd&&!dnd.kbd&&!dnd.settled)cancelDrag();});
+    window.addEventListener('blur',function(){if(dnd&&!dnd.settled)cancelDrag();});
+    document.addEventListener('click',function(e){if(justDragged){e.stopPropagation();e.preventDefault();justDragged=false;}},true);
+  }
+
+  App.shell({active:'tasks',crumbs:[{t:'nav.tasks'}],title:'page.title',onOpenTask:function(id){openTask(id)}});
+  document.getElementById('exportTag').innerHTML=App.phaseB(); /* V1 không có xuất Excel danh sách công việc */
+
+  document.addEventListener('click',function(e){
+    var el;
+    if(dnd||e.target.closest('.dlg-wrap')||e.target.closest('#dr'))return;
+    if((el=e.target.closest('#tipX'))){tipOff=true;App.lss('b2-tip','off');renderTip();return;}
+    if((el=e.target.closest('.step'))){goStep(el.dataset.step);return;}
+    if((el=e.target.closest('[data-star]'))){var x=find(el.dataset.star);x.star=x.star?0:1;renderBoard();renderCounts();
+      var nb=document.querySelector('[data-star="'+x.id+'"]'); if(nb)nb.focus(); return;}
+    if((el=e.target.closest('[data-act]'))&&el.closest('#board')){run(find(el.dataset.id),el.dataset.act);return;}
+    if((el=e.target.closest('[data-cardmore]'))){e.stopPropagation();e.preventDefault();var qx=find(el.dataset.cardmore);
+      if(TaskForm.isMyDraft(qx)){TaskForm.draftMenu(el,qx);return;}
+      App.quickMenu(el,qx,{onView:function(id){openTask(id)},onChange:function(k,r){setTimeout(function(){after(qx,k,r&&r.moved,false);var nb=board.querySelector('[data-cardmore="'+qx.id+'"]');if(nb)nb.focus({preventScroll:true});},0)}});
+      return;}
+    if((el=e.target.closest('.kcard[data-id]'))&&!e.target.closest('button,a')){openTask(el.dataset.id);return;}
+    if(e.target.closest('#drScrim')){App.drawer.close();return;}
+  });
+  document.addEventListener('keydown',function(e){
+    if(App.dialogOpen()||App.drawer.isOpen())return;
+    if(dnd){
+      if(dnd.settled)return;
+      if(e.key==='Escape'){e.preventDefault();cancelDrag();return;}
+      if(dnd.kbd){
+        if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();kbdMove(e.key==='ArrowRight'?1:-1);}
+        else if(e.key==='Enter'){e.preventDefault(); if(dnd.over){dnd.settled=true;run(dnd.x,dnd.info.a);} else cancelDrag();}
+        else if(e.key==='Tab'||e.key===' '||e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();}
+      }
+      return;
+    }
+    var c=e.target.classList&&e.target.classList.contains('kcard')?e.target:null;
+    if(c&&c.classList.contains('dz')&&dndOn()&&(e.key===' '||e.key==='Spacebar')){e.preventDefault();startDrag(c,0,0,true);return;}
+    if(c&&e.key==='Enter'){e.preventDefault();openTask(c.dataset.id);return;}
+  });
+  $('#q').addEventListener('input',function(e){q=e.target.value.trim().toLowerCase();renderSub();renderFlow();renderBoard();});
+  document.addEventListener('langchange',function(){renderAll();if(App.drawer.isOpen())refreshDrawer();});
+  document.addEventListener('rolechange',function(){TaskForm.closeDrawer(true);App.drawer.close();renderAll();});
+  board=$('#board'); live=$('#live');
+  document.documentElement.classList.toggle('dnd-on',matchMedia('(pointer: fine)').matches&&matchMedia('(hover: hover)').matches&&innerWidth>680);
+  /* ---------- Tạo công việc trong ngăn trượt (task-form.js) ---------- */
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('[data-tf-new]'); if(!a||e.ctrlKey||e.metaKey||e.shiftKey||e.button)return;
+    e.preventDefault(); TaskForm.openDrawer({opener:a});
+  });
+  TaskForm.page({onChange:function(ev){
+    TaskForm.apply(tasks,ev); fresh=ev.kind==='created'?ev.id:null;
+    renderAll();
+    var c=fresh&&board.querySelector('.kcard[data-id="'+fresh+'"]');
+    if(c){goStep(c.closest('.col').dataset.s);c.classList.add('landed');setTimeout(function(){c.classList.remove('landed')},1300);}
+  }});
+  renderAll(); bind();
+  var rt; addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(evalDnd,150)});
+  try{matchMedia('(pointer: fine)').addEventListener('change',evalDnd)}catch(_){}
+})();
+</script>
+</body>
+</html>

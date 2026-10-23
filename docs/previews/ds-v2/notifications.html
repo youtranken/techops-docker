@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Thông báo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+/* ---------- Riêng trang Thông báo ---------- */
+.nt,.content>.head{max-width:960px}
+.nt-ctl{display:flex;align-items:flex-end;gap:16px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.nt-ctl .tabs{flex:1}
+.nt-type{display:flex;align-items:center;gap:8px;padding-bottom:8px;flex:none}
+.nt-type .select{height:34px;width:200px;font-size:var(--fs-sm)}
+/* Phase B (tạm, chờ app.css có .pb-zone) */
+.pb-zone{outline:1px dashed color-mix(in srgb,var(--amber) 70%,transparent);outline-offset:2px;border-radius:var(--r-sm)}
+.phase-b.pb-s{height:16px;padding:0 4px;margin-left:4px}
+.nt-type.pb-zone{outline-offset:-1px;padding-left:2px;padding-right:4px;margin-bottom:6px;padding-bottom:2px;padding-top:2px}
+.nt-box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-1);overflow:hidden}
+.nt-g{margin:0;padding:12px 20px 6px;font:500 var(--fs-xs)/1.4 var(--f-body);color:var(--ink-3);border-top:1px solid var(--line)}
+.nt-g:first-child{border-top:0}
+.nt-list{list-style:none;margin:0;padding:0 0 4px}
+.nt-i{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 40px;align-items:center}
+.nt-i+.nt-i .nt-a::before{content:"";position:absolute;left:66px;right:0;top:0;border-top:1px solid var(--line)}
+.nt-a{position:relative;display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;padding:12px 4px 12px 20px;text-decoration:none;color:inherit;min-width:0}
+.nt-a:hover{background:var(--surface-2)}
+.nt-a:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--primary);border-radius:0}
+.nt-ico{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--ink-2)}
+.nt-b{min-width:0}
+.nt-b p{margin:0;font-size:var(--fs-md);line-height:1.45;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.nt-b p b{font-weight:500;color:var(--ink-2)}
+.nt-i.unread .nt-b p{color:var(--ink)}
+.nt-i.unread .nt-b p b{font-weight:600;color:var(--ink)}
+.nt-m{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-top:3px;font-size:var(--fs-xs);color:var(--ink-3)}
+.nt-m .i{width:13px;height:13px}
+.nt-m .mono{font-size:var(--fs-xs)}
+.nt-m .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-3);opacity:.6}
+.nt-r{display:grid;place-items:center;align-self:stretch}
+.nt-u{width:8px;height:8px;border-radius:50%;background:var(--primary)}
+.nt-r .icon-btn{width:32px;height:32px}
+.nt-r .icon-btn .nt-u{transition:opacity .12s}
+.nt-r .icon-btn .i{display:none}
+.nt-r .icon-btn:hover .nt-u,.nt-r .icon-btn:focus-visible .nt-u{display:none}
+.nt-r .icon-btn:hover .i,.nt-r .icon-btn:focus-visible .i{display:block}
+.nt-foot{display:flex;justify-content:center;padding:10px;border-top:1px solid var(--line);font-size:var(--fs-sm);color:var(--ink-3)}
+.nt-foot .btn{height:32px;font-size:var(--fs-sm)}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid color-mix(in srgb,currentColor 35%,transparent);border-top-color:currentColor;animation:spin .8s linear infinite;flex:none}
+.state .btn span{color:inherit;font-size:inherit;max-width:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.nt-box .state{padding:40px 24px}
+.nt-box .state .acts{margin-top:16px}
+.sk-row{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;padding:14px 20px;align-items:center}
+.sk-row+.sk-row{border-top:1px solid var(--line)}
+.sk-row .sk-col{display:grid;gap:8px}
+@media (max-width:680px){
+  .nt-ctl{display:block;border-bottom:0}
+  .nt-ctl .tabs{border-bottom:1px solid var(--line)}
+  .nt-type{padding:12px 0 0}
+  .nt-type .select{flex:1;width:auto}
+  .nt-a{padding:12px 0 12px 14px;gap:12px}
+  .nt-i+.nt-i .nt-a::before{left:58px}
+  .nt-g{padding:12px 14px 6px}
+  .nt-b p{font-size:var(--fs-sm);-webkit-line-clamp:3}
+  .sk-row{padding:14px}
+}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="content" id="content">
+  <div class="head">
+    <div><h1 data-t="nt.title"></h1><p id="sub"></p></div>
+    <div class="head-act"><button type="button" class="btn" id="readAll"><i data-i="check" class="i-sm"></i><span data-t="nt.readAll"></span></button></div>
+  </div>
+  <div class="nt">
+    <div class="nt-ctl">
+      <div class="tabs" role="tablist" id="tabs" data-t-label="nt.title"></div>
+      <div class="nt-type pb-zone" id="typeWrap"><label class="sr" for="type" data-t="nt.type"></label><select class="select" id="type"></select><span class="phase-b pb-s" id="typePb"></span></div>
+    </div>
+    <div class="nt-box" id="box" aria-live="polite"></div>
+  </div>
+</main>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+(function(){
+  /* Luật lấy từ V1: prisma enum NotificationType (14 loại) + src/modules/notifications/** — lọc unreadOnly, đánh dấu 1 / tất cả đã đọc,
+     bấm → /tasks/{taskId}, trang 20 mục (tối đa 50). V1 chỉ có dropdown chuông; trang đầy đủ là mới ở V2. */
+  var T=I18N.t, esc=App.esc, $=App.$, $$=App.$$;
+  var CAT={TASK_ASSIGNED:'assign',TRANSFER_RECEIVED:'assign',ALL_FAILED:'assign',PLAN_APPROVAL_REQUESTED:'approval',TASK_APPROVED:'approval',TASK_REJECTED:'approval',
+    REVIEW_REQUIRED:'review',REVISION_REQUIRED:'review',TASK_COMPLETED:'review',EXTENSION_REQUESTED:'ext',EXTENSION_APPROVED:'ext',EXTENSION_REJECTED:'ext',COMMENT_ADDED:'comment',DEADLINE_REMINDER:'due'};
+  var ICON={TASK_ASSIGNED:'tasks',TRANSFER_RECEIVED:'transfer',ALL_FAILED:'alert',PLAN_APPROVAL_REQUESTED:'file',TASK_APPROVED:'check-circle',TASK_REJECTED:'x-circle',
+    REVIEW_REQUIRED:'eye',REVISION_REQUIRED:'undo',TASK_COMPLETED:'check-circle',EXTENSION_REQUESTED:'calendar-plus',EXTENSION_APPROVED:'calendar-plus',EXTENSION_REJECTED:'calendar-plus',COMMENT_ADDED:'message',DEADLINE_REMINDER:'clock'};
+  var CATS=['assign','approval','review','ext','comment','due'];
+  /* [id, loại, người, mã việc, thời điểm, nhóm, đã đọc, ngày gia hạn] */
+  var SRC={
+    boss:[['b1','PLAN_APPROVAL_REQUESTED','NH','26-0042',['min',12],'today',0],['b2','REVIEW_REQUIRED','TA','26-0033',['hour',1],'today',0],['b3','EXTENSION_REQUESTED','LM','26-0033',['hour',3],'today',0,'2026-10-28'],
+      ['b4','COMMENT_ADDED','PD','26-0036',['hour',5],'today',1],['b5','ALL_FAILED',null,'26-0031',['yday','16:40'],'yday',0],['b6','COMMENT_ADDED','LM','26-0019',['yday','09:15'],'yday',1],
+      ['b7','DEADLINE_REMINDER',null,'26-0036',['yday','08:00'],'yday',1],['b8','TASK_COMPLETED',null,'26-0039','2026-10-19 17:05','older',1],['b9','REVIEW_REQUIRED','PD','26-0039','2026-10-19 10:22','older',1],
+      ['b10','EXTENSION_REQUESTED','TA','26-0028','2026-10-17 14:10','older',1,'2026-11-28']],
+    emp:[['e1','TASK_ASSIGNED','CT','26-0031',['min',25],'today',0],['e2','EXTENSION_APPROVED','CT','26-0017',['hour',2],'today',0,'2026-10-27'],['e3','REVISION_REQUIRED','CT','26-0019',['hour',4],'today',0],
+      ['e4','COMMENT_ADDED','PD','26-0036',['hour',6],'today',1],['e5','TRANSFER_RECEIVED','TA','26-0025',['yday','15:10'],'yday',0],['e6','DEADLINE_REMINDER',null,'26-0036',['yday','08:00'],'yday',1],
+      ['e7','TASK_APPROVED','CT','26-0017',['yday','07:52'],'yday',1],['e8','TASK_COMPLETED',null,'26-0039','2026-10-19 17:05','older',1],['e9','EXTENSION_REJECTED','CT','26-0036','2026-10-18 11:20','older',1],
+      ['e10','TASK_REJECTED','CT','26-0022','2026-10-16 09:40','older',1]]
+  };
+  var MORE={boss:[['b11','PLAN_APPROVAL_REQUESTED','LM','26-0019','2026-10-14 08:45','older',1],['b12','COMMENT_ADDED','DK','26-0033','2026-10-13 15:30','older',1]],
+    emp:[['e11','TASK_ASSIGNED','CT','26-0028','2026-10-12 08:30','older',1],['e12','COMMENT_ADDED','NH','26-0042','2026-10-11 16:02','older',1]]};
+  var SCN=['normal','empty','loading','error'];
+  var q=new URLSearchParams(location.search).get('s');
+  var S={scn:SCN.indexOf(q)>-1?q:'normal',tab:'all',type:'',items:[],more:'idle'};
+  var TASKS=DATA.tasks();
+
+  function mk(r){return {id:r[0],k:r[1],a:r[2],task:r[3],w:r[4],g:r[5],read:!!r[6],d:r[7]}}
+  function load(){var k=App.isBoss()?'boss':'emp';S.items=S.scn==='empty'?[]:SRC[k].map(mk);S.more=S.scn==='empty'?'done':'idle';}
+  function title(id){var t=TASKS.filter(function(x){return x.id===id})[0];return t?I18N.title(t):id}
+  function unread(){return S.items.filter(function(n){return !n.read}).length}
+  function shown(){return S.items.filter(function(n){return (S.tab==='all'||!n.read)&&(!S.type||CAT[n.k]===S.type)})}
+
+  function itemHtml(n){
+    var b=function(s){return '<b>'+esc(s)+'</b>'};
+    var text=App.fill('nt.m.'+n.k,{a:n.a?b(App.nm(n.a)):'',t:b('“'+title(n.task)+'”'),d:n.d?b(App.dt(n.d,true)):''});
+    var lead=n.a?App.av(n.a,'av-lg'):'<span class="nt-ico" aria-hidden="true">'+ic(ICON[n.k],'i-sm')+'</span>';
+    return '<li class="nt-i'+(n.read?'':' unread')+'" data-nid="'+n.id+'">'+
+      '<a class="nt-a" href="task.html?id='+n.task+'" data-go="'+n.id+'">'+lead+'<div class="nt-b">'+(n.read?'':'<span class="sr">'+esc(T('nt.unread'))+': </span>')+'<p>'+text+'</p>'+
+        '<div class="nt-m">'+ic(ICON[n.k])+'<span>'+esc(T('nt.cat.'+CAT[n.k]))+'</span><span class="dot" aria-hidden="true"></span><span class="mono">'+n.task+'</span><span class="dot" aria-hidden="true"></span><time>'+esc(App.when(n.w))+'</time></div></div></a>'+
+      '<div class="nt-r">'+(n.read?'':'<button type="button" class="icon-btn" data-read="'+n.id+'" aria-label="'+esc(T('nt.markRead'))+'" title="'+esc(T('nt.markRead'))+'"><span class="nt-u" aria-hidden="true"></span>'+ic('check','i-sm')+'</button>')+'</div></li>';
+  }
+  function emptyHtml(){
+    var t,d,act='';
+    if(!S.items.length){t='nt.empty.all.t';d='nt.empty.all.d';}
+    else if(S.type&&(S.tab==='all'||S.items.some(function(n){return CAT[n.k]===S.type}))){t='nt.empty.type.t';act='<div class="acts"><button type="button" class="btn" id="clearType">'+esc(T('nt.clear'))+'</button></div>';}
+    else {t='nt.empty.unread.t';d='nt.empty.unread.d';}
+    return '<div class="state" role="status">'+ic(t==='nt.empty.unread.t'?'check-circle':'bell')+'<b>'+esc(T(t))+'</b>'+(d?'<span>'+esc(T(d))+'</span>':'')+act+'</div>';
+  }
+  function skel(){var r='';for(var i=0;i<6;i++)r+='<div class="sk-row"><span class="sk circle" style="width:32px;height:32px"></span><div class="sk-col"><span class="sk line" style="width:'+(i%2?'58%':'82%')+'"></span><span class="sk line" style="width:34%;height:10px"></span></div></div>';
+    return '<div aria-busy="true"><span class="sr">'+esc(T('app.loading'))+'</span>'+r+'</div>'}
+  function renderBox(){
+    var box=$('#box');
+    if(S.scn==='loading'){box.innerHTML=skel();return;}
+    if(S.scn==='error'){box.innerHTML='<div class="state bad" role="alert">'+ic('alert')+'<b>'+esc(T('nt.err.t'))+'</b><span>'+esc(T('nt.err.d'))+'</span><div class="acts"><button type="button" class="btn btn-p" id="retry">'+ic('refresh','i-sm')+'<span>'+esc(T('app.retry'))+'</span></button></div></div>';return;}
+    var list=shown();
+    if(!list.length){box.innerHTML=emptyHtml();return;}
+    var h='';
+    ['today','yday','older'].forEach(function(g){
+      var gi=list.filter(function(n){return n.g===g}); if(!gi.length)return;
+      h+='<h2 class="nt-g" id="g-'+g+'">'+esc(T('nt.g.'+g))+'</h2><ul class="nt-list" aria-labelledby="g-'+g+'">'+gi.map(itemHtml).join('')+'</ul>';
+    });
+    h+='<div class="nt-foot">'+(S.more==='done'?'<span>'+esc(T('nt.end'))+'</span>':'<button type="button" class="btn btn-ghost" id="more"'+(S.more==='busy'?' disabled':'')+'>'+(S.more==='busy'?'<span class="spin" aria-hidden="true"></span>':ic('chev-d','i-sm'))+'<span>'+esc(T('nt.more'))+'</span></button>')+'</div>';
+    box.innerHTML=h;
+  }
+  function renderCtl(){
+    var off=S.scn==='loading'||S.scn==='error', u=unread();
+    $('#sub').textContent=off?'':u?T('nt.sub',{n:u}):T('nt.subNone');
+    $('#readAll').disabled=off||!u;
+    $('#tabs').innerHTML=[['all',S.items.length],['unread',u]].map(function(x){
+      return '<button type="button" class="tab" role="tab" data-tab="'+x[0]+'" aria-selected="'+(S.tab===x[0])+'" tabindex="'+(S.tab===x[0]?0:-1)+'"'+(off?' disabled':'')+'>'+esc(T('nt.tab.'+x[0]))+'<span class="n">'+(off?'':x[1])+'</span></button>';
+    }).join('');
+    $('#type').innerHTML='<option value="">'+esc(T('nt.type.all'))+'</option>'+CATS.map(function(c){return '<option value="'+c+'"'+(S.type===c?' selected':'')+'>'+esc(T('nt.cat.'+c))+'</option>'}).join('');
+    $('#type').disabled=off;
+    /* V1 GET /api/notifications chỉ có page, limit (≤50), unreadOnly → tab Tất cả/Chưa đọc + Xem thêm là Phase A; lọc theo loại cần thêm tham số → Phase B */
+    $('#typeWrap').title=T('nt.pb.type'); $('#typePb').textContent=T('nt.pb.s');
+  }
+  function render(){renderCtl();renderBox();}
+  function markRead(id){S.items.forEach(function(n){if(n.id===id)n.read=true});}
+  function pv(){return '<label class="pvl" for="pvScn">'+esc(T('nt.scn'))+'</label><select id="pvScn">'+SCN.map(function(k){return '<option value="'+k+'"'+(k===S.scn?' selected':'')+'>'+esc(T('nt.scn.'+k))+'</option>'}).join('')+'</select>'}
+  function apply(scn){S.scn=scn;S.tab='all';S.type='';load();render();}
+
+  document.addEventListener('click',function(e){
+    var el;
+    if((el=e.target.closest('[data-read]'))){
+      var li=el.closest('.nt-i'), next=li.nextElementSibling||li.previousElementSibling;
+      markRead(el.dataset.read); render();
+      var tgt=next&&$('[data-nid="'+next.dataset.nid+'"] .nt-a'); (tgt||$('#tabs [aria-selected="true"]')).focus();
+      return;
+    }
+    if((el=e.target.closest('[data-go]'))){markRead(el.dataset.go);return;}   /* để link mở trang chi tiết */
+    if((el=e.target.closest('#tabs [data-tab]'))){e.stopImmediatePropagation();S.tab=el.dataset.tab;render();$('#tabs [data-tab="'+S.tab+'"]').focus();return;}
+    if(e.target.closest('#readAll')){var n=unread();if(!n)return;S.items.forEach(function(x){x.read=true});render();App.toast(T('nt.readAllDone',{n:n}));$('#tabs [aria-selected="true"]').focus();return;}
+    if(e.target.closest('#clearType')){S.type='';render();$('#type').focus();return;}
+    if(e.target.closest('#more')){S.more='busy';renderBox();setTimeout(function(){S.items=S.items.concat(MORE[App.isBoss()?'boss':'emp'].map(mk));S.more='done';render();var l=$$('.nt-a');if(l.length>1)l[l.length-2].focus();},600);return;}
+    if(e.target.closest('#retry')){S.scn='loading';render();setTimeout(function(){apply('normal');App.refreshPv();},800);return;}
+  });
+  document.addEventListener('keydown',function(e){
+    var tab=e.target.closest&&e.target.closest('#tabs [data-tab]');
+    if(tab&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){var m=e.key==='ArrowRight'?tab.nextElementSibling:tab.previousElementSibling;if(m)m.click();}
+  });
+  document.addEventListener('change',function(e){
+    if(e.target.id==='type'){S.type=e.target.value;renderBox();return;}
+    if(e.target.id==='pvScn'){apply(e.target.value);history.replaceState(null,'','?s='+S.scn);App.refreshPv();$('#pvScn').focus();}
+  });
+  document.addEventListener('langchange',render);
+  document.addEventListener('rolechange',function(){apply(S.scn);});
+
+  App.shell({active:'notifications',crumbs:[{t:'nt.title'}],title:'nt.title',pv:pv});
+  if(S.scn==='normal'){S.scn='loading';load();render();setTimeout(function(){apply('normal');},400);}
+  else apply(S.scn);
+})();
+</script>
+</body>
+</html>

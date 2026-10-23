@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Tổng quan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+/* ---------- Riêng trang Tổng quan ---------- */
+.db-head{margin-bottom:16px}
+.db-head p b{font-weight:600}
+/* Hàng chỉ số: 1 khối, các ô ngăn bằng đường kẻ 1px */
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-1);margin:0 0 16px}
+.kpi{background:var(--surface);padding:14px 16px 16px;min-width:0;display:flex;flex-direction:column}
+.kpi .kl{display:flex;align-items:center;gap:7px;font-size:var(--fs-xs);color:var(--ink-2);font-weight:500;min-width:0}
+.kpi .kl span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .kn{font:600 26px/1.15 var(--f-head);font-variant-numeric:tabular-nums;letter-spacing:-.01em;color:var(--ink);margin-top:8px}
+.kpi .kn.bad{color:var(--danger)}
+.kpi .ks{font-size:var(--fs-xs);color:var(--ink-3);margin-top:4px;line-height:1.4}
+.kpi .kb{height:4px;border-radius:var(--r-pill);background:var(--surface-2);margin-top:auto;overflow:hidden}
+.kpi .kb i{display:block;height:100%;border-radius:inherit;background:var(--k,var(--primary))}
+.kpi .kb-wrap{margin-top:auto;padding-top:10px}
+/* Lưới khối */
+.db-grid{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"act due cm" "perf perf st" "rec rec pr";align-items:start}
+/* khối co theo nội dung (không kéo cao bằng nhau); riêng hàng biểu đồ giữ cao bằng nhau */
+.c-perf,.c-st{align-self:stretch}
+.c-act{grid-area:act}.c-due{grid-area:due}.c-cm{grid-area:cm}.c-perf{grid-area:perf}.c-st{grid-area:st}.c-pr{grid-area:pr}.c-rec{grid-area:rec}
+.db-grid .card{min-width:0;display:flex;flex-direction:column}
+.card-h{min-height:34px;padding-top:12px}
+.card-h h2{white-space:nowrap}
+.card-h .hc{font:500 12px/1 var(--f-mono);color:var(--ink-3)}
+.card-h .hl{margin-left:auto;margin-right:-6px;flex:none}
+.card-h .seg{margin-left:auto;flex:none}
+.csub{padding:2px 16px 0;line-height:20px;font-size:var(--fs-xs);color:var(--ink-3)}
+/* Phase B (tạm, chờ app.css có .pb-zone) */
+.pb-zone{outline:1px dashed color-mix(in srgb,var(--amber) 70%,transparent);outline-offset:2px;border-radius:var(--r-sm)}
+.phase-b.pb-s{height:16px;padding:0 4px;margin-left:4px}
+.li .el.pb-zone{outline-offset:1px}
+.card-h .xb{flex:none;font:500 11px/1 var(--f-body);color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 45%,transparent);border-radius:var(--r-pill);padding:3px 8px;white-space:nowrap}
+.card-h .xb{margin-left:auto}.card-h .xb+.hl{margin-left:8px}
+.dbx{display:block;border-top:1px dashed var(--line-2);margin:0 0 4px}
+.dbx .dbx-h{display:flex;align-items:center;gap:4px;padding:8px 16px 0;font-size:var(--fs-xs);color:var(--ink-3)}
+.prop{display:inline-flex;align-items:center;height:18px;padding:0 5px;border:1px dashed var(--line-2);border-radius:4px;font-size:11px;font-weight:500;color:var(--ink-3);white-space:nowrap;flex:none}
+/* Danh sách trong khối */
+.ls{padding:4px 0 4px;flex:1}
+.li{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:3px;align-items:baseline;width:100%;padding:10px 16px;border:0;border-top:1px solid var(--line);background:transparent;text-align:left;color:var(--ink);font-size:var(--fs-md)}
+.ls>.li:first-child{border-top:0}
+button.li:hover{background:var(--surface-2)}
+button.li:focus-visible{outline-offset:-2px;border-radius:0}
+.li .l1{display:flex;align-items:center;gap:7px;min-width:0}
+.li .tx{font-weight:500;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.li .lr{font-size:var(--fs-xs);white-space:nowrap;text-align:right}
+.li .l2{display:flex;align-items:center;gap:6px;min-width:0;font-size:var(--fs-xs);color:var(--ink-3);line-height:18px}
+.li .l2>*{flex:none}
+.li .l2 .el{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .l2 .mono{font-size:12px}
+.li .lr2{display:flex;justify-content:flex-end;align-items:center;font-size:var(--fs-xs);color:var(--ink-3);white-space:nowrap}
+.li .vb{color:var(--primary);font-weight:500}
+.li .sdot{width:7px;height:7px}
+.li .sl{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2)}
+.li .avs .av{width:20px;height:20px;font-size:8px}
+.li .flag{align-self:center}
+/* Bình luận */
+.li.cmr{grid-template-columns:24px minmax(0,1fr);column-gap:10px;align-items:start}
+.cmr .av{margin-top:1px}
+.cmr .c1{display:flex;align-items:baseline;gap:6px;min-width:0;font-size:var(--fs-sm)}
+.cmr .c1 b{font-weight:600;white-space:nowrap;flex:none}
+.cmr .c1 .mono{font-size:12px;color:var(--ink-3);flex:none}
+.cmr .c1 .ct{color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.cmr .c1 time{margin-left:auto;font-size:var(--fs-xs);color:var(--ink-3);white-space:nowrap;flex:none;padding-left:6px}
+.cmr .c2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:var(--fs-sm);line-height:1.5;color:var(--ink-2);margin-top:2px;overflow-wrap:anywhere}
+/* Trạng thái rỗng trong khối */
+.card .state{padding:28px 16px 32px;flex:1;justify-content:center}
+.card .state>.i{width:28px;height:28px;margin-bottom:10px}
+.card .state.big{padding:56px 24px}
+.card .state.big>.i{width:36px;height:36px}
+.card .state .btn span{color:inherit;font-size:inherit}
+.card .state:not(.big) b{font-weight:400;color:var(--ink-2);font-size:var(--fs-sm)}
+/* Biểu đồ hiệu suất */
+.pf-lg{display:flex;flex-wrap:wrap;gap:4px 18px;padding:10px 16px 0;font-size:var(--fs-sm);color:var(--ink-2)}
+.pf-lg span{display:inline-flex;align-items:center;gap:7px}
+.pf-lg b{font:500 13px/1 var(--f-mono);color:var(--ink)}
+.key{width:14px;height:3px;border-radius:2px;background:var(--k);flex:none}
+.chart{position:relative;height:220px;margin:6px 16px 14px}
+.chart svg{display:block;overflow:visible}
+.chart text{font:400 11px/1 var(--f-mono);fill:var(--ink-3)}
+.chart .gl{stroke:var(--line);stroke-width:1}
+.chart .gl0{stroke:var(--line-2)}
+.chart .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart .ln-c{stroke:var(--primary)} .chart .ln-d{stroke:var(--c-done)}
+.chart .dt-c{fill:var(--primary);stroke:var(--surface);stroke-width:2} .chart .dt-d{fill:var(--c-done);stroke:var(--surface);stroke-width:2}
+.chart .guide{stroke:var(--line-2);stroke-width:1;stroke-dasharray:3 3}
+.chart .state{position:absolute;inset:0;padding:0}
+.tip{position:absolute;top:4px;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-ctl);box-shadow:var(--shadow-pop);padding:8px 10px;font-size:var(--fs-xs);color:var(--ink-2);white-space:nowrap;z-index:2}
+.tip b{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}
+.tip div{display:flex;align-items:center;gap:7px;line-height:18px}
+.tip .mono{margin-left:auto;padding-left:14px;color:var(--ink)}
+/* Phân bố */
+.dist{padding:12px 16px 16px;flex:1;display:flex;flex-direction:column}
+.dist-t{display:flex;align-items:baseline;gap:8px;margin-bottom:12px;font-size:var(--fs-sm);color:var(--ink-2)}
+.dist-t b{font:600 22px/1 var(--f-head);color:var(--ink);font-variant-numeric:tabular-nums}
+.stack{display:flex;gap:2px;height:10px;border-radius:var(--r-pill);overflow:hidden;background:var(--surface-2)}
+.stack i{display:block;height:100%;background:var(--k);min-width:3px}
+.lg{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:2px}
+.lg li{display:grid;grid-template-columns:8px minmax(0,1fr) auto 44px;align-items:center;gap:8px;min-height:26px;font-size:var(--fs-sm);color:var(--ink-2)}
+.lg li.z{color:var(--ink-3)}
+.lg li.z .sdot{opacity:.45}
+.lg .n{font:500 13px/1 var(--f-mono);color:var(--ink);text-align:right}
+.lg li.z .n{color:var(--ink-3)}
+.lg .pc{font:400 12px/1 var(--f-mono);color:var(--ink-3);text-align:right}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:64px minmax(0,1fr) 32px;align-items:center;gap:10px;font-size:var(--fs-sm);color:var(--ink-2)}
+.bar .tr2{height:8px;border-radius:var(--r-pill);background:var(--surface-2);overflow:hidden}
+.bar .tr2 i{display:block;height:100%;border-radius:inherit;background:var(--k)}
+.bar .n{font:500 13px/1 var(--f-mono);color:var(--ink);text-align:right}
+.p-urgent{--k:var(--danger)} .p-high{--k:var(--c-review)} .p-normal{--k:var(--c-progress)} .p-low{--k:var(--c-draft)}
+.w-direct{--k:var(--c-pickup)} .w-approval{--k:var(--c-approval)}
+.sub-h{display:flex;align-items:baseline;gap:8px;margin:18px 0 10px;padding-top:14px;border-top:1px solid var(--line);font:600 13px/1.3 var(--f-head);color:var(--ink)}
+.sub-h span{font:400 12px/1 var(--f-body);color:var(--ink-3)}
+.lg.row{grid-template-columns:1fr 1fr;gap:4px 16px}
+.lg.row li{grid-template-columns:8px minmax(0,1fr) auto}
+/* Skeleton */
+.sk-k .sk{max-width:100%}
+.sk-li{pointer-events:none}
+.sk-li .sk{max-width:100%}
+
+@media (max-width:1199px){
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .db-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"act due" "perf perf" "st pr" "rec cm"}
+}
+@media (max-width:680px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi{padding:12px 14px 14px}
+  .kpi .kn{font-size:22px;margin-top:6px}
+  .db-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"act" "due" "perf" "st" "pr" "rec" "cm";gap:12px}
+  .card-h{flex-wrap:wrap}
+  .chart{height:200px;margin:6px 12px 12px}
+  .li{padding:10px 14px}
+}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="content" id="content"><div id="mount" aria-live="polite"></div></main>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+(function(){
+  /* Tổng quan — bám V1: src/app/(dashboard)/page.tsx + src/modules/dashboard/services/stats/*.
+     KPI tổng/hoàn thành/SLA là số mẫu (mọi thời điểm, không tính việc hủy); số chờ duyệt/nghiệm thu/quá hạn,
+     danh sách và phân bố tháng tính từ DATA.tasks() để khớp với Danh sách/Bảng và ngăn chi tiết. */
+  var T=I18N.t, esc=App.esc, av=App.av, nm=App.nm, $=App.$, dt=App.dt;
+  var TODAY=DATA.TODAY, FLOW=['DRAFT','PENDING_APPROVAL','WAITING_ACKNOWLEDGE','IN_PROGRESS','PENDING_REVIEW','COMPLETED','CANCELLED'];
+  var TASKS=DATA.tasks();
+  var S={screen:'loading',boot:true,days:30,sel:null,nav:[],open:false};
+  /* Số mẫu ngoài DATA: base = số việc cũ (trước tháng này) cộng vào KPI; month = việc tạo trong tháng đã đóng (không có trong DATA) */
+  var MOCK={
+    boss:{totalBase:402,doneBase:355,sla:91.2,month:{COMPLETED:26,CANCELLED:2},pr:{urgent:3,high:7,normal:13,low:5},wf:{approval:11,direct:17},seed:11,scale:1},
+    emp:{totalBase:57,doneBase:51,sla:88.5,month:{COMPLETED:6},pr:{urgent:1,high:2,normal:3,low:0},wf:{approval:2,direct:4},seed:5,scale:.5}
+  };
+  function boss(){return App.isBoss()}
+  MOCK.admin=MOCK.admin||MOCK.boss;
+  function mk(){var r=App.role3||App.role;return MOCK[r]||MOCK[App.role]}
+  function isEmpty(){return S.screen==='empty'}
+  function byId(id){return TASKS.filter(function(x){return x.id===id})[0]}
+  function my(t){return App.task.mine(t)}
+  /* Phạm vi như buildSecurityFilter của V1: Vice Manager thấy hết; Nhân viên = việc mình tạo hoặc được giao */
+  function pool(){if(isEmpty())return [];var me=App.me();return TASKS.filter(function(t){return boss()||t.cr===me||t.a.indexOf(me)>-1})}
+  function open(t){return t.s!=='COMPLETED'&&t.s!=='CANCELLED'}
+  function dueNum(t){if(t.due===null||t.due===undefined)return 9999;if(t.due==='ok')return 9998;if(typeof t.due==='string')return App.daysBetween(TODAY,t.due);return t.due}
+  /* Giống tasks-list: việc đang chờ chính người xem */
+  function needMe(t){
+    if(t.s==='CANCELLED')return false;
+    if(boss())return t.s==='PENDING_APPROVAL'||t.s==='PENDING_REVIEW';
+    var m=my(t); if(!m)return false;
+    return ((t.s==='WAITING_ACKNOWLEDGE'||t.s==='IN_PROGRESS')&&m==='PENDING')||(t.s==='IN_PROGRESS'&&(m==='IN_PROGRESS'||m==='ACKNOWLEDGED'||m==='REVISION_REQUIRED'));
+  }
+  function verb(t){if(boss())return t.s==='PENDING_APPROVAL'?'act.approve':'act.review';var m=my(t);return m==='PENDING'?'act.accept':m==='REVISION_REQUIRED'?'act.supplement':'act.report'}
+  function fmtNum(n,d){return Number(n).toLocaleString(I18N.lang==='vi'?'vi-VN':'en-US',{maximumFractionDigits:d||0,minimumFractionDigits:d||0})}
+  function prop(){return '<span class="prop" title="'+esc(T('db.prop.tip'))+'">'+esc(T('db.prop'))+'</span>'}
+  function pb(sm,tip){return '<span class="phase-b'+(sm?' pb-s':'')+'" title="'+esc(T(tip||'db.pb.tip'))+'">'+esc(T(sm?'db.pb.s':'db.pb'))+'</span>'}
+
+  /* ---------- Dữ liệu ---------- */
+  function v1Need(t){return boss()?(t.s==='PENDING_APPROVAL'||t.s==='PENDING_REVIEW'):((t.s==='WAITING_ACKNOWLEDGE'||t.s==='IN_PROGRESS')&&t.a.indexOf(App.me())>-1)}
+  function v1Verb(t){return t.s==='PENDING_APPROVAL'?'act.approve':t.s==='PENDING_REVIEW'?'act.review':t.s==='WAITING_ACKNOWLEDGE'?'act.accept':'act.report'}
+  function actionItems(){
+    return pool().filter(v1Need).sort(function(a,b){return dueNum(a)-dueNum(b)}).slice(0,8).map(function(t){return {t:t,k:v1Verb(t)}});
+  }
+  function extItems(){
+    var r=[]; if(!boss())return r;
+    pool().forEach(function(t){if(open(t))(t.ext||[]).forEach(function(e){if(e.st==='PENDING')r.push({t:t,k:'ext',e:e})})});
+    return r.sort(function(a,b){return dueNum(a.t)-dueNum(b.t)});
+  }
+  function dueItems(){return pool().filter(function(t){var d=dueNum(t);return open(t)&&t.s!=='DRAFT'&&d>=0&&d<=7}).sort(function(a,b){return dueNum(a)-dueNum(b)})}
+  function overdue(){return pool().filter(function(t){return open(t)&&dueNum(t)<0}).length}
+  function hm(s){var p=(s||'10:00').split(':');return (+p[0])*60+(+p[1]||0)}
+  /* phút trước "bây giờ" (giả định 22/10 10:00) — để sắp xếp bình luận */
+  function minsAgo(w){
+    if(Array.isArray(w)){
+      if(w[0]==='now')return 0; if(w[0]==='min')return w[1]; if(w[0]==='hour')return w[1]*60;
+      if(w[0]==='yday')return 1440+600-hm(w[1]); if(w[0]==='date')w=w[1]; else return 99999;
+    }
+    var a=String(w).split(' ');return App.daysBetween(a[0],TODAY)*1440+600-hm(a[1]);
+  }
+  function comments(){
+    var r=[];
+    pool().forEach(function(t){
+      var best=null;
+      (t.cm||[]).forEach(function(c){if(c.del)return;var m=minsAgo(c.w);if(!best||m<best.m)best={c:c,m:m,t:t}});
+      if(best)r.push(best);
+    });
+    return r.sort(function(a,b){return a.m-b.m}).slice(0,6);
+  }
+  function lastEvent(t){var h=(t.hist||[]).slice().sort(function(a,b){return a[0]<b[0]?-1:a[0]>b[0]?1:0});return h[h.length-1]||null}
+  function recent(){
+    return pool().map(function(t){return {t:t,h:lastEvent(t)}}).filter(function(x){return x.h})
+      .sort(function(a,b){return a.h[0]<b.h[0]?1:a.h[0]>b.h[0]?-1:0}).slice(0,5);
+  }
+  function evText(h){
+    var x=h[3]||{}, k='td.h.'+h[2];
+    if(!I18N.has(k))return '';
+    return T(k,{a:nm(h[1]),b:x.b?nm(x.b):'',d:x.d?dt(x.d,true):'',v:x.v||'',n:x.n||''});
+  }
+  function monthStatus(){
+    var c={}; FLOW.forEach(function(s){c[s]=0});
+    pool().forEach(function(t){c[t.s]++});
+    if(!isEmpty()){var m=mk().month;for(var k in m)c[k]+=m[k];}
+    return c;
+  }
+  function monthPriority(){
+    var c={urgent:0,high:0,normal:0,low:0};
+    pool().forEach(function(t){c[t.p]++});
+    if(!isEmpty()){var m=mk().pr;for(var k in m)c[k]+=m[k];}
+    return c;
+  }
+  function monthFlow(){
+    var c={direct:0,approval:0};
+    pool().forEach(function(t){c[t.approval?'approval':'direct']++});
+    if(!isEmpty()){var m=mk().wf;c.direct+=m.direct;c.approval+=m.approval;}
+    return c;
+  }
+  /* Chuỗi 30 ngày (mẫu, cố định theo vai trò). 7 ngày = 7 điểm cuối. */
+  function series(){
+    var m=mk(), seed=m.seed, out=[];
+    function rnd(){seed=(seed*9301+49297)%233280;return seed/233280}
+    for(var i=29;i>=0;i--){
+      var iso=DATA.addDays(TODAY,-i), p=iso.split('-'), wd=new Date(+p[0],+p[1]-1,+p[2]).getDay(), we=wd===0||wd===6;
+      var c=Math.round((we?rnd()*.8:3+rnd()*2.6)*m.scale+(i<10?.6:0)), k=Math.round((we?rnd()*.6:2.4+rnd()*2.6)*m.scale+(i<10?.4:0));
+      out.push({d:iso,wd:wd,c:isEmpty()?0:c,k:isEmpty()?0:k});
+    }
+    return out;
+  }
+
+  /* ---------- Khối dựng ---------- */
+  function hdr(id,title,count,right){
+    return '<div class="card-h"><h2 id="'+id+'">'+esc(title)+'</h2>'+(count!=null?'<span class="hc">'+count+'</span>':'')+(right||'')+'</div>';
+  }
+  function allLink(href){return '<a class="btn-link hl" href="'+href+'">'+esc(T('db.all'))+'</a>'}
+  function cstate(icon,title,big){return '<div class="state'+(big?' big':'')+'">'+ic(icon)+'<b>'+esc(title)+'</b></div>'}
+  function flag(t){return t.p==='urgent'||t.p==='high'?'<span class="flag flag-'+t.p+'" title="'+esc(T('filter.priority')+': '+T('pr.'+t.p))+'">'+ic('flag','i-xs')+'<span class="sr">'+esc(T('pr.'+t.p))+', </span></span>':''}
+  function people(t){
+    if(!t.a.length)return '<span>'+esc(T('card.unassigned'))+'</span>';
+    return '<span class="avs">'+t.a.slice(0,3).map(function(c){return av(c)}).join('')+(t.a.length>3?'<span class="av more" title="'+esc(t.a.slice(3).map(nm).join(', '))+'">+'+(t.a.length-3)+'</span>':'')+'</span>';
+  }
+  function stl(t){return '<span class="sl s-'+t.s+'"><span class="sdot" aria-hidden="true"></span>'+esc(T('st.'+t.s))+'</span>'}
+
+  function kpiCell(o){
+    return '<div class="kpi"><div class="kl">'+(o.s?'<span class="sdot s-'+o.s+'" aria-hidden="true"></span>':'')+'<span>'+esc(o.l)+'</span></div>'+
+      '<div class="kn'+(o.bad?' bad':'')+'">'+o.n+'</div><div class="ks">'+esc(o.sub)+'</div>'+
+      (o.bar!=null?'<div class="kb-wrap"><div class="kb" role="presentation"><i style="width:'+Math.max(0,Math.min(100,o.bar))+'%;--k:var('+o.k+')"></i></div></div>':'')+'</div>';
+  }
+  function kpis(){
+    var p=pool(), m=mk(), e=isEmpty();
+    var total=e?0:m.totalBase+p.filter(function(t){return t.s!=='CANCELLED'}).length;
+    var done=e?0:m.doneBase+p.filter(function(t){return t.s==='COMPLETED'}).length;
+    var rate=total?done/total*100:0, sla=e?null:m.sla, od=overdue();
+    var cells=[
+      {l:T('db.k.total'),n:fmtNum(total),sub:T('db.k.totalSub')},
+      {l:T('db.k.done'),n:fmtNum(done),sub:T('db.k.rate',{n:fmtNum(rate,1)}),bar:rate,k:'--primary'}
+    ];
+    if(boss()){
+      cells.push({s:'PENDING_APPROVAL',l:T('st.PENDING_APPROVAL'),n:p.filter(function(t){return t.s==='PENDING_APPROVAL'}).length,sub:T('db.k.apSub')});
+      cells.push({s:'PENDING_REVIEW',l:T('st.PENDING_REVIEW'),n:p.filter(function(t){return t.s==='PENDING_REVIEW'}).length,sub:T('db.k.rvSub')});
+    } else {
+      cells.push({s:'IN_PROGRESS',l:T('db.k.myProg'),n:p.filter(function(t){var x=my(t);return t.s==='IN_PROGRESS'&&(x==='IN_PROGRESS'||x==='ACKNOWLEDGED'||x==='REVISION_REQUIRED')}).length,sub:T('db.k.myProgSub')});
+      cells.push({s:'WAITING_ACKNOWLEDGE',l:T('db.k.myAck'),n:p.filter(function(t){return t.s==='WAITING_ACKNOWLEDGE'&&t.a.indexOf(App.me())>-1}).length,sub:T('db.k.myAckSub')});
+    }
+    cells.push({l:T('db.k.overdue'),n:od,bad:od>0,sub:T('db.k.overSub')});
+    cells.push({l:T('db.k.sla'),n:sla==null?'—':fmtNum(sla,1)+'%',sub:T('db.k.slaSub'),bar:sla==null?0:sla,k:sla==null?'--line':sla>=80?'--c-done':sla>=60?'--c-review':'--danger'});
+    return '<section class="kpis" aria-label="'+esc(T('db.k.label'))+'">'+cells.map(kpiCell).join('')+'</section>';
+  }
+
+  function cardAct(){
+    var r=actionItems(), X=extItems();
+    function row(it){
+        var t=it.t, d=App.dueOf(t), ext=it.k==='ext';
+        return '<button type="button" class="li" data-open="'+t.id+'" data-list="act" title="'+t.id+' · '+esc(I18N.title(t))+'">'+
+          '<span class="l1">'+flag(t)+'<span class="tx">'+esc(I18N.title(t))+'</span></span>'+
+          '<span class="lr due-'+d.tone+'">'+esc(d.label)+'</span>'+
+          '<span class="l2"><span class="vb">'+esc(T(ext?'db.act.ext':it.k))+'</span><span aria-hidden="true">·</span><span class="mono">'+t.id+'</span>'+
+            (ext?'<span aria-hidden="true">·</span><span class="el" title="'+esc(nm(it.e.by))+'">'+esc(T('db.act.extTo',{d:dt(it.e.to,true)}))+'</span>':'')+'</span>'+
+          '<span class="lr2"></span></button>';
+    }
+    var body=(!r.length?cstate('check-circle',T(boss()?'db.act.empty.boss':'db.act.empty.emp')):'<div class="ls">'+r.map(row).join('')+'</div>')+
+      (X.length?'<div class="ls dbx pb-zone" title="'+esc(T('db.pb.ext'))+'"><div class="dbx-h">'+esc(T('db.act.extList'))+pb(1,'db.pb.ext')+'</div>'+X.slice(0,4).map(row).join('')+'</div>':'');
+    var badge=boss()&&X.length?'<span class="xb" title="'+esc(T('db.act.extBadgeT'))+'">'+esc(T('db.act.extBadge',{n:X.length}))+'</span>':'';
+    return '<section class="card c-act" aria-labelledby="hAct">'+hdr('hAct',T('db.act.t'),r.length||null,badge+allLink('tasks-list.html?view=mine'))+
+      '<div class="csub">'+esc(T(boss()?'db.act.sub.boss':'db.act.sub.emp'))+'</div>'+body+'</section>';
+  }
+  function cardDue(){
+    var all=dueItems(), r=all.slice(0,8);
+    var body=!r.length?cstate('calendar',T('db.due.empty')):
+      '<div class="ls">'+r.map(function(t){
+        var d=App.dueOf(t);
+        return '<button type="button" class="li" data-open="'+t.id+'" data-list="due" title="'+t.id+' · '+esc(I18N.title(t))+'">'+
+          '<span class="l1">'+flag(t)+'<span class="tx">'+esc(I18N.title(t))+'</span></span>'+
+          '<span class="lr due-'+d.tone+'">'+esc(d.label)+'</span>'+
+          '<span class="l2">'+stl(t)+'<span aria-hidden="true">·</span><span class="mono">'+t.id+'</span></span>'+
+          '<span class="lr2">'+people(t)+'</span></button>';
+      }).join('')+'</div>';
+    return '<section class="card c-due" aria-labelledby="hDue">'+hdr('hDue',T('db.due.t'),all.length||null,allLink('tasks-list.html'))+
+      '<div class="csub">'+esc(T('db.due.sub'))+'</div>'+body+'</section>';
+  }
+  function cardCm(){
+    var r=comments();
+    var body=!r.length?cstate('message',T('db.cm.empty')):
+      '<div class="ls">'+r.map(function(x){
+        var c=x.c, t=x.t;
+        return '<button type="button" class="li cmr" data-open="'+t.id+'" data-list="cm" title="'+t.id+' · '+esc(I18N.title(t))+'">'+av(c.a)+
+          '<span><span class="c1"><b>'+esc(nm(c.a))+'</b><span class="mono">'+t.id+'</span><span class="ct">'+esc(I18N.title(t))+'</span><time>'+esc(App.when(c.w))+'</time></span>'+
+          '<span class="c2">'+esc(I18N.L(c.x))+'</span></span></button>';
+      }).join('')+'</div>';
+    return '<section class="card c-cm" aria-labelledby="hCm">'+hdr('hCm',T('db.cm.t'),null)+'<div class="csub">'+esc(T('db.cm.sub'))+'</div>'+body+'</section>';
+  }
+  function cardRec(){
+    var r=recent();
+    var body=!r.length?cstate('history',T('db.rec.empty')):
+      '<div class="ls">'+r.map(function(x){
+        var t=x.t, d=App.dueOf(t), ev=evText(x.h);
+        return '<button type="button" class="li" data-open="'+t.id+'" data-list="rec" title="'+t.id+' · '+esc(I18N.title(t))+'">'+
+          '<span class="l1">'+flag(t)+'<span class="tx">'+esc(I18N.title(t))+'</span></span>'+
+          '<span class="lr due-'+d.tone+'">'+esc(d.label)+'</span>'+
+          '<span class="l2">'+stl(t)+'<span aria-hidden="true">·</span><span class="mono">'+t.id+'</span>'+(ev?'<span aria-hidden="true">·</span><span class="el pb-zone">'+esc(ev)+'</span>':'')+'</span>'+
+          '<span class="lr2"><time class="mono">'+esc(App.dtt(x.h[0]))+'</time></span></button>';
+      }).join('')+'</div>';
+    return '<section class="card c-rec" aria-labelledby="hRec">'+hdr('hRec',T('db.rec.t'),null,pb(1,'db.pb.rec')+allLink('tasks-list.html'))+'<div class="csub">'+esc(T('db.rec.sub'))+'</div>'+body+'</section>';
+  }
+  function cardPerf(){
+    var d=series().slice(-S.days), c=0, k=0; d.forEach(function(x){c+=x.c;k+=x.k});
+    var seg='<div class="seg" role="group" aria-label="'+esc(T('db.perf.range'))+'">'+[7,30].map(function(n){return '<button type="button" data-days="'+n+'" aria-pressed="'+(S.days===n)+'">'+esc(T('db.perf.d'+n))+'</button>'}).join('')+'</div>';
+    return '<section class="card c-perf" aria-labelledby="hPerf">'+hdr('hPerf',T('db.perf.t'),null,seg)+'<div class="csub">'+esc(T('db.perf.sub'))+'</div>'+
+      '<div class="pf-lg"><span><i class="key" style="--k:var(--primary)"></i>'+esc(T('db.perf.created'))+' <b>'+c+'</b></span><span><i class="key" style="--k:var(--c-done)"></i>'+esc(T('db.perf.done'))+' <b>'+k+'</b></span></div>'+
+      '<div class="chart" id="perf"></div></section>';
+  }
+  function monthName(){var p=TODAY.split('-');return T('db.mon').split('|')[+p[1]-1]}
+  function cardSt(){
+    var c=monthStatus(), tot=0; FLOW.forEach(function(s){tot+=c[s]});
+    var body;
+    if(!tot)body=cstate('chart',T('db.dist.empty'));
+    else body='<div class="dist"><div class="dist-t"><b>'+tot+'</b><span>'+esc(T('db.dist.total',{m:monthName()}))+'</span></div>'+
+      '<div class="stack" role="img" aria-label="'+esc(FLOW.filter(function(s){return c[s]}).map(function(s){return T('st.'+s)+' '+c[s]}).join(', '))+'">'+
+        FLOW.filter(function(s){return c[s]}).map(function(s){return '<i class="s-'+s+'" style="flex:'+c[s]+' 1 0"></i>'}).join('')+'</div>'+
+      '<ul class="lg">'+FLOW.map(function(s){return '<li class="s-'+s+(c[s]?'':' z')+'"><span class="sdot" aria-hidden="true"></span><span>'+esc(T('st.'+s))+'</span><span class="n">'+c[s]+'</span><span class="pc">'+Math.round(c[s]/tot*100)+'%</span></li>'}).join('')+'</ul></div>';
+    return '<section class="card c-st" aria-labelledby="hSt">'+hdr('hSt',T('filter.status'),null)+'<div class="csub">'+esc(T('db.dist.sub',{m:monthName()}))+'</div>'+body+'</section>';
+  }
+  function cardPr(){
+    var c=monthPriority(), w=monthFlow(), P=['urgent','high','normal','low'], tot=0, max=0;
+    P.forEach(function(p){tot+=c[p];max=Math.max(max,c[p])});
+    var body;
+    if(!tot)body=cstate('flag',T('db.dist.empty'));
+    else{
+      var wt=w.direct+w.approval;
+      body='<div class="dist"><div class="bars">'+P.map(function(p){return '<div class="bar p-'+p+'"><span>'+esc(T('pr.'+p))+'</span><span class="tr2" role="presentation"><i style="width:'+(max?c[p]/max*100:0)+'%"></i></span><span class="n">'+c[p]+'</span></div>'}).join('')+'</div>'+
+        '<div class="sub-h">'+esc(T('db.wf.t'))+'</div>'+
+        '<div class="stack" role="img" aria-label="'+esc(T('td.mode.direct')+' '+w.direct+', '+T('td.mode.approval')+' '+w.approval)+'">'+
+          (w.direct?'<i class="w-direct" style="flex:'+w.direct+' 1 0"></i>':'')+(w.approval?'<i class="w-approval" style="flex:'+w.approval+' 1 0"></i>':'')+'</div>'+
+        '<ul class="lg">'+['direct','approval'].map(function(k){return '<li class="w-'+k+'"><span class="sdot" aria-hidden="true"></span><span>'+esc(T('td.mode.'+k))+'</span><span class="n">'+w[k]+'</span><span class="pc">'+Math.round(w[k]/wt*100)+'%</span></li>'}).join('')+'</ul></div>';
+    }
+    return '<section class="card c-pr" aria-labelledby="hPr">'+hdr('hPr',T('filter.priority'),null)+'<div class="csub">'+esc(T('db.dist.sub',{m:monthName()}))+'</div>'+body+'</section>';
+  }
+
+  /* ---------- Biểu đồ hiệu suất (SVG thuần, vẽ theo bề rộng thật) ---------- */
+  function drawPerf(){
+    var box=$('#perf'); if(!box)return;
+    var W=box.clientWidth, H=box.clientHeight; if(!W)return;
+    var data=series().slice(-S.days), n=data.length;
+    var max=Math.max.apply(null,data.map(function(x){return Math.max(x.c,x.k)}));
+    if(!max){box.innerHTML=cstate('chart',T('db.perf.empty',{n:S.days}));return;}
+    var stp=max<=4?1:max<=10?2:max<=25?5:10, top=Math.ceil(max/stp)*stp;
+    var pl=26, pr=6, pt=8, pb=24, pw=W-pl-pr, ph=H-pt-pb;
+    function X(i){return pl+(n===1?pw/2:i*pw/(n-1))}
+    function Y(v){return pt+ph-v/top*ph}
+    var g='';
+    for(var v=0;v<=top;v+=stp){var y=Math.round(Y(v))+.5;g+='<line class="gl'+(v?'':' gl0')+'" x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(pl-8)+'" y="'+(y+4)+'" text-anchor="end">'+v+'</text>';}
+    var lw=I18N.lang==='vi'?40:50, sp=n>1?pw/(n-1):pw, every=Math.max(1,Math.ceil(lw*1.35/sp));
+    data.forEach(function(p,i){
+      if((n-1-i)%every)return;
+      var x=X(i), a=i===n-1?'end':(x-pl<lw/2?'start':'middle');
+      g+='<text x="'+x+'" y="'+(H-6)+'" text-anchor="'+a+'">'+esc(dt(p.d,true))+'</text>';
+    });
+    /* đường cong monotone (không vượt quá giá trị thật, không xuống dưới 0) */
+    function line(key,cls){
+      var P=data.map(function(p,i){return [X(i),Y(p[key])]}), k=P.length, d=[], m=[], dd='M'+P[0][0].toFixed(1)+','+P[0][1].toFixed(1);
+      for(var i=0;i<k-1;i++)d.push((P[i+1][1]-P[i][1])/(P[i+1][0]-P[i][0]));
+      for(i=0;i<k;i++)m.push(i===0?d[0]:i===k-1?d[k-2]:(d[i-1]*d[i]<=0?0:(d[i-1]+d[i])/2));
+      for(i=0;i<k-1;i++){var h=(P[i+1][0]-P[i][0])/3;dd+=' C'+(P[i][0]+h).toFixed(1)+','+(P[i][1]+m[i]*h).toFixed(1)+' '+(P[i+1][0]-h).toFixed(1)+','+(P[i+1][1]-m[i+1]*h).toFixed(1)+' '+P[i+1][0].toFixed(1)+','+P[i+1][1].toFixed(1);}
+      return '<path class="ln '+cls+'" d="'+dd+'"/>';
+    }
+    g+=line('c','ln-c')+line('k','ln-d');
+    if(n<=7)data.forEach(function(p,i){g+='<circle class="dt-c" cx="'+X(i)+'" cy="'+Y(p.c)+'" r="3.5"/><circle class="dt-d" cx="'+X(i)+'" cy="'+Y(p.k)+'" r="3.5"/>'});
+    g+='<g id="pfHover" visibility="hidden"><line class="guide" id="pfG" y1="'+pt+'" y2="'+(pt+ph)+'"/><circle class="dt-c" id="pfC" r="4"/><circle class="dt-d" id="pfD" r="4"/></g>';
+    var wd=T('db.wd').split('|');
+    var tbl='<table class="sr"><caption>'+esc(T('db.perf.t')+' · '+T('db.perf.d'+S.days))+'</caption><thead><tr><th>'+esc(T('db.perf.date'))+'</th><th>'+esc(T('db.perf.created'))+'</th><th>'+esc(T('db.perf.done'))+'</th></tr></thead><tbody>'+
+      data.map(function(p){return '<tr><td>'+esc(dt(p.d))+'</td><td>'+p.c+'</td><td>'+p.k+'</td></tr>'}).join('')+'</tbody></table>';
+    box.innerHTML='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+g+'</svg><div class="tip" id="pfTip" hidden></div>'+tbl;
+    var hov=$('#pfHover',box), tip=$('#pfTip',box);
+    function show(e){
+      var r=box.getBoundingClientRect(), x=e.clientX-r.left;
+      var i=Math.max(0,Math.min(n-1,Math.round((x-pl)/(n===1?1:pw/(n-1))))), p=data[i], cx=X(i);
+      hov.setAttribute('visibility','visible');
+      $('#pfG',box).setAttribute('x1',cx);$('#pfG',box).setAttribute('x2',cx);
+      $('#pfC',box).setAttribute('cx',cx);$('#pfC',box).setAttribute('cy',Y(p.c));
+      $('#pfD',box).setAttribute('cx',cx);$('#pfD',box).setAttribute('cy',Y(p.k));
+      tip.hidden=false;
+      tip.innerHTML='<b>'+esc(wd[p.wd]+', '+dt(p.d,true))+'</b><div><i class="key" style="--k:var(--primary)"></i>'+esc(T('db.perf.created'))+'<span class="mono">'+p.c+'</span></div><div><i class="key" style="--k:var(--c-done)"></i>'+esc(T('db.perf.done'))+'<span class="mono">'+p.k+'</span></div>';
+      var tw=tip.offsetWidth, left=cx+12; if(left+tw>W)left=cx-12-tw; if(left<0)left=0;
+      tip.style.left=left+'px';
+    }
+    function hide(){hov.setAttribute('visibility','hidden');tip.hidden=true}
+    box.onpointermove=show; box.onpointerdown=show; box.onpointerleave=hide;
+  }
+
+  /* ---------- Skeleton (đúng hình, đúng số khối) ---------- */
+  function sk(w,h,extra){return '<span class="sk line" style="width:'+w+(typeof w==='number'?'px':'')+';'+(h?'height:'+h+'px;':'')+(extra||'')+'"></span>'}
+  function skRows(n){var r='';for(var i=0;i<n;i++)r+='<div class="li sk-li"><span class="l1">'+sk(['82%','64%','74%','58%','70%'][i%5],13)+'</span><span class="lr">'+sk(54,10)+'</span><span class="l2">'+sk(['44%','36%','52%'][i%3],10)+'</span><span class="lr2">'+sk(36,10)+'</span></div>';return '<div class="ls">'+r+'</div>'}
+  function skHdr(w){return '<div class="card-h">'+sk(w,14)+'</div><div class="csub">'+sk(110,10,'margin-top:6px')+'</div>'}
+  function skeleton(){
+    var k='';for(var i=0;i<6;i++)k+='<div class="kpi sk-k">'+sk(84,10)+sk(56,22,'margin-top:12px')+sk('70%',10,'margin-top:10px')+'</div>';
+    var lg='';for(var j=0;j<7;j++)lg+='<li>'+sk(8,8,'border-radius:50%')+sk(['60%','72%','54%','66%'][j%4],10)+sk(20,10)+sk(28,10)+'</li>';
+    var bars='';for(var b=0;b<4;b++)bars+='<div class="bar">'+sk(48,10)+'<span class="tr2"></span>'+sk(20,10)+'</div>';
+    return '<div class="head db-head" aria-hidden="true"><div>'+sk(280,24)+sk(360,13,'margin-top:10px;max-width:80vw')+'</div></div>'+
+      '<section class="kpis" aria-hidden="true">'+k+'</section>'+
+      '<div class="db-grid" aria-hidden="true">'+
+        '<section class="card c-act">'+skHdr(120)+skRows(4)+'</section>'+
+        '<section class="card c-due">'+skHdr(110)+skRows(4)+'</section>'+
+        '<section class="card c-cm">'+skHdr(130)+skRows(4)+'</section>'+
+        '<section class="card c-perf">'+skHdr(90)+'<div class="pf-lg">'+sk(96,10)+sk(110,10)+'</div><div class="chart"><span class="sk" style="height:100%"></span></div></section>'+
+        '<section class="card c-st">'+skHdr(90)+'<div class="dist">'+sk(140,18,'margin-bottom:14px')+sk('100%',10)+'<ul class="lg">'+lg+'</ul></div></section>'+
+        '<section class="card c-pr">'+skHdr(80)+'<div class="dist"><div class="bars">'+bars+'</div><div class="sub-h">'+sk(70,10)+'</div>'+sk('100%',10)+'</div></section>'+
+        '<section class="card c-rec">'+skHdr(130)+skRows(5)+'</section>'+
+      '</div><span class="sr" role="status">'+esc(T('db.loading'))+'</span>';
+  }
+
+  /* ---------- Trang ---------- */
+  function greet(){
+    var h=new Date().getHours(), k=h<11?'db.hi.am':h<18?'db.hi.pm':'db.hi.eve';
+    return T(k,{n:nm(App.me())});
+  }
+  function today(){var p=TODAY.split('-');return T('db.wd').split('|')[new Date(+p[0],+p[1]-1,+p[2]).getDay()]+', '+dt(TODAY)}
+  function head(sub){return '<div class="head db-head"><div><h1>'+esc(greet())+'</h1>'+(sub!=null?'<p id="sub">'+sub+'</p>':'')+'</div></div>'}
+  function subLine(){
+    var d=esc(today());
+    if(isEmpty())return App.fill('db.sub.empty',{d:d});
+    var n=actionItems().length+extItems().length;
+    if(!n)return App.fill('db.sub.none',{d:d});
+    return App.fill(boss()?'db.sub.boss':'db.sub.emp',{d:d,n:'<b>'+n+'</b>'});
+  }
+  var ro=null;
+  function render(){
+    var m=$('#mount'), sc=S.screen;
+    m.parentElement.setAttribute('aria-busy',sc==='loading');
+    if(sc==='loading'){m.innerHTML=skeleton();}
+    else if(sc==='error'){
+      m.innerHTML=head(null)+'<section class="card"><div class="state big bad" role="alert">'+ic('wifi-off')+'<b>'+esc(T('db.err.t'))+'</b><span>'+esc(T('db.err.d'))+'</span>'+
+        '<div class="acts"><button type="button" class="btn btn-p" data-retry>'+ic('refresh','i-sm')+'<span>'+esc(T('app.retry'))+'</span></button></div></div></section>';
+    } else {
+      m.innerHTML=head(subLine())+kpis()+'<div class="db-grid">'+cardAct()+cardDue()+cardCm()+cardPerf()+cardSt()+cardPr()+cardRec()+'</div>';
+      drawPerf();
+      var pf=$('#perf');
+      if(ro)ro.disconnect();
+      if(pf&&window.ResizeObserver){var lw=pf.clientWidth;ro=new ResizeObserver(function(){if(Math.abs(pf.clientWidth-lw)>2){lw=pf.clientWidth;drawPerf();}});ro.observe(pf);}
+    }
+    document.title=T('app.name')+' · '+T('nav.home');
+  }
+  function load(ms){
+    S.screen='loading';S.boot=true;render();App.refreshPv();
+    setTimeout(function(){S.boot=false;S.screen='normal';render();App.refreshPv();},ms);
+  }
+  function opt(v,label,cur){return '<option value="'+v+'"'+(v===cur?' selected':'')+'>'+esc(label)+'</option>'}
+  function pv(){
+    var cur=S.screen==='loading'&&S.boot?'normal':S.screen;
+    return '<label class="pvl" for="pvScreen">'+esc(T('db.pv.screen'))+'</label><select id="pvScreen">'+
+      [['normal','db.pv.data'],['loading','db.pv.loading'],['empty','db.pv.empty'],['error','db.pv.error']].map(function(x){return opt(x[0],T(x[1]),cur)}).join('')+'</select>';
+  }
+
+  /* ---------- Ngăn chi tiết (App.taskDetail, giống tasks-list) ---------- */
+  function listIds(list){
+    if(list==='act'){var seen={};return actionItems().concat(extItems().slice(0,4)).map(function(x){return x.t.id}).filter(function(id){if(seen[id])return false;seen[id]=1;return true})}
+    if(list==='due')return dueItems().slice(0,8).map(function(t){return t.id});
+    if(list==='cm')return comments().map(function(x){return x.t.id});
+    if(list==='rec')return recent().map(function(x){return x.t.id});
+    return [];
+  }
+  function drawerHtml(t){var i=S.nav.indexOf(t.id);return App.taskDetail(t,{mode:'drawer',nav:{i:i,n:S.nav.length},rerender:refresh,onStep:step})}
+  function refresh(){var t=byId(S.sel);if(!t||!S.open)return;App.drawer.set(drawerHtml(t));if(S.screen==='normal')render();}
+  function openTask(id,list,keepNav){
+    var t=byId(id); if(!t)return;
+    if(!keepNav){var ids=listIds(list);S.nav=ids.indexOf(id)>-1?ids:[id];S.list=list;}
+    S.sel=id; if(t.unseen&&boss())App.markSeen(id);
+    S.open=true;
+    App.drawer.open({html:drawerHtml(t),label:T('td.detail'),onClose:onClose});
+  }
+  function onClose(){
+    S.open=false;
+    var r=$('#mount [data-open="'+S.sel+'"][data-list="'+S.list+'"]')||$('#mount [data-open="'+S.sel+'"]');
+    if(r)r.focus({preventScroll:false});
+  }
+  function step(d){
+    var i=S.nav.indexOf(S.sel)+d; if(i<0||i>=S.nav.length)return;
+    openTask(S.nav[i],S.list,true);
+    var b=$('#dr [data-ta="dr-step"][data-d="'+d+'"]'); if(b&&!b.disabled)b.focus(); else $('#dr').focus();
+  }
+
+  App.shell({active:'home',crumbs:[{t:'nav.home'}],title:'nav.home',pv:pv,onOpenTask:function(id){openTask(id,null)},
+    onNav:function(k){if(k==='home')return true;}});
+
+  document.addEventListener('click',function(e){
+    var el;
+    if((el=e.target.closest('#mount [data-open]'))){openTask(el.dataset.open,el.dataset.list);return;}
+    if((el=e.target.closest('[data-days]'))){var n=+el.dataset.days;if(n!==S.days){S.days=n;var c=$('.c-perf');if(c){c.outerHTML=cardPerf();drawPerf();var f=$('[data-days="'+n+'"]');f&&f.focus();}}return;}
+    if(e.target.closest('[data-retry]')){load(900);return;}
+    if(e.target.closest('#drScrim')){App.drawer.close();return;}
+  });
+  document.addEventListener('change',function(e){
+    if(e.target.id==='pvScreen'){S.boot=false;S.screen=e.target.value;if(App.drawer.isOpen())App.drawer.close();render();App.refreshPv();$('#pvScreen').focus();}
+  });
+  document.addEventListener('langchange',function(){render();App.refreshPv();if(S.open)refresh();});
+  document.addEventListener('rolechange',function(){if(App.drawer.isOpen())App.drawer.close();render();App.refreshPv();});
+  load(350);
+})();
+</script>
+</body>
+</html>

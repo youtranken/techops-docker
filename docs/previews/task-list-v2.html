@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xem thử danh sách task</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; }
+  .clamp2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  select, input { outline: none; }
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col overflow-hidden">
+
+<div class="shrink-0 bg-amber-50 border-b border-amber-200 px-4 py-2 flex flex-wrap items-center gap-3 text-sm">
+  <b class="text-amber-800">XEM THỬ — Mục 1 &amp; 2</b>
+  <label class="flex items-center gap-1">Đang đăng nhập:
+    <select id="role" class="border rounded px-2 py-0.5 bg-white">
+      <option value="BOSS">Cao Thuận (BOSS)</option>
+      <option value="EMPLOYEE">Lê Minh (EMPLOYEE)</option>
+    </select>
+  </label>
+  <span class="text-amber-700">Bấm ☆/★ trên thẻ để đánh dấu · Ở mục “Chưa xem”, bấm vào thẻ = mở chi tiết = đã xem</span>
+  <a href="task-detail-v2.html" class="ml-auto underline text-indigo-700">→ Trang chi tiết task</a>
+</div>
+
+<div class="flex flex-1 min-h-0">
+  <!-- SIDEBAR -->
+  <aside class="w-60 shrink-0 bg-gray-900 text-white flex flex-col">
+    <div class="px-4 py-4 font-bold text-lg">TechOps</div>
+    <nav class="px-2 space-y-1 text-sm" id="nav"></nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 min-w-0 overflow-y-auto p-6 space-y-5">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span id="pageIcon" class="text-2xl"></span>
+        <div>
+          <h1 id="pageTitle" class="text-2xl font-bold tracking-tight"></h1>
+          <p class="text-sm text-slate-500"><span id="pageDesc"></span> · Tổng cộng <b id="total" class="font-mono bg-slate-200 rounded px-1.5"></b> công việc</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="markAll" class="hidden h-9 px-3 rounded-md border border-emerald-300 bg-emerald-50 text-emerald-700 text-sm font-medium hover:bg-emerald-100">✓ Đánh dấu đã xem tất cả</button>
+        <select class="h-9 border rounded-md px-2 text-sm bg-white"><option>↕ Mới tạo nhất</option><option>Hạn gần nhất</option></select>
+        <button class="h-9 px-4 rounded-md bg-indigo-600 text-white text-sm font-medium">+ Tạo công việc</button>
+      </div>
+    </div>
+
+    <!-- FILTERS: giống hệt trang Tasks -->
+    <div class="flex flex-wrap gap-2">
+      <input id="fSearch" placeholder="🔍 Tìm theo tiêu đề..." class="flex-1 min-w-[200px] max-w-sm h-9 border rounded-md px-3 text-sm bg-white">
+      <select id="fStatus" class="h-9 w-[170px] border rounded-md px-2 text-sm bg-white"></select>
+      <select id="fPriority" class="h-9 w-[150px] border rounded-md px-2 text-sm bg-white">
+        <option value="">Tất cả ưu tiên</option><option>Khẩn cấp</option><option>Cao</option><option>Bình thường</option><option>Thấp</option>
+      </select>
+      <select id="fType" class="h-9 w-[160px] border rounded-md px-2 text-sm bg-white">
+        <option value="">Tất cả loại</option><option>Hạ tầng</option><option>Phần mềm</option><option>Khác</option>
+      </select>
+      <select id="fSource" class="h-9 w-[150px] border rounded-md px-2 text-sm bg-white">
+        <option value="">Tất cả nguồn</option><option value="techops">TechOps</option><option value="helpdesk">Helpdesk</option>
+      </select>
+      <select class="h-9 w-[150px] border rounded-md px-2 text-sm bg-white"><option>Tất cả thời hạn</option><option>Hôm nay</option><option>7 ngày tới</option><option>Quá hạn</option></select>
+    </div>
+
+    <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+    <div id="empty" class="hidden bg-white rounded-2xl border p-16 text-center text-slate-500"></div>
+  </main>
+</div>
+
+<script>
+const PRIO = { 'Khẩn cấp': '#dc2626', 'Cao': '#f97316', 'Bình thường': '#3b82f6', 'Thấp': '#94a3b8' };
+const STATUS = {
+  PENDING_APPROVAL:    ['Chờ Duyệt',      'bg-purple-50 text-purple-700 border-purple-200'],
+  WAITING_ACKNOWLEDGE: ['Chờ Tiếp Nhận', 'bg-blue-50 text-blue-700 border-blue-200'],
+  IN_PROGRESS:         ['Đang Làm',       'bg-amber-50 text-amber-700 border-amber-200'],
+  PENDING_REVIEW:      ['Chờ Review',     'bg-violet-50 text-violet-700 border-violet-200'],
+  COMPLETED:           ['Hoàn Thành',     'bg-emerald-50 text-emerald-700 border-emerald-200'],
+  CANCELLED:           ['Đã Hủy',         'bg-slate-100 text-slate-500 border-slate-200 line-through'],
+};
+// mine = Lê Minh được giao; seen = Boss đã xem (chỉ ý nghĩa với COMPLETED)
+let TASKS = [
+  { code:'#26-0458', title:'Xử lý công văn 3448/VNIC – Rà soát tên miền ".vn" và đề xuất đăng ký bảo vệ thương hiệu PMH', status:'COMPLETED', prio:'Bình thường', type:'Khác', src:'techops', imp:true,  seen:false, mine:true,  who:['LM','LN'], due:'10/10', doneAt:'07/10' },
+  { code:'#26-0461', title:'Gia hạn chứng chỉ SSL *.pmh.com.vn trước 12/2026', status:'IN_PROGRESS', prio:'Khẩn cấp', type:'Hạ tầng', src:'techops', imp:true, seen:false, mine:true, who:['LM'], due:'15/10' },
+  { code:'#26-0463', title:'Nâng cấp firewall chi nhánh Crescent Mall', status:'PENDING_REVIEW', prio:'Cao', type:'Hạ tầng', src:'techops', imp:true, seen:false, mine:false, who:['LN'], due:'14/10' },
+  { code:'HD-10233', title:'Máy in tầng 5 không nhận lệnh in từ phòng Kế toán', status:'COMPLETED', prio:'Bình thường', type:'Hạ tầng', src:'helpdesk', imp:false, seen:false, mine:false, who:['TH'], due:'09/10', doneAt:'09/10' },
+  { code:'#26-0455', title:'Viết báo cáo tổng hợp sự cố tháng 9', status:'COMPLETED', prio:'Thấp', type:'Khác', src:'techops', imp:false, seen:true, mine:true, who:['LM'], due:'05/10', doneAt:'04/10' },
+  { code:'#26-0466', title:'Triển khai module chấm công mới cho khối văn phòng', status:'WAITING_ACKNOWLEDGE', prio:'Cao', type:'Phần mềm', src:'techops', imp:false, seen:false, mine:true, who:['LM','TH'], due:'20/10' },
+  { code:'#26-0468', title:'Đánh giá phương án sao lưu dữ liệu offsite', status:'PENDING_APPROVAL', prio:'Bình thường', type:'Hạ tầng', src:'techops', imp:false, seen:false, mine:false, who:['LN'], due:'25/10' },
+  { code:'#26-0450', title:'Cập nhật hướng dẫn sử dụng VPN cho nhân viên mới', status:'CANCELLED', prio:'Thấp', type:'Khác', src:'techops', imp:true, seen:false, mine:false, who:['TH'], due:'01/10' },
+];
+
+let view = 'tasks';
+const role = () => document.getElementById('role').value;
+const isBoss = () => role() !== 'EMPLOYEE';
+// Task "chưa xem" = Hoàn thành + Boss/Admin này chưa mở chi tiết
+const unseen = t => isBoss() && t.status === 'COMPLETED' && !t.seen;
+const visibleToMe = t => isBoss() || t.mine;
+
+const VIEWS = {
+  tasks:     { icon:'☑', title:'Công việc', desc:'Tất cả công việc' },
+  important: { icon:'★', title:'Task quan trọng', desc:'Các task được đánh dấu ★' },
+  unseen:    { icon:'✓', title:'Hoàn thành – chưa xem', desc:'Nhân viên đã hoàn thành, anh/chị chưa mở xem' },
+};
+
+function renderNav() {
+  const mine = TASKS.filter(visibleToMe);
+  const impCount = mine.filter(t => t.imp && (!['COMPLETED','CANCELLED'].includes(t.status) || unseen(t))).length;
+  const unseenCount = mine.filter(unseen).length;
+  const item = (key, icon, label, badge, badgeCls, sub) => `
+    <a data-view="${key}" class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer ${sub ? 'pl-8' : ''} ${view === key ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-gray-800'}">
+      <span>${icon}</span><span class="flex-1">${label}</span>
+      ${badge ? `<span class="text-[11px] ${badgeCls} text-white rounded-full px-1.5">${badge}</span>` : ''}
+    </a>`;
+  document.getElementById('nav').innerHTML =
+    `<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300">▦ <span>Dashboard</span></a>` +
+    item('tasks', '☑', 'Tasks') +
+    item('important', '<span class="text-amber-400">★</span>', 'Quan trọng', impCount, 'bg-amber-500', true) +
+    (isBoss() ? item('unseen', '<span class="text-emerald-400">✓</span>', 'Hoàn thành – chưa xem', unseenCount, 'bg-emerald-500', true) : '') +
+    `<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300">☰ <span>Logs</span></a>
+     <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300">☎ <span>Helpdesk</span></a>`;
+  document.querySelectorAll('[data-view]').forEach(a => a.onclick = () => { view = a.dataset.view; resetStatus(); render(); });
+}
+
+function resetStatus() {
+  const s = document.getElementById('fStatus');
+  const opts = view === 'unseen'
+    ? [['COMPLETED', 'Hoàn Thành']]
+    : [['active', 'Chưa hoàn thành'], ['all', 'Tất cả trạng thái'], ...Object.entries(STATUS).map(([k, v]) => [k, v[0]])];
+  s.innerHTML = opts.map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  s.disabled = view === 'unseen';
+  s.classList.toggle('opacity-60', s.disabled);
+}
+
+function card(t) {
+  const [sl, sc] = STATUS[t.status];
+  const canStar = isBoss();   // người tạo / Boss / Admin; Lê Minh không phải người tạo nên chỉ xem
+  return `
+  <div data-code="${t.code}" class="card group relative flex flex-col rounded-xl border bg-white shadow-sm hover:shadow-lg hover:border-indigo-200 transition cursor-pointer overflow-hidden ${unseen(t) ? 'ring-2 ring-emerald-300' : ''}"
+       style="background:linear-gradient(135deg, ${PRIO[t.prio]}10 0%, transparent 35%)">
+    <div class="absolute left-0 top-0 bottom-0 w-[3px]" style="background:${PRIO[t.prio]}"></div>
+    <div class="pl-4 pr-3 pt-3 pb-3 flex flex-col h-full">
+      <div class="flex items-start justify-between mb-2.5">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="font-mono text-xs font-black text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">${t.code}</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-600">⚡ Trực tiếp</span>
+          ${t.src === 'helpdesk' ? '<span class="px-1 py-0.5 rounded bg-sky-100 text-sky-600 text-[10px] font-semibold">HD</span>' : ''}
+        </div>
+        <button data-star="${t.code}" ${canStar ? '' : 'disabled'} title="${t.imp ? 'Quan trọng' : 'Đánh dấu quan trọng'}"
+          class="star text-lg leading-none ${t.imp ? 'text-amber-500' : 'text-slate-300 ' + (canStar ? 'opacity-0 group-hover:opacity-100' : 'hidden')} ${canStar ? 'hover:scale-125' : 'cursor-default'} transition">${t.imp ? '★' : '☆'}</button>
+      </div>
+      <div class="flex items-center gap-1.5 mb-2.5 flex-wrap">
+        <span class="text-xs px-2 py-0.5 rounded-full border ${sc}">${sl}</span>
+        ${unseen(t) ? '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500 text-white">● Mới hoàn thành</span>' : ''}
+        <span class="text-[10px] text-slate-500 bg-slate-100 border px-1.5 py-0.5 rounded">${t.type}</span>
+      </div>
+      <h3 class="clamp2 flex-1 mb-3 font-semibold text-[14px] text-slate-900 leading-snug group-hover:text-indigo-700">${t.title}</h3>
+      <div class="flex items-center justify-between pt-2.5 border-t border-slate-100 text-[11px] text-slate-500">
+        <div class="flex -space-x-1.5">${t.who.map(w => `<span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 border-2 border-white grid place-items-center text-[9px] font-bold">${w}</span>`).join('')}</div>
+        <span>${t.doneAt ? '✓ Xong ' + t.doneAt : '⏱ Hạn ' + t.due}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function render() {
+  const v = VIEWS[view];
+  document.getElementById('pageIcon').textContent = v.icon;
+  document.getElementById('pageTitle').textContent = v.title;
+  document.getElementById('pageDesc').textContent = v.desc;
+  document.getElementById('markAll').classList.toggle('hidden', view !== 'unseen');
+
+  const q = document.getElementById('fSearch').value.toLowerCase();
+  const st = document.getElementById('fStatus').value;
+  const pr = document.getElementById('fPriority').value;
+  const ty = document.getElementById('fType').value;
+  const so = document.getElementById('fSource').value;
+
+  let list = TASKS.filter(visibleToMe);
+  if (view === 'important') list = list.filter(t => t.imp);
+  if (view === 'unseen')    list = list.filter(unseen);
+  // "Chưa hoàn thành" (mặc định): ẩn Hoàn thành + Đã hủy — trừ task Boss/Admin chưa xem
+  if (st === 'active') list = list.filter(t => !['COMPLETED', 'CANCELLED'].includes(t.status) || unseen(t));
+  else if (st !== 'all') list = list.filter(t => t.status === st);
+  if (q)  list = list.filter(t => t.title.toLowerCase().includes(q) || t.code.toLowerCase().includes(q));
+  if (pr) list = list.filter(t => t.prio === pr);
+  if (ty) list = list.filter(t => t.type === ty);
+  if (so) list = list.filter(t => t.src === so);
+  // Task chưa xem luôn lên đầu
+  list.sort((a, b) => unseen(b) - unseen(a));
+
+  document.getElementById('total').textContent = list.length;
+  document.getElementById('grid').innerHTML = list.map(card).join('');
+  const empty = document.getElementById('empty');
+  empty.classList.toggle('hidden', list.length > 0);
+  empty.textContent = view === 'unseen' ? '🎉 Đã xem hết các task hoàn thành' : 'Không có công việc nào';
+  renderNav();
+
+  document.querySelectorAll('[data-star]').forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    const t = TASKS.find(x => x.code === b.dataset.star); t.imp = !t.imp; render();
+  });
+  document.querySelectorAll('.card').forEach(c => c.onclick = () => {
+    const t = TASKS.find(x => x.code === c.dataset.code);
+    if (unseen(t)) { t.seen = true; flash(`Đã mở ${t.code} → tính là đã xem, task ẩn khỏi danh sách`); render(); }
+    else flash(`Mở chi tiết ${t.code}`);
+  });
+}
+
+function flash(msg) {
+  const el = document.createElement('div');
+  el.className = 'fixed bottom-6 right-6 bg-slate-900 text-white text-sm px-4 py-2 rounded-lg shadow-lg';
+  el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 2200);
+}
+
+document.getElementById('markAll').onclick = () => { TASKS.forEach(t => { if (unseen(t)) t.seen = true; }); render(); };
+['fSearch', 'fStatus', 'fPriority', 'fType', 'fSource'].forEach(id => document.getElementById(id).addEventListener('input', render));
+document.getElementById('role').onchange = () => { if (!isBoss() && view === 'unseen') view = 'tasks'; resetStatus(); render(); };
+resetStatus(); render();
+</script>
+</body>
+</html>

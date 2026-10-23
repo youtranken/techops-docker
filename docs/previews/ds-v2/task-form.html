@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Tạo công việc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="task-form.css">
+<style>
+/* Riêng trang Tạo / Sửa công việc — phần biểu mẫu dùng chung nằm ở task-form.css + task-form.js */
+#content{padding-bottom:0}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="content" id="content"><div id="mount"></div></main>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="task-form.js"></script>
+<script>
+(function(){
+  /* Trang Tạo công việc / Sửa công việc (?id=26-0019 — mã V1 YY-NNNN; mã cũ CV-1019 vẫn nhận). Biểu mẫu dựng bằng TaskForm.mount (task-form.js) — dùng chung với ngăn trượt ở Danh sách/Bảng.
+     ?from=panel: mở từ ngăn trượt, giữ nguyên dữ liệu đang nhập (sessionStorage tf-handoff). ?draft=<mã nháp>: mở nháp lưu trên trình duyệt (Phase B). */
+  var T=I18N.t, esc=App.esc, $=App.$;
+  var qs=new URLSearchParams(location.search), QID=DATA.normId(qs.get('id')||''), DID=qs.get('draft')||'';
+  var HAND=null;
+  if(qs.get('from')==='panel'){try{HAND=JSON.parse(sessionStorage.getItem('tf-handoff'))}catch(e){}try{sessionStorage.removeItem('tf-handoff')}catch(e){}}
+  var S={sc:QID?'edit':'new'}, FORM=null;
+
+  function load(){
+    if(FORM)FORM.destroy();
+    var init=S.sc==='new'&&HAND?HAND:null;
+    var did=S.sc==='new'&&!init&&DID&&TaskForm.drafts.get(DID)?DID:null;
+    FORM=TaskForm.mount($('#mount'),{mode:S.sc==='edit'?'edit':'create',id:QID,sc:S.sc,compact:false,init:init,draftId:did,draftable:!!init||!!did});
+  }
+  function dirty(){return FORM&&FORM.dirty()}
+  function leaving(){return FORM&&FORM.leaving()}
+
+  /* Rời trang khi có thay đổi chưa lưu */
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href]'); if(!a||leaving())return;
+    var href=a.getAttribute('href'); if(!href||href.charAt(0)==='#'||a.hasAttribute('data-soon')||a.target==='_blank')return;
+    if(a.getAttribute('aria-disabled')==='true'){e.preventDefault();e.stopPropagation();return;}
+    if(!dirty())return;
+    e.preventDefault(); e.stopPropagation();
+    App.confirm({title:T('tf.leave.t'),text:T('tf.leave.d'),ok:T('tf.leave.ok'),danger:true,onOk:function(){FORM.destroy();FORM=null;location.href=href;}});
+  },true);
+  addEventListener('beforeunload',function(e){if(dirty()&&!leaving()){e.preventDefault();e.returnValue='';}});
+
+  /* ---------- Kịch bản ---------- */
+  function pv(){
+    var o=[['new','tf.pv.new'],['edit','tf.pv.edit'],['invalid','tf.pv.invalid'],['server','tf.pv.server'],['files','tf.pv.files']];
+    return '<label class="pvl" for="pvSc">'+esc(T('tf.pv.sc'))+'</label><select id="pvSc">'+o.map(function(x){return '<option value="'+x[0]+'"'+(S.sc===x[0]?' selected':'')+'>'+esc(T(x[1]))+'</option>'}).join('')+'</select>';
+  }
+  App.shell({active:'tasks',crumbs:[{t:'nav.tasks',href:'tasks-list.html'},{t:'tf.title.new'}],pv:pv});
+  document.addEventListener('change',function(e){if(e.target.id==='pvSc'){S.sc=e.target.value;HAND=null;DID='';load();App.refreshPv();$('#pvSc').focus();}});
+  document.addEventListener('rolechange',function(){load();App.refreshPv();});
+  addEventListener('resize',function(){var b=$('#tfBar');document.body.style.setProperty('--tf-pv',(b?b.offsetHeight+10:20)+'px')});
+  load();
+})();
+</script>
+</body>
+</html>

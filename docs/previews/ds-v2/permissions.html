@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Phân quyền</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+/* ---------- Riêng trang Phân quyền ---------- */
+.subnav{display:flex;gap:22px;border-bottom:1px solid var(--line);margin:0 0 16px}
+.subnav a{position:relative;height:40px;display:inline-flex;align-items:center;font-size:var(--fs-md);font-weight:500;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+.subnav a:hover{color:var(--ink)}
+.subnav a[aria-current="page"]{color:var(--ink);font-weight:600}
+.subnav a[aria-current="page"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--primary);border-radius:2px 2px 0 0}
+
+/* thanh công cụ */
+.ptools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px}
+.ptools .search{width:260px}
+.ptools .sp{flex:1}
+.ptools .btn .i{color:var(--ink-3)}
+.pdesc{display:flex;align-items:baseline;gap:6px 20px;flex-wrap:wrap;margin:0 0 16px;font-size:var(--fs-sm);color:var(--ink-3)}
+.pdesc p{margin:0;flex:1 1 320px;min-width:0}
+.psum{display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--ink-2)}
+.psum span{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap}
+.psum b{font:500 var(--fs-sm)/1 var(--f-mono);color:var(--ink)}
+
+/* segmented */
+.seg3{display:inline-flex;padding:2px;gap:2px;background:var(--surface-2);border-radius:var(--r-ctl);flex:none}
+.seg3 button{height:26px;padding:0 10px;border:0;background:transparent;border-radius:6px;font-size:var(--fs-xs);font-weight:500;color:var(--ink-3);white-space:nowrap}
+.seg3 button:hover:not(:disabled){color:var(--ink)}
+.seg3 [aria-checked="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-1)}
+.seg3 [aria-checked="true"][data-v="g"]{color:var(--c-done)}
+.seg3 [aria-checked="true"][data-v="r"]{color:var(--danger)}
+.seg3 button:disabled{cursor:not-allowed;opacity:.5}
+.seg3.big button{height:30px;font-size:var(--fs-sm);padding:0 14px}
+
+/* công tắc */
+.sw{position:relative;width:34px;height:20px;border:0;border-radius:var(--r-pill);background:color-mix(in srgb,var(--ink-3) 45%,var(--surface));padding:0;flex:none;transition:background .15s}
+.sw::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow-1);transition:transform .15s}
+.sw[aria-checked="true"]{background:var(--primary)}
+.sw[aria-checked="true"]::after{transform:translateX(14px)}
+.sw:disabled{cursor:not-allowed;opacity:.35}
+html[data-theme="dark"] .sw::after{background:var(--ink)}
+
+/* ===== Ma trận theo vai trò: mỗi menu là 1 khối, cột vai trò thẳng hàng ===== */
+.pgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
+.mx{--lw:240px;--cw:116px;min-width:0}
+.mx-in{min-width:calc(var(--lw) + var(--n) * var(--cw))}
+.mx-row{display:grid;grid-template-columns:minmax(var(--lw),1fr) repeat(var(--n),var(--cw));align-items:stretch}
+.mx-row>.c1{position:sticky;left:0;z-index:1;min-width:0;background:inherit}
+.mx-head{position:sticky;top:var(--topH,60px);z-index:8;background:var(--canvas);margin:0 -2px;padding:0 2px}
+.mx-hs{overflow:hidden}
+.mx-g{background:var(--canvas)}
+.mx-g .g{display:flex;align-items:center;justify-content:center;gap:5px;margin:0 8px;padding:8px 0 5px;border-bottom:1px solid var(--line-2);font-size:11px;font-weight:500;color:var(--ink-3);white-space:nowrap}
+.mx-g .g .i{width:12px;height:12px}
+.mx-n{background:var(--canvas);border-bottom:1px solid var(--line)}
+.mx-n .c1{display:flex;align-items:flex-end;padding:0 16px 10px;font-size:var(--fs-xs);font-weight:500;color:var(--ink-3)}
+.rh{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:8px 4px 10px;text-align:center;min-width:0}
+.rh b{font-size:var(--fs-sm);font-weight:600;color:var(--ink);line-height:1.25}
+.rh small{font-size:var(--fs-xs);color:var(--ink-3);line-height:1.3}
+.rh .pl{display:inline-block;margin-top:1px;padding:1px 6px;border:1px dashed var(--line-2);border-radius:var(--r-pill);font-size:11px;color:var(--ink-2);white-space:nowrap}
+.mx-body{overflow-x:auto;overscroll-behavior-x:contain;margin:0 -2px;padding:12px 2px 2px}
+.pb{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-1);margin-bottom:10px;overflow:clip}
+.pb-h{background:var(--surface);min-height:62px}
+.pb-h>.c1{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 8px}
+.pb-tg{width:28px;height:28px;display:grid;place-items:center;border:0;background:transparent;border-radius:var(--r-sm);color:var(--ink-3);flex:none}
+.pb-tg:hover{background:var(--surface-2);color:var(--ink)}
+.pb-tg .i{width:16px;height:16px;transition:transform .15s}
+.pb-tg[aria-expanded="false"] .i{transform:rotate(-90deg)}
+.pb-tgx{width:28px;flex:none}
+.pb-ic{width:32px;height:32px;display:grid;place-items:center;border-radius:var(--r-ctl);background:var(--surface-2);color:var(--ink-2);flex:none}
+.pb-ic .i{width:17px;height:17px}
+.pb-tx{min-width:0;display:flex;flex-direction:column}
+.pb-n{display:flex;align-items:baseline;gap:8px;min-width:0}
+.pb-n b{font:600 var(--fs-md)/1.35 var(--f-head);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-n .cnt{font-size:var(--fs-xs);color:var(--ink-3);white-space:nowrap}
+.pb-tx small,.pf-tx small{font-size:var(--fs-xs);color:var(--ink-3);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-b{border-top:1px solid var(--line)}
+.pf{background:var(--surface);min-height:52px}
+.pf+.pf{border-top:1px solid var(--line)}
+.pf>.c1{display:flex;align-items:center;padding:8px 12px 8px 88px}
+.pf-tx{min-width:0;display:flex;flex-direction:column}
+.pf-tx b{font-size:var(--fs-sm);font-weight:500;color:var(--ink);line-height:1.4}
+.pb-off{display:flex;align-items:center;gap:8px;padding:9px 16px 9px 88px;border-bottom:1px solid var(--line);background:var(--surface-2);font-size:var(--fs-xs);color:var(--ink-2)}
+.pb-off .i{width:14px;height:14px;color:var(--ink-3)}
+.pb.off .pf{opacity:.5}
+.rc{display:flex;align-items:center;justify-content:center;min-width:0}
+.rc.lkc{background:color-mix(in srgb,var(--surface-2) 55%,var(--surface))}
+.rc .ok{display:inline-grid;place-items:center;color:var(--ink-3)}
+.rc .ok .i{width:16px;height:16px}
+.rc.chg{box-shadow:inset 0 -2px 0 var(--primary);background:color-mix(in srgb,var(--primary-soft) 55%,var(--surface))}
+mark{background:color-mix(in srgb,var(--amber) 35%,transparent);color:inherit;border-radius:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 20px;margin:6px 2px 0;font-size:var(--fs-xs);color:var(--ink-3)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .i{width:13px;height:13px}
+.noq{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card)}
+
+/* cột tóm tắt (màn rộng) */
+.paside{display:none}
+.sumc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-1);padding:14px 16px}
+.sumc h3{margin:0 0 12px;font:600 var(--fs-sm)/1.3 var(--f-head);color:var(--ink)}
+.sumr+.sumr{margin-top:14px}
+.sumr .tt{display:flex;align-items:baseline;gap:8px;font-size:var(--fs-sm);font-weight:500}
+.sumr .tt .pl{font-size:11px;font-weight:400;color:var(--ink-3)}
+.sumr .tt b{margin-left:auto;font:500 var(--fs-xs)/1 var(--f-mono);color:var(--ink-2)}
+.bar{height:6px;margin:7px 0 5px;border-radius:var(--r-pill);background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--primary);border-radius:inherit}
+.sumr small{display:block;font-size:var(--fs-xs);color:var(--ink-3)}
+.sumc hr{border:0;border-top:1px solid var(--line);margin:14px -16px}
+.sumc .cu{display:flex;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--ink-2)}
+.sumc .btn-link{margin:6px 0 0 -6px}
+.sumc .lg{display:flex;flex-direction:column;gap:8px;font-size:var(--fs-xs);color:var(--ink-3)}
+.sumc .lg span{display:flex;gap:8px;align-items:flex-start}
+.sumc .lg .i{width:13px;height:13px;margin-top:2px;flex:none}
+@media (min-width:1400px){
+  .pgrid{grid-template-columns:minmax(0,1fr) 264px}
+  .paside{display:flex;flex-direction:column;gap:12px;position:sticky;top:76px}
+  .pgrid .legend{display:none}
+}
+
+/* thanh lưu dính đáy */
+.savebar{position:sticky;bottom:12px;z-index:25;display:flex;align-items:center;gap:8px;margin:16px 0 0;padding:10px 10px 10px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-pop)}
+.savebar .msg{flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:var(--fs-sm);font-weight:500}
+.savebar .pd{width:8px;height:8px;border-radius:50%;background:var(--c-review);flex:none}
+body.has-save .pv{bottom:86px}
+body.has-save .toasts{bottom:140px}
+
+/* ===== Theo người dùng ===== */
+.ub{display:grid;grid-template-columns:272px minmax(0,1fr);gap:20px;align-items:start}
+.ulist{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-1);position:sticky;top:76px;max-height:calc(100dvh - 160px);display:flex;flex-direction:column}
+.ulist .search{margin:12px 12px 8px}
+.ulist ul{list-style:none;margin:0;padding:0 6px 8px;overflow-y:auto}
+.uitem{display:flex;align-items:center;gap:10px;width:100%;min-height:50px;padding:6px 10px 6px 8px;border:0;background:transparent;border-radius:var(--r-ctl);text-align:left}
+.uitem .av{width:30px;height:30px;font-size:11px}
+.uitem:hover{background:var(--surface-2)}
+.uitem[aria-current="true"]{background:var(--primary-soft)}
+.uitem .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.uitem b{font-weight:500;font-size:var(--fs-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uitem small{font-size:var(--fs-xs);color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uitem .odot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 18%,transparent)}
+.uitem .lk{color:var(--ink-3);display:inline-grid}
+.ulist .none{padding:16px 14px;font-size:var(--fs-sm);color:var(--ink-3)}
+.upick{display:none;margin-bottom:16px}
+.upanel{min-width:0;container-type:inline-size}
+.uh{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-1)}
+.uh .av{width:40px;height:40px;font-size:14px}
+.uh .tx{flex:1;min-width:0}
+.uh h2{margin:0;font:600 var(--fs-lg)/1.3 var(--f-head)}
+.uh p{margin:2px 0 0;font-size:var(--fs-sm);color:var(--ink-2);display:flex;flex-wrap:wrap;gap:0 6px;align-items:center}
+.uh p .oc{display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-weight:500}
+.uh p .oc::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.sec-h{display:flex;align-items:center;gap:10px 12px;flex-wrap:wrap;margin:22px 2px 10px}
+.sec-h:first-of-type{margin-top:4px}
+.sec-h h3{margin:0;font:600 var(--fs-md)/1.3 var(--f-head)}
+.sec-h p{flex-basis:100%;margin:0;font-size:var(--fs-xs);color:var(--ink-3)}
+.sec-h .sp{flex:1}
+.sec-h .check{font-size:var(--fs-sm);color:var(--ink-2);min-height:28px}
+.ur{display:grid;grid-template-columns:minmax(0,1fr) auto auto 32px;align-items:center;gap:12px;position:relative;background:var(--surface);min-height:54px;padding:8px 12px 8px 88px}
+.ur+.ur,.pb-b>.ur:first-child{border-top:1px solid var(--line)}
+.pb-b>.ur:first-child{border-top:0}
+.st .ur{padding-left:46px}
+.ur.hd{padding:10px 12px 10px 8px;min-height:62px}
+.ur.hd>.c1{display:flex;align-items:center;gap:10px;min-width:0}
+.ur.ov-g::before,.ur.ov-r::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c-done)}
+.ur.ov-r::before{background:var(--danger)}
+.ur.chg{background:color-mix(in srgb,var(--primary-soft) 45%,var(--surface))}
+.ur .inh{display:inline-flex;align-items:center;gap:6px;min-width:9.5em;font-size:var(--fs-xs);color:var(--ink-3);white-space:nowrap}
+.ur .inh .sdot{width:6px;height:6px}
+.on{--k:var(--c-done)} .offk{--k:var(--line-2)}
+.ur.dim>*:not(.inh){opacity:.5}
+.ur .lkx{color:var(--c-review)}
+.ur .lkn{display:inline-flex;color:var(--c-review)}
+.ur .lkn .i{width:13px;height:13px}
+.pf-tx .t1{display:flex;align-items:center;gap:6px}
+.sthd{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 8px;min-height:50px;background:var(--surface)}
+.sthd .stat{font-weight:600;color:var(--ink);font-size:var(--fs-sm)}
+.sthd .cnt{font:500 11px/1 var(--f-mono);color:var(--ink-3)}
+.lock-panel{padding:40px 24px}
+.sk-row{display:flex;align-items:center;gap:12px;height:62px;padding:0 16px;border-bottom:1px solid var(--line)}
+/* V1 — mỗi dòng: [tên + mô tả] [công tắc] */
+.vr{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;background:var(--surface);min-height:54px;padding:8px 16px 8px 88px}
+.vr.hd{padding:10px 16px 10px 8px;min-height:62px}
+.vr.hd>.c1{display:flex;align-items:center;gap:10px;min-width:0}
+.pb-b>.vr{border-top:1px solid var(--line)}
+.pb-b>.pb-off+.vr{border-top:0}
+.vr.chg{background:color-mix(in srgb,var(--primary-soft) 45%,var(--surface))}
+.pbn{display:flex;align-items:flex-start;gap:8px;margin:0 0 16px;padding:10px 14px;border:1px dashed var(--line-2);border-radius:var(--r-card);font-size:var(--fs-sm);color:var(--ink-2);background:var(--surface)}
+.pbn .phase-b{flex:none;margin-top:1px}
+.seg3 .phase-b{margin-left:6px;height:16px;font-size:10px}
+.rh .phase-b{margin-top:2px}
+.sec-h .phase-b{margin-left:2px}
+.uhint{margin:0 2px 12px;font-size:var(--fs-xs);color:var(--ink-3)}
+/* Tạm thời: agent lõi sẽ đưa .phase-b vào app.css; rule dưới chỉ là dự phòng */
+.phase-b{display:inline-flex;align-items:center;height:18px;padding:0 6px;border:1px dashed var(--amber);border-radius:var(--r-pill);font:500 11px/1 var(--f-body);color:var(--ink-2);white-space:nowrap;vertical-align:middle;letter-spacing:0}
+@container (max-width:640px){
+  .ur{grid-template-columns:minmax(0,1fr) 32px;row-gap:6px;padding-left:44px}
+  .ur.hd{padding-left:8px}
+  .ur>.c1,.ur>.pf-tx,.ur .inh{grid-column:1/-1}
+  .ur .seg3{grid-column:1;justify-self:start}
+  .ur.hd .inh,.ur.hd .seg3{margin-left:38px}
+  .st .ur{padding-left:46px}
+}
+
+@media (max-width:1023px){
+  .ub{grid-template-columns:minmax(0,1fr)}
+  .ulist{display:none}
+  .upick{display:block}
+  .pb-tx small,.pf-tx small{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+}
+@media (max-width:680px){
+  .subnav{margin:0 -16px 12px;padding:0 16px}
+  .ptools .seg3{width:100%}
+  .ptools .seg3 button{flex:1}
+  .ptools .search{flex:1;width:auto;min-width:0}
+  .ptools .sp{display:none}
+  .mx{--cw:84px}
+  .pb-h>.c1{gap:8px;padding:10px 8px 10px 4px}
+  .pb-ic{display:none}
+  .pb-n{flex-direction:column;gap:2px}
+  .pb-tx small,.pf-tx small{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .pf>.c1{padding-left:36px}
+  .pb-off{padding-left:36px}
+  .rh{padding:8px 2px 10px}
+  .rh b{font-size:var(--fs-xs)}
+  .rh small{font-size:11px}
+  .mx-n .c1{padding-left:12px}
+  .ur{padding-left:36px}
+  .st .ur{padding-left:36px}
+  .mx{--lw:150px}
+  .ur .seg3 button{padding:0 8px}
+  .vr{padding-left:36px}
+  .vr.hd{padding-left:4px}
+  .uh .btn{width:100%}
+  .savebar{bottom:8px;padding:10px;flex-wrap:wrap}
+  .savebar .msg{flex-basis:100%}
+  .savebar .btn{flex:1}
+  body.has-save .pv{bottom:124px}
+  body.has-save .toasts{bottom:178px}
+}
+@media (prefers-reduced-motion:reduce){.sw,.sw::after,.pb-tg .i{transition:none}}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="content" id="content">
+  <div class="head"><div><h1 data-t="pp.pm.title"></h1><p id="sub"></p></div></div>
+  <nav class="subnav" data-t-label="pp.subnav">
+    <a href="people.html" data-t="pp.tab.users"></a>
+    <a href="permissions.html" aria-current="page" data-t="pp.tab.perms"></a>
+  </nav>
+  <div id="mount"></div>
+</main>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="pp-data.js"></script>
+<script>
+(function(){
+  var T=I18N.t, L=I18N.L, esc=App.esc, $=App.$, $$=App.$$, AV=PPDATA.av;
+  var USERS=PPDATA.users(), MENUS=PPDATA.MENUS, COLS=PPDATA.PM_ROLES;
+  var EDIT=COLS.filter(function(c){return !c.lock}).map(function(c){return c.k});
+  /* Theo vai trò: chỉ vai trò không khoá sửa được (ADMIN/BOSS luôn toàn quyền — PermissionsTable.tsx:27, settings-guard.ts:59) */
+  function cp(o){return JSON.parse(JSON.stringify(o))}
+  function initRole(){var r={};EDIT.forEach(function(k){r[k]=cp(PPDATA.ROLE_MENU[k])});return r}
+  var SAVED_ROLE=initRole(), ROLE=cp(SAVED_ROLE);
+  /* Theo người dùng (V1): bản ghi quyền menu của từng nhân viên (null = mặc định) */
+  var SAVED_PERM=PPDATA.perms(), PERM=cp(SAVED_PERM);
+  /* PHASE B: quyền công việc riêng (UserStatusAction GRANT/REVOKE) — V1 không có hiệu lực */
+  var SAVED_OVR=PPDATA.overrides(), OVR=cp(SAVED_OVR);
+  var PB=PPDATA.pb;
+  function priv(){return PPDATA.myRole()!=='EMPLOYEE'}
+  function isAdm(){return PPDATA.myRole()==='ADMIN'}
+  var S={screen:'loading',boot:true,tab:'user',uid:null,uq:'',q:'',mode:'IMMEDIATE',all:false,col:{}};
+  /* Phase B: các khối trạng thái của quyền công việc riêng thu gọn sẵn */
+  PPDATA.STATUSES.forEach(function(st){S.col['s:'+st]=true});
+  var TOTAL=MENUS.reduce(function(n,m){return n+(m.core?0:1)+m.f.length},0);
+
+  function byId(id){return USERS.filter(function(u){return u.id===id})[0]}
+  function rL(r){return r==='MANAGER'?T('pp.px.r.MANAGER'):T('pp.role.'+r)} /* dùng chung khoá pp.role.* với people.html */
+  function mL(k){return T('pp.menu.'+k)}
+  function mD(k){return k==='tasks'?T('pp.px.core'):T('pp.md.'+k)}
+  function fL(m,f){return T('pp.feat.'+m+'.'+f)}
+  function fD(m,f){return T('pp.fd.'+m+'.'+f)}
+  function ppl(n){return n===0?T('pp.px.ppl0'):n===1?T('pp.px.ppl1'):T('pp.px.ppl',{n:n})}
+  function fold(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase().trim()}
+  function hit(s){return !S.q||fold(s).indexOf(fold(S.q))>-1}
+  function hl(s){ /* tô từ khoá tìm (bỏ dấu) */
+    var q=fold(S.q); if(!q)return esc(s); var f=fold(s), i=f.indexOf(q);
+    return i<0||f.length!==s.length?esc(s):esc(s.slice(0,i))+'<mark>'+esc(s.slice(i,i+q.length))+'</mark>'+esc(s.slice(i+q.length));
+  }
+  function sw(on,attrs,dis){return '<button type="button" role="switch" class="sw" aria-checked="'+!!on+'"'+(dis?' disabled':'')+' '+attrs+'></button>'}
+  function chev(key,label,open){return '<button type="button" class="pb-tg" data-col="'+key+'" aria-expanded="'+open+'" aria-label="'+esc(T('pp.px.toggle',{m:label}))+'">'+ic('chev-d')+'</button>'}
+  function isOpen(key){return !!S.q||!S.col[key]}
+  function hashRead(){var m=/user=([\w-]+)/.exec(location.hash);if(m&&byId(m[1])){S.tab='user';S.uid=m[1];}else if(/tab=role/.test(location.hash))S.tab='role';else S.tab='user';}
+  function hashWrite(){var h=S.tab==='role'?'#tab=role':(S.uid?'#user='+S.uid:'');history.replaceState(null,'',location.pathname+location.search+h)}
+  function roleCount(r){return USERS.filter(function(u){return u.r===r&&u.st!=='locked'}).length}
+
+  /* ================= THEO VAI TRÒ ================= */
+  function mOn(src,r,m){return src[r].menus.indexOf(m)>-1}
+  function fOn(src,r,m,f){return mOn(src,r,m)&&(src[r].feat[m]||[]).indexOf(f)>-1}
+  function onCount(src,r){var n=0;MENUS.forEach(function(m){if(m.core)return;if(mOn(src,r,m.k)){n++;m.f.forEach(function(f){if(fOn(src,r,m.k,f))n++})}});return n}
+  function roleChanges(){var n=0;EDIT.forEach(function(r){MENUS.forEach(function(m){if(m.core)return;if(mOn(ROLE,r,m.k)!==mOn(SAVED_ROLE,r,m.k))n++;m.f.forEach(function(f){if(fOn(ROLE,r,m.k,f)!==fOn(SAVED_ROLE,r,m.k,f))n++})})});return n}
+  function lockCell(label,nb){return '<div class="rc'+(nb?'':' lkc')+'"><span class="ok" role="img" aria-label="'+esc(label+': '+T('pp.px.grpLock'))+'">'+ic('check')+'</span></div>'}
+  function headHtml(){
+    var g='', i=0;
+    while(i<COLS.length){var lk=!!COLS[i].lock, j=i;while(j<COLS.length&&!!COLS[j].lock===lk)j++;
+      g+='<span class="g" style="grid-column:span '+(j-i)+'">'+(lk?ic('lock'):'')+esc(T(lk?'pp.px.grpLock':'pp.px.grpEdit'))+'</span>';i=j;}
+    var n=COLS.map(function(c){
+      return '<div class="rh" role="columnheader"><b>'+esc(rL(c.k))+'</b>'+(c.planned?PB(T('pp.px.plannedT')):'<small>'+esc(ppl(roleCount(c.k)))+'</small>')+'</div>';
+    }).join('');
+    return '<div class="mx-head" aria-hidden="false"><div class="mx-hs" id="mxHead"><div class="mx-in">'+
+      '<div class="mx-row mx-g" aria-hidden="true"><span class="c1"></span>'+g+'</div>'+
+      '<div class="mx-row mx-n"><span class="c1">'+esc(T('pp.pm.colMenu'))+'</span>'+n+'</div></div></div></div>';
+  }
+  function menuBlock(m){
+    var name=mL(m.k), desc=mD(m.k), mHit=hit(name+' '+desc);
+    var feats=m.f.filter(function(f){return mHit||hit(fL(m.k,f)+' '+fD(m.k,f))});
+    if(S.q&&!mHit&&!feats.length)return '';
+    var key='m:'+m.k, open=isOpen(key);
+    var h='<section class="pb'+(m.f.length&&!m.core&&EDIT.every(function(r){return !mOn(ROLE,r,m.k)})?' off':'')+'" aria-label="'+esc(name)+'"><div class="mx-row pb-h"><div class="c1">'+
+      (m.f.length?chev(key,name,open):'<span class="pb-tgx"></span>')+'<span class="pb-ic">'+ic(m.i)+'</span><span class="pb-tx"><span class="pb-n"><b>'+hl(name)+'</b>'+
+      (m.f.length?'<span class="cnt">'+esc(T('pp.px.nFeat',{n:m.f.length}))+'</span>':'')+'</span><small title="'+esc(desc)+'">'+hl(desc)+'</small></span></div>';
+    COLS.forEach(function(c){
+      if(c.lock||m.core){h+=lockCell(rL(c.k),!c.lock);return;}
+      var on=mOn(ROLE,c.k,m.k), chg=on!==mOn(SAVED_ROLE,c.k,m.k);
+      h+='<div class="rc'+(chg?' chg':'')+'">'+sw(on,'data-rs="'+c.k+'|'+m.k+'" aria-label="'+esc(name+' — '+rL(c.k))+'"')+'</div>';
+    });
+    h+='</div>';
+    if(m.f.length){
+      var offR=EDIT.filter(function(r){return !mOn(ROLE,r,m.k)});
+      h+='<div class="pb-b"'+(open?'':' hidden')+'>';
+      if(offR.length)h+='<div class="pb-off">'+ic('info')+'<span>'+esc(offR.length===EDIT.length?T('pp.px.menuOff'):T('pp.px.menuOffR',{r:offR.map(rL).join(', ')}))+'</span></div>';
+      feats.forEach(function(f){
+        var fl=fL(m.k,f), fd=fD(m.k,f);
+        h+='<div class="mx-row pf"><div class="c1"><span class="pf-tx"><b>'+hl(fl)+'</b><small title="'+esc(fd)+'">'+hl(fd)+'</small></span></div>';
+        COLS.forEach(function(c){
+          if(c.lock){h+=lockCell(rL(c.k));return;}
+          var mo=mOn(ROLE,c.k,m.k), on=fOn(ROLE,c.k,m.k,f), chg=on!==fOn(SAVED_ROLE,c.k,m.k,f);
+          h+='<div class="rc'+(chg?' chg':'')+'">'+sw(on,'data-rs="'+c.k+'|'+m.k+'.'+f+'" aria-label="'+esc(fl+' — '+rL(c.k))+'"',!mo)+'</div>';
+        });
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+    return h+'</section>';
+  }
+  function custUsers(){return empUsers().filter(function(u){return !!SAVED_PERM[u.id]})}
+  function asideHtml(){
+    var s='<div class="sumc"><h3>'+esc(T('pp.px.sumL'))+'</h3>'+EDIT.map(function(r){
+      var c=COLS.filter(function(x){return x.k===r})[0], a=onCount(ROLE,r);
+      var off=MENUS.filter(function(m){return !m.core&&!mOn(ROLE,r,m.k)}).map(function(m){return mL(m.k)});
+      return '<div class="sumr"><div class="tt"><span>'+esc(rL(r))+'</span>'+(c.planned?PB(T('pp.px.plannedT')):'')+'<b>'+a+'/'+TOTAL+'</b></div>'+
+        '<div class="bar" aria-hidden="true"><i style="width:'+Math.round(a/TOTAL*100)+'%"></i></div><small>'+esc(off.length?T('pp.px.off',{m:off.join(', ')}):T('pp.px.allOn'))+'</small></div>';
+    }).join('');
+    var cu=custUsers();
+    s+='<hr><div class="cu"><span class="avs">'+cu.slice(0,4).map(function(u){return AV(u)}).join('')+'</span><span>'+esc(T('pp.px.custN',{n:cu.length}))+'</span></div>'+
+      '<button type="button" class="btn-link" data-tab="user">'+esc(T('pp.px.custGo'))+ic('chev-r','i-xs')+'</button></div>';
+    s+='<div class="sumc"><div class="lg">'+legendItems().map(function(x){return '<span>'+x+'</span>'}).join('')+'</div></div>';
+    return '<aside class="paside" aria-label="'+esc(T('pp.px.sumL'))+'">'+s+'</aside>';
+  }
+  function legendItems(){return [ic('lock')+'<span>'+esc(T('pp.px.lgLock'))+'</span>',ic('info')+'<span>'+esc(T('pp.pm.lg.off'))+'</span>',ic('users')+'<span>'+esc(T('pp.pm.lg.user'))+'</span>']}
+  function noMatch(){return '<div class="noq"><div class="state">'+ic('search')+'<b>'+esc(T('pp.px.none'))+'</b><span>'+esc(T('pp.px.noneD'))+'</span><div class="acts"><button type="button" class="btn" data-x="qclear">'+esc(T('pp.px.clear'))+'</button></div></div></div>'}
+  function roleHtml(){
+    var blocks=MENUS.map(menuBlock).join('');
+    var h='<div class="pbn">'+PB()+'<span>'+esc(T('pp.pm.roleD'))+'</span></div><div class="pgrid"><div class="mx" style="--n:'+COLS.length+'">'+(blocks?headHtml()+'<div class="mx-body" id="mxBody" role="region" tabindex="-1" aria-label="'+esc(T('pp.pm.matrix'))+'"><div class="mx-in">'+blocks+'</div></div>':noMatch())+
+      '<div class="legend">'+legendItems().map(function(x){return '<span>'+x+'</span>'}).join('')+'</div></div>'+asideHtml()+'</div>';
+    var n=roleChanges();
+    return h+(n?saveBar(n,'role'):'');
+  }
+
+  /* ================= THEO NGƯỜI DÙNG ================= */
+  /* V1: chỉ Nhân viên đang hoạt động (sidebar-permissions/route.ts:65) */
+  function empUsers(){return USERS.filter(function(u){return u.r==='EMPLOYEE'&&u.st!=='locked'})}
+  function pOf(src,id){return src[id]||PPDATA.EMP_MENU}
+  function pHas(p,key){var k=key.split('.');if(k.length===1)return p.menus.indexOf(k[0])>-1;return p.menus.indexOf(k[0])>-1&&(p.feat[k[0]]||[]).indexOf(k[1])>-1}
+  function pKeys(){var a=[];MENUS.forEach(function(m){if(m.core)return;a.push(m.k);m.f.forEach(function(f){a.push(m.k+'.'+f)})});return a}
+  function menuChanges(id){var a=pOf(PERM,id),b=pOf(SAVED_PERM,id);return pKeys().filter(function(k){return pHas(a,k)!==pHas(b,k)}).length}
+  function ov(id){return OVR[id]||(OVR[id]={task:{}})}
+  function sv(id){return SAVED_OVR[id]||{task:{}}}
+  function ovCount(id,src){var o=(src||OVR)[id];return o?Object.keys(o.task).length:0}
+  function taskChanges(id){var a=ov(id).task,b=sv(id).task,ks={},n=0;Object.keys(a).concat(Object.keys(b)).forEach(function(x){ks[x]=1});Object.keys(ks).forEach(function(x){if((a[x]||'d')!==(b[x]||'d'))n++});return n}
+  function userChanges(id){return menuChanges(id)+(isAdm()?taskChanges(id):0)}
+  function eff(inh,o){return o==='g'?true:o==='r'?false:inh}
+  function seg(cur,attr,label,dis){
+    return '<div class="seg3" role="radiogroup" aria-label="'+esc(label)+'">'+[['d','pp.u.d'],['g','pp.u.g'],['r','pp.u.r']].map(function(x){
+      var on=(cur||'d')===x[0];return '<button type="button" role="radio" aria-checked="'+on+'" tabindex="'+(on?0:-1)+'" data-v="'+x[0]+'" '+attr+(dis?' disabled':'')+'>'+esc(T(x[1]))+'</button>'}).join('')+'</div>';
+  }
+  /* một dòng quyền: [tên + mô tả] [Theo vai trò: Có] [Theo vai trò|Cho phép|Thu hồi] [↺] */
+  function urow(cls,left,inh,cur,saved,attr,attrRv,label,dis){
+    return '<div class="ur '+cls+(cur?' ov-'+cur:'')+((cur||'d')!==(saved||'d')?' chg':'')+'">'+left+
+      '<span class="inh"><span class="sdot '+(inh?'on':'offk')+'" aria-hidden="true"></span>'+esc(T('pp.px.inh',{v:T(inh?'pp.u.has':'pp.u.not')}))+'</span>'+
+      seg(cur,attr,label,dis)+
+      (cur&&!dis?'<button type="button" class="icon-btn sm" '+attrRv+' aria-label="'+esc(T('pp.px.revert')+' — '+label)+'" title="'+esc(T('pp.px.revert'))+'">'+ic('undo','i-sm')+'</button>':'<span></span>')+'</div>';
+  }
+  function txt(name,desc,extra){return '<span class="pf-tx"><b class="t1">'+hl(name)+(extra||'')+'</b><small title="'+esc(desc)+'">'+hl(desc)+'</small></span>'}
+  /* V1: mỗi nhân viên một bộ công tắc menu + tính năng (PermissionsTable.tsx) */
+  function uMenus(u){
+    var cur=pOf(PERM,u.id), sav=pOf(SAVED_PERM,u.id), out='';
+    MENUS.forEach(function(m){
+      if(m.core)return;
+      var name=mL(m.k), desc=mD(m.k), mHit=hit(name+' '+desc);
+      var feats=m.f.filter(function(f){return mHit||hit(fL(m.k,f)+' '+fD(m.k,f))});
+      if(S.q&&!mHit&&!feats.length)return;
+      var key='u:'+m.k, open=isOpen(key), on=pHas(cur,m.k), chg=on!==pHas(sav,m.k);
+      var h='<section class="pb'+(on?'':' off')+'" aria-label="'+esc(name)+'"><div class="vr hd'+(chg?' chg':'')+'"><div class="c1">'+(m.f.length?chev(key,name,open):'<span class="pb-tgx"></span>')+'<span class="pb-ic">'+ic(m.i)+'</span><span class="pb-tx"><span class="pb-n"><b>'+hl(name)+'</b>'+
+        (m.f.length?'<span class="cnt">'+esc(T('pp.px.nFeat',{n:m.f.length}))+'</span>':'')+'</span><small title="'+esc(desc)+'">'+hl(desc)+'</small></span></div>'+
+        sw(on,'data-um="'+m.k+'" aria-label="'+esc(name)+'"')+'</div>';
+      if(m.f.length){
+        h+='<div class="pb-b"'+(open?'':' hidden')+'>'+(on?'':'<div class="pb-off">'+ic('info')+'<span>'+esc(T('pp.px.menuOff'))+'</span></div>');
+        feats.forEach(function(f){var k=m.k+'.'+f, fo=pHas(cur,k), fc=fo!==pHas(sav,k);
+          h+='<div class="vr'+(fc?' chg':'')+'">'+txt(fL(m.k,f),fD(m.k,f))+sw(fo,'data-um="'+k+'" aria-label="'+esc(name+' — '+fL(m.k,f))+'"',!on)+'</div>';
+        });
+        h+='</div>';
+      }
+      out+=h+'</section>';
+    });
+    return out;
+  }
+  function uTasks(u){
+    var o=ov(u.id).task, s=sv(u.id).task, out='', mode=S.mode;
+    PPDATA.STATUSES.forEach(function(st){
+      var acts=[];
+      PPDATA.ACTIONS.forEach(function(g){g[1].forEach(function(a){
+        var k=mode+'|'+st+'|'+a, rh=PPDATA.roleHas(u.r,mode,st,a);
+        if((rh||o[k]||s[k]||S.all)&&(hit(T('st.'+st))||hit(T('pp.act.'+a)+' '+T('pp.ad.'+a))))acts.push([a,k,rh]);
+      })});
+      if(!acts.length)return;
+      var key='s:'+st, open=isOpen(key), name=T('st.'+st);
+      var h='<section class="pb st" aria-label="'+esc(name)+'"><div class="sthd">'+chev(key,name,open)+'<span class="stat s-'+st+'"><span class="sdot" aria-hidden="true"></span><span>'+esc(name)+'</span></span><span class="cnt">'+esc(T('pp.u.nAct',{n:acts.length}))+'</span></div>';
+      h+='<div class="pb-b"'+(open?'':' hidden')+'>';
+      acts.forEach(function(x){
+        var lk=x[2]===2, lab=T('pp.act.'+x[0]);
+        var left=lk?'<span class="pf-tx"><b class="t1">'+hl(lab)+'<span class="lkn" title="'+esc(T('pp.u.lockT'))+'">'+ic('lock')+'</span></b><small class="lkx" title="'+esc(T('pp.u.lockD'))+'">'+esc(T('pp.u.lockD'))+'</small></span>':txt(lab,T('pp.ad.'+x[0]));
+        h+=urow('',left,x[2]>0,o[x[1]],s[x[1]],'data-ot="'+x[1]+'"','data-rv="t|'+x[1]+'"',lab+' — '+name);
+      });
+      out+=h+'</div></section>';
+    });
+    return out;
+  }
+  function filtered(){var q=fold(S.uq);return empUsers().filter(function(u){return !q||fold(u.n+' '+u.u+' '+L(u.d)).indexOf(q)>-1})}
+  function userHtml(){
+    var list=filtered();
+    var emps=empUsers();
+    if(!S.uid||!emps.some(function(u){return u.id===S.uid}))S.uid=(list[0]||emps[0]||{}).id||null;
+    var items=list.map(function(u){var c=!!SAVED_PERM[u.id];return '<li><button type="button" class="uitem" data-uid="'+u.id+'" aria-current="'+(u.id===S.uid)+'">'+AV(u)+'<span class="tx"><b>'+esc(u.n)+'</b><small>'+esc(L(u.d))+'</small></span>'+
+      (c?'<span class="odot" title="'+esc(T('pp.u.own'))+'"></span><span class="sr">'+esc(T('pp.u.own'))+'</span>':'')+'</button></li>'}).join('');
+    var left='<aside class="ulist" aria-label="'+esc(T('pp.u.pick'))+'"><label class="search">'+ic('search','i-sm')+'<span class="sr">'+esc(T('pp.u.search'))+'</span><input type="search" id="uq" value="'+esc(S.uq)+'" placeholder="'+esc(T('pp.u.search'))+'"></label>'+
+      '<ul>'+(items||'<li class="none">'+esc(T('pp.u.none'))+'</li>')+'</ul></aside>';
+    var pick='<div class="upick field"><label class="lbl" for="upick">'+esc(T('pp.u.pick'))+'</label><select class="select" id="upick">'+emps.map(function(u){return '<option value="'+u.id+'"'+(u.id===S.uid?' selected':'')+'>'+esc(u.n+(SAVED_PERM[u.id]?' · '+T('pp.u.own'):''))+'</option>'}).join('')+'</select></div>';
+    var u=list.length?byId(S.uid):null, right;
+    if(!u)right='<div class="noq"><div class="state">'+ic('search')+'<b>'+esc(T('pp.u.none'))+'</b><span>'+esc(T('pp.u.noneD'))+'</span><div class="acts"><button type="button" class="btn" data-x="uclear">'+esc(T('pp.f.clear'))+'</button></div></div></div>';
+    else{
+      var own=!!SAVED_PERM[u.id];
+      right='<div class="uh">'+AV(u)+'<div class="tx"><h2 id="uTitle" tabindex="-1">'+esc(u.n)+'</h2><p><span>'+esc(rL(u.r))+'</span><span aria-hidden="true">·</span><span>'+esc(L(u.d))+'</span>'+
+        '<span aria-hidden="true">·</span>'+(own?'<span class="oc">'+esc(T('pp.u.own'))+'</span>':'<span>'+esc(T('pp.px.uNone'))+'</span>')+'</p></div>'+
+        '<button type="button" class="btn" data-x="reset"'+(PERM[u.id]||ovCount(u.id)?'':' disabled')+'>'+ic('undo','i-sm')+'<span>'+esc(T('pp.u.reset'))+'</span></button></div>';
+      var mm=uMenus(u);
+      right+='<div class="sec-h"><h3>'+esc(T('pp.u.menus'))+'</h3><p>'+esc(T('pp.u.menusD'))+'</p></div>'+(mm||noMatch());
+      /* PHASE B — quyền công việc riêng: chỉ ADMIN (api/hr/users/[id]/permissions: requireRole ADMIN), V1 chưa có hiệu lực */
+      if(isAdm()){
+        var tt=uTasks(u);
+        right+='<div class="sec-h"><h3>'+esc(T('pp.u.tasks'))+'</h3>'+PB(T('pp.u.tasksPB'))+'<span class="sp"></span><label class="check"><input type="checkbox" id="showAll"'+(S.all?' checked':'')+'><span>'+esc(T('pp.u.showAll'))+'</span></label>'+
+          '<div class="seg3" role="radiogroup" aria-label="'+esc(T('pp.u.mode'))+'">'+PPDATA.MODES.map(function(m){var on=S.mode===m;return '<button type="button" role="radio" aria-checked="'+on+'" tabindex="'+(on?0:-1)+'" data-mode="'+m+'">'+esc(T('pp.mode.'+m))+'</button>'}).join('')+'</div>'+
+          '<p>'+esc(T('pp.u.tasksPB'))+'</p></div>'+(tt||noMatch());
+      }
+      var n=userChanges(u.id); if(n)right+=saveBar(n,'user');
+    }
+    return '<p class="uhint">'+esc(T('pp.u.empOnly'))+'</p><div class="ub">'+left+'<div class="upanel">'+pick+right+'</div></div>';
+  }
+
+  function saveBar(n,k){
+    return '<div class="savebar" role="region" aria-label="'+esc(T('pp.sv.label'))+'"><span class="msg" aria-live="polite"><span class="pd" aria-hidden="true"></span>'+esc(T('pp.sv.n',{n:n}))+'</span>'+
+      '<button type="button" class="btn" data-save="undo-'+k+'">'+ic('undo','i-sm')+'<span>'+esc(T('pp.sv.undo'))+'</span></button><button type="button" class="btn btn-p" data-save="save-'+k+'">'+esc(T('pp.sv.save'))+'</button></div>';
+  }
+
+  /* ================= KHUNG ================= */
+  function skeleton(){
+    var r='';for(var i=0;i<6;i++)r+='<div class="sk-row"><span class="sk" style="width:32px;height:32px;border-radius:8px"></span><span class="sk line" style="width:'+(i%2?'28%':'20%')+'"></span><span style="flex:1"></span><span class="sk" style="width:34px;height:20px;border-radius:99px"></span><span class="sk" style="width:34px;height:20px;border-radius:99px"></span><span class="sk circle" style="width:16px;height:16px"></span><span class="sk circle" style="width:16px;height:16px"></span></div>';
+    return '<div class="ptools"><span class="sk" style="width:240px;height:34px;border-radius:8px"></span><span class="sk" style="width:220px;height:34px;border-radius:8px"></span></div><div class="pdesc"><span class="sk line" style="width:50%"></span></div><div class="noq" aria-busy="true" aria-label="'+esc(T('app.loading'))+'">'+r+'</div>';
+  }
+  function keys(){ /* khoá gập/mở đang hiện trên tab */
+    if(S.tab==='role')return MENUS.filter(function(m){return m.f.length}).map(function(m){return 'm:'+m.k});
+    return MENUS.filter(function(m){return m.f.length&&!m.core}).map(function(m){return 'u:'+m.k}).concat(PPDATA.STATUSES.map(function(s){return 's:'+s}));
+  }
+  function toolbar(){
+    var anyClosed=!S.q&&keys().some(function(k){return S.col[k]});
+    var h='<div class="ptools"><div class="seg3 big" role="radiogroup" aria-label="'+esc(T('pp.pm.view'))+'">'+[['user','pp.pm.byUser'],['role','pp.pm.byRole']].map(function(x){var on=S.tab===x[0];return '<button type="button" role="radio" aria-checked="'+on+'" tabindex="'+(on?0:-1)+'" data-tab="'+x[0]+'">'+esc(T(x[1]))+(x[0]==='role'?PB():'')+'</button>'}).join('')+'</div>'+
+      '<label class="search">'+ic('search','i-sm')+'<span class="sr">'+esc(T('pp.px.search'))+'</span><input type="search" id="fq" value="'+esc(S.q)+'" placeholder="'+esc(T('pp.px.search'))+'"></label><span class="sp"></span>'+
+      '<button type="button" class="btn btn-sm" data-x="colall"'+(S.q?' disabled':'')+'>'+ic('expand','i-sm')+'<span>'+esc(T(anyClosed?'pp.px.expandAll':'pp.px.collapseAll'))+'</span></button></div>';
+    var sum='';
+    if(S.tab==='role')sum='<div class="psum">'+EDIT.map(function(r){return '<span><b>'+onCount(ROLE,r)+'/'+TOTAL+'</b>'+esc(T('pp.px.sumOn',{r:rL(r)}))+'</span>'}).join('')+'</div>';
+    else if(S.uid&&byId(S.uid)){var dp=pOf(PERM,S.uid),c=pKeys().filter(function(k){return pHas(dp,k)!==pHas(PPDATA.EMP_MENU,k)}).length;sum='<div class="psum"><span><b>'+c+'</b>'+esc(T('pp.px.sumU',{u:byId(S.uid).n}))+'</span></div>';}
+    return h+(S.tab==='role'?'':'<div class="pdesc"><p>'+esc(T('pp.pm.userD'))+'</p>'+sum+'</div>');
+  }
+  function focusSel(a){
+    if(!a||a===document.body)return null;
+    if(a.id)return '#'+a.id;
+    var d=a.dataset||{}, ks=['rs','um','ot','rv','uid','mode','tab','col','x','save'];
+    for(var i=0;i<ks.length;i++)if(d[ks[i]]!=null){var at=ks[i].replace(/[A-Z]/g,function(c){return '-'+c.toLowerCase()});return '[data-'+at+'="'+d[ks[i]]+'"]'+(d.v?'[data-v="'+d.v+'"]':'');}
+    return null;
+  }
+  function render(){
+    $('#sub').textContent=T('pp.pm.sub');
+    var m=$('#mount'), keep=focusSel(document.activeElement), sx=$('#mxBody')?$('#mxBody').scrollLeft:0;
+    document.body.classList.remove('has-save');
+    if(!priv()){m.innerHTML='<div class="state page">'+ic('lock')+'<h1>'+esc(T('pp.na.t'))+'</h1><p>'+esc(T('pp.na.d'))+'</p><div class="acts"><a class="btn btn-p" href="people.html">'+esc(T('pp.na.back'))+'</a></div></div>';return;}
+    if(S.screen==='loading'){m.innerHTML=skeleton();return;}
+    if(S.screen==='error'){m.innerHTML='<div class="noq"><div class="state bad" role="alert">'+ic('wifi-off')+'<b>'+esc(T('pp.err.pt'))+'</b><span>'+esc(T('pp.err.d'))+'</span><div class="acts"><button type="button" class="btn btn-p" data-x="retry">'+ic('refresh','i-sm')+'<span>'+esc(T('app.retry'))+'</span></button></div></div></div>';return;}
+    m.innerHTML=toolbar()+(S.tab==='role'?roleHtml():userHtml());
+    document.body.classList.toggle('has-save',!!$('.savebar',m));
+    var tb=$('.top'); if(tb)document.documentElement.style.setProperty('--topH',tb.offsetHeight+'px');
+    var b=$('#mxBody'), hd=$('#mxHead'); if(b&&hd){b.scrollLeft=sx;hd.scrollLeft=b.scrollLeft;b.addEventListener('scroll',function(){hd.scrollLeft=b.scrollLeft},{passive:true});}
+    if(keep){var el=$(keep,m);if(el&&!el.disabled){el.focus({preventScroll:true});if(el.type==='search'){var v=el.value.length;el.setSelectionRange(v,v)}}}
+  }
+  function load(ms){S.screen='loading';render();setTimeout(function(){S.screen='data';S.boot=false;render();App.refreshPv();},ms)}
+
+  function guard(next){ /* đổi người / đổi tab khi còn thay đổi chưa lưu */
+    var n=S.tab==='user'?(S.uid?userChanges(S.uid):0):roleChanges();
+    if(!n){next();return;}
+    App.confirm({title:T('pp.sv.leaveT',{n:n}),text:T('pp.sv.leaveD'),ok:T('pp.sv.leaveOk'),danger:1,onOk:function(){
+      if(S.tab==='role')ROLE=cp(SAVED_ROLE);else{OVR[S.uid]=cp(sv(S.uid));PERM[S.uid]=SAVED_PERM[S.uid]?cp(SAVED_PERM[S.uid]):undefined;if(!PERM[S.uid])delete PERM[S.uid];}setTimeout(next,0);}});
+  }
+
+  function pv(){
+    var cur=S.boot?'data':S.screen==='data'&&S.uq==='zzz'?'nomatch':S.screen;
+    return '<label class="pvl" for="pvScreen">'+esc(T('pp.pv.screen'))+'</label><select id="pvScreen">'+
+      [['data','pp.pv.data'],['loading','pp.pv.loading'],['nomatch','pp.pv.nomatchU'],['error','pp.pv.error']].map(function(x){return '<option value="'+x[0]+'"'+(x[0]===cur?' selected':'')+'>'+esc(T(x[1]))+'</option>'}).join('')+'</select>';
+  }
+
+  hashRead();
+  App.shell({active:'people',crumbs:[{t:'nav.people',href:'people.html'},{t:'pp.tab.perms'}],title:'pp.pm.title',pv:pv});
+
+  document.addEventListener('click',function(e){
+    var el;
+    if((el=e.target.closest('[data-rs]'))&&!el.disabled){
+      var p=el.dataset.rs.split('|'), r=ROLE[p[0]], k=p[1].split('.');
+      if(k.length===1){var i=r.menus.indexOf(k[0]);if(i>-1)r.menus.splice(i,1);else r.menus.push(k[0]);}
+      else{var l=r.feat[k[0]]||(r.feat[k[0]]=[]),j=l.indexOf(k[1]);if(j>-1)l.splice(j,1);else l.push(k[1]);}
+      render();return;}
+    if((el=e.target.closest('[data-um]'))&&!el.disabled){var pr=PERM[S.uid]||(PERM[S.uid]=cp(PPDATA.EMP_MENU)), kk=el.dataset.um.split('.');
+      if(kk.length===1){var ix=pr.menus.indexOf(kk[0]);if(ix>-1)pr.menus.splice(ix,1);else pr.menus.push(kk[0]);}
+      else{var fl=pr.feat[kk[0]]||(pr.feat[kk[0]]=[]),jx=fl.indexOf(kk[1]);if(jx>-1)fl.splice(jx,1);else fl.push(kk[1]);}
+      render();return;}
+    if((el=e.target.closest('[data-ot]'))&&!el.disabled){var t=ov(S.uid).task;if(el.dataset.v==='d')delete t[el.dataset.ot];else t[el.dataset.ot]=el.dataset.v;render();return;}
+    if((el=e.target.closest('[data-rv]'))){var q=el.dataset.rv.split('|');delete ov(S.uid).task[q[1]];render();
+      var rr=$('[data-ot="'+q[1]+'"][data-v="d"]');if(rr)rr.focus();return;}
+    if((el=e.target.closest('[data-col]'))){var c=el.dataset.col;S.col[c]=!S.col[c];render();return;}
+    if((el=e.target.closest('[data-mode]'))){S.mode=el.dataset.mode;render();return;}
+    if((el=e.target.closest('[data-tab]'))){var nt=el.dataset.tab;if(nt===S.tab)return;guard(function(){S.tab=nt;hashWrite();render();scrollTo(0,0);});return;}
+    if((el=e.target.closest('[data-uid]'))){var id=el.dataset.uid;if(id===S.uid)return;guard(function(){S.uid=id;hashWrite();render();var h=$('#uTitle');if(h&&innerWidth<1024)h.focus();});return;}
+    if((el=e.target.closest('[data-save]'))){var a=el.dataset.save;
+      if(a==='undo-role'){ROLE=cp(SAVED_ROLE);render();App.toast(T('pp.t.undone'),'info');}
+      if(a==='save-role'){var n=roleChanges();SAVED_ROLE=cp(ROLE);render();App.toast(T('pp.px.saved',{n:n}));}
+      if(a==='undo-user'){OVR[S.uid]=cp(sv(S.uid));if(SAVED_PERM[S.uid])PERM[S.uid]=cp(SAVED_PERM[S.uid]);else delete PERM[S.uid];render();App.toast(T('pp.t.undone'),'info');}
+      if(a==='save-user'){var cc=userChanges(S.uid);SAVED_OVR[S.uid]=cp(ov(S.uid));if(PERM[S.uid])SAVED_PERM[S.uid]=cp(PERM[S.uid]);else delete SAVED_PERM[S.uid];render();App.toast(T('pp.t.userSaved',{n:cc,u:byId(S.uid).n}));}
+      return;}
+    if((el=e.target.closest('[data-x]'))&&!el.disabled){var x=el.dataset.x;
+      if(x==='retry')load(600);
+      if(x==='uclear'){S.uq='';render();$('#uq')&&$('#uq').focus();}
+      if(x==='qclear'){S.q='';render();$('#fq')&&$('#fq').focus();}
+      if(x==='colall'){var ks=keys(),any=ks.some(function(k){return S.col[k]});ks.forEach(function(k){S.col[k]=!any});render();}
+      if(x==='reset'){var u=byId(S.uid);App.confirm({title:T('pp.u.resetT',{n:u.n}),text:T('pp.u.resetD'),ok:T('pp.u.resetOk'),danger:1,onOk:function(){
+        delete PERM[u.id];delete SAVED_PERM[u.id];OVR[u.id]={task:{}};SAVED_OVR[u.id]={task:{}};setTimeout(function(){render();App.toast(T('pp.t.reset',{u:u.n}))},0);}});}
+      return;}
+  });
+  /* phím mũi tên trong nhóm radio */
+  document.addEventListener('keydown',function(e){
+    if(App.dialogOpen())return;
+    var b=e.target.closest&&e.target.closest('.seg3 [role=radio]'); if(!b)return;
+    if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+    e.preventDefault(); var n=e.key==='ArrowRight'?b.nextElementSibling:b.previousElementSibling; if(n&&!n.disabled)n.click();
+  });
+  document.addEventListener('change',function(e){
+    var el=e.target;
+    if(el.id==='showAll'){S.all=el.checked;render();return;}
+    if(el.id==='upick'){var id=el.value,prev=S.uid;guard(function(){S.uid=id;hashWrite();render();});if(S.uid===prev)el.value=prev;return;}
+    if(el.id==='pvScreen'){var v=el.value;S.boot=false;if(v==='nomatch'){S.screen='data';S.tab='user';S.uq='zzz';hashWrite();}else{S.screen=v;if(S.uq==='zzz')S.uq='';}render();App.refreshPv();$('#pvScreen').focus();}
+  });
+  document.addEventListener('input',function(e){if(e.target.id==='uq'){S.uq=e.target.value;render();}if(e.target.id==='fq'){S.q=e.target.value;render();}});
+  addEventListener('hashchange',function(){hashRead();render();});
+  addEventListener('beforeunload',function(e){if((S.tab==='role'&&roleChanges())||(S.tab==='user'&&S.uid&&userChanges(S.uid))){e.preventDefault();e.returnValue='';}});
+  document.addEventListener('langchange',function(){render();App.refreshPv()});
+  document.addEventListener('rolechange',render);
+  load(350);
+})();
+</script>
+</body>
+</html>

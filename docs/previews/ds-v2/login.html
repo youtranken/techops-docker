@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TechOps · Đăng nhập</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600&family=Noto+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+/* ---------- Trang xác thực (không shell): căn giữa, 1 thẻ form ~400px ---------- */
+.au{min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:56px 16px 96px}
+.au-col{width:100%;max-width:400px;margin:auto 0}
+.au-brand{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 24px;text-decoration:none}
+.au-card{padding:28px}
+.au-card h1{margin:0 0 6px;font:600 var(--fs-xl)/1.3 var(--f-head);letter-spacing:-.015em}
+.au-lead{margin:0 0 22px;color:var(--ink-2)}
+.au-card .note{margin:0 0 20px}
+.au-card .note b{display:block;font-weight:600}
+.au-card .note .mono{font-weight:500}
+.lbl-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:0 0 6px}
+.lbl-row .lbl{margin:0}
+.lbl-row .btn-link{padding:2px 4px;margin-right:-4px}
+.pw{position:relative}
+.pw .input{padding-right:44px}
+.pw .icon-btn{position:absolute;right:1px;top:1px;width:36px;height:36px}
+.au-forgot{margin:-4px 0 0;font-size:var(--fs-sm)}
+.au-submit{width:100%;margin-top:24px}
+.au-submit .mono{font-weight:500}
+.au-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 12px;margin-top:20px;font-size:var(--fs-xs);color:var(--ink-3)}
+.au-foot .btn{height:30px;font-size:var(--fs-xs);padding:0 10px;gap:6px}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid color-mix(in srgb,currentColor 35%,transparent);border-top-color:currentColor;animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pv .pvh{font-size:var(--fs-xs);color:var(--ink-3);padding:0 8px;font-family:var(--f-mono)}
+@media (max-width:480px){
+  .au{padding-top:28px}
+  .au-card{padding:22px 18px}
+  .au-brand{margin-bottom:20px}
+}
+/* Phase B (tạm, chờ app.css có .pb-zone) */
+.pb-zone{outline:1px dashed color-mix(in srgb,var(--amber) 70%,transparent);outline-offset:2px;border-radius:var(--r-sm)}
+.note.pb-zone{outline-offset:3px}
+</style>
+</head>
+<body data-no-pvbar>
+<main class="au" id="content">
+  <div class="au-col">
+    <a class="au-brand" href="login.html"><span class="brand-mark"><i data-i="workflow" class="i-sm"></i></span><span class="brand-tx"><b data-t="app.name"></b><small data-t="app.org"></small></span></a>
+    <section class="card au-card" id="card" aria-labelledby="auT"></section>
+    <footer class="au-foot">
+      <div class="seg" id="lang" role="group" data-t-label="pv.lang"><button type="button" data-lang="vi" data-t="lang.vi"></button><button type="button" data-lang="en" data-t="lang.en"></button></div>
+      <button type="button" class="btn btn-ghost" data-theme-toggle id="themeBtn"></button>
+      <span data-t="au.foot"></span>
+    </footer>
+  </div>
+</main>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div class="pv" id="pv" role="toolbar"></div>
+
+<script src="copy.js"></script>
+<script src="ds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+(function(){
+  /* Luật lấy từ V1: src/lib/auth.ts + src/lib/rate-limit.ts — sai 5 lần (cửa sổ 5 phút, theo IP) → khoá 15 phút (SecurityConfig.rateLimit.loginMaxAttempts/lockoutMinutes);
+     phiên hết sau idleTimeoutMinutes = 30 (IdleTimeoutProvider). Quên mật khẩu: V1 không có tự phục vụ — Admin/Boss gửi link (send-reset-link, TTL 15 phút). */
+  var T=I18N.t, esc=App.esc, $=App.$;
+  var MAX=5, LOCK_MIN=15, IDLE_MIN=30, DEMO={u:'leminh',p:'Techops@2026'};
+  /* V1 LoginForm.tsx:33-35: MỌI lần đăng nhập lỗi (sai mật khẩu, tài khoản bị khoá, vượt rate limit) chỉ hiện 1 câu chung "Sai tên đăng nhập hoặc mật khẩu".
+     Báo lỗi theo loại (còn n lần, bị vô hiệu, đếm ngược) cần NextAuth trả mã lỗi riêng → Phase B (kịch bản wrongB/locked/rate). "Phiên đã kết thúc" chỉ là UI (callbackUrl ?reason=idle). */
+  var SCN=['default','loading','wrong','expired','wrongB','locked','rate'];
+  function pb(){return '<span class="phase-b" title="'+esc(T('au.pb.tip'))+'">'+esc(T('au.pb'))+'</span>'}
+  var q=new URLSearchParams(location.search).get('s');
+  var S={scn:SCN.indexOf(q)>-1?q:'default',u:'',p:'',show:false,busy:false,fails:0,note:null,lockUntil:0,forgot:false,ok:false,errU:'',errP:''};
+  var timer=null;
+
+  function mmss(sec){sec=Math.max(0,sec);return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
+  function left(){return Math.ceil((S.lockUntil-Date.now())/1000)}
+  function locked(){return S.lockUntil&&left()>0}
+
+  function noteHtml(){
+    var n=S.note; if(!n)return '';
+    if(n==='wrong')return '<div class="note bad" role="alert">'+ic('alert','i-sm')+'<div><b>'+esc(T('au.err.wrong'))+'</b></div></div>';
+    if(n==='wrongB')return '<div class="note bad pb-zone" role="alert" title="'+esc(T('au.pb.tip'))+'">'+ic('alert','i-sm')+'<div><b>'+esc(T('au.err.wrong'))+pb()+'</b>'+esc(T('au.err.left',{n:MAX-S.fails,m:LOCK_MIN}))+'</div></div>';
+    if(n==='locked')return '<div class="note bad pb-zone" role="alert" title="'+esc(T('au.pb.tip'))+'">'+ic('lock','i-sm')+'<div><b>'+esc(T('au.err.locked.t'))+pb()+'</b>'+esc(T('au.err.locked.d'))+'</div></div>';
+    if(n==='rate')return '<div class="note warn pb-zone" role="alert" title="'+esc(T('au.pb.tip'))+'">'+ic('clock','i-sm')+'<div><b>'+esc(T('au.err.rate.t',{n:MAX}))+pb()+'</b>'+App.fill('au.err.rate.d',{t:'<span class="mono" data-cd>'+mmss(left())+'</span>'})+'</div></div>';
+    if(n==='expired')return '<div class="note" role="status">'+ic('info','i-sm')+'<div>'+esc(T('au.expired',{n:IDLE_MIN}))+'</div></div>';
+    return '';
+  }
+  function field(id,label,inner,err,extra){
+    return '<div class="field">'+(extra||'<label class="lbl" for="'+id+'">'+esc(label)+'</label>')+inner+
+      '<p class="err" id="'+id+'E"'+(err?'':' hidden')+'>'+(err?ic('alert','i-xs')+'<span>'+esc(err)+'</span>':'')+'</p></div>';
+  }
+  function btnLabel(){
+    if(S.ok)return '<span class="spin" aria-hidden="true"></span><span>'+esc(T('au.ok'))+'</span>';
+    if(S.busy)return '<span class="spin" aria-hidden="true"></span><span>'+esc(T('au.submitting'))+'</span>';
+    if(locked())return ic('clock','i-sm')+'<span>'+App.fill('au.err.rate.btn',{t:'<span class="mono" data-cd>'+mmss(left())+'</span>'})+'</span>';
+    return '<span>'+esc(T('au.submit'))+'</span>';
+  }
+  function render(focus){
+    var dis=S.busy||S.ok?' disabled':'';
+    $('#card').innerHTML='<h1 id="auT">'+esc(T('au.login.t'))+'</h1><p class="au-lead">'+esc(T('au.login.d'))+'</p>'+noteHtml()+
+      '<form id="f" novalidate>'+
+        field('u',T('au.user'),'<input class="input" id="u" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="'+esc(T('au.user.ph'))+'" value="'+esc(S.u)+'" aria-describedby="uE"'+(S.errU?' aria-invalid="true"':'')+dis+'>',S.errU)+
+        field('p',T('au.pass'),'<div class="pw"><input class="input" id="p" name="password" type="'+(S.show?'text':'password')+'" autocomplete="current-password" value="'+esc(S.p)+'" aria-describedby="pE"'+(S.errP?' aria-invalid="true"':'')+dis+'>'+
+          '<button type="button" class="icon-btn" id="eye" aria-pressed="'+S.show+'" aria-label="'+esc(T(S.show?'au.hide':'au.show'))+'"'+dis+'>'+ic(S.show?'eye-off':'eye','i-sm')+'</button></div>',S.errP,
+          '<div class="lbl-row"><label class="lbl" for="p">'+esc(T('au.pass'))+'</label><button type="button" class="btn-link" id="forgot" aria-expanded="'+S.forgot+'" aria-controls="forgotNote">'+esc(T('au.forgot'))+'</button></div>')+
+        '<div class="note au-forgot" id="forgotNote"'+(S.forgot?'':' hidden')+'>'+ic('key','i-sm')+'<div>'+esc(T('au.forgot.d'))+'</div></div>'+
+        '<button type="submit" class="btn btn-p btn-lg au-submit" id="go"'+(S.busy||S.ok||locked()?' disabled':'')+' aria-live="polite">'+btnLabel()+'</button>'+
+      '</form>';
+    if(focus){var el=$(focus);if(el)el.focus();}
+    document.title=T('app.name')+' · '+T('au.login.t');
+  }
+  function tick(){
+    if(timer)clearInterval(timer);
+    if(!locked())return;
+    timer=setInterval(function(){
+      if(!locked()){clearInterval(timer);timer=null;S.lockUntil=0;S.note=null;S.fails=0;render();return;}
+      App.$$('[data-cd]').forEach(function(x){x.textContent=mmss(left())});
+    },1000);
+  }
+  function sync(){var u=$('#u'),p=$('#p');if(u)S.u=u.value;if(p)S.p=p.value;}
+
+  function apply(scn){
+    if(timer){clearInterval(timer);timer=null;}
+    S={scn:scn,u:'',p:'',show:false,busy:false,fails:0,note:null,lockUntil:0,forgot:false,ok:false,errU:'',errP:''};
+    if(scn==='loading'){S.u='leminh';S.p='••••••••••';S.busy=true;}
+    if(scn==='wrong'){S.u='leminh';S.note='wrong';}
+    if(scn==='wrongB'){S.u='leminh';S.fails=3;S.note='wrongB';}
+    if(scn==='locked'){S.u='nvhung';S.note='locked';}
+    if(scn==='rate'){S.u='leminh';S.fails=MAX;S.note='rate';S.lockUntil=Date.now()+(LOCK_MIN*60-28)*1000;}
+    if(scn==='expired'){S.note='expired';}
+    render(); tick();
+  }
+  function submit(){
+    sync(); if(S.busy||S.ok||locked())return;
+    S.errU=S.u.trim()?'':T('au.user.req'); S.errP=S.p?'':T('au.pass.req');
+    if(S.errU||S.errP){render(S.errU?'#u':'#p');return;}
+    S.busy=true; S.note=S.note==='expired'?'expired':null; render();
+    setTimeout(function(){
+      S.busy=false;
+      var u=S.u.trim().toLowerCase();
+      if(u===DEMO.u&&S.p===DEMO.p){S.ok=true;S.note=null;render();App.toast(T('au.ok'));setTimeout(function(){location.href='tasks-list.html'},1400);return;}
+      /* V1: sai mật khẩu / bị vô hiệu (nvhung) / quá số lần → cùng một câu báo lỗi chung */
+      S.fails++; S.p=''; S.note='wrong'; render('#p');
+    },900);
+  }
+
+  function pvHtml(){
+    return '<a href="index.html">'+ic('grid','i-sm')+'<span>'+esc(T('pv.index'))+'</span></a><span class="pv-sep"></span>'+
+      '<label class="pvl" for="pvScn">'+esc(T('au.pv.scn'))+'</label><select id="pvScn">'+SCN.map(function(k){return '<option value="'+k+'"'+(k===S.scn?' selected':'')+'>'+esc(T('au.scn.'+k))+'</option>'}).join('')+'</select>'+
+      '<span class="pv-sep"></span><span class="pvh">'+esc(T('au.pv.demo'))+'</span>';
+  }
+  function chrome(){
+    I18N.apply(document);
+    $('#pv').innerHTML=pvHtml(); $('#pv').setAttribute('aria-label',T('app.pv.label'));
+    App.$$('#lang [data-lang]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.lang===I18N.lang)});
+    var dark=document.documentElement.getAttribute('data-theme')==='dark', k=dark?'pv.light':'pv.dark';
+    $('#themeBtn').innerHTML=ic(dark?'sun':'moon','i-xs')+'<span>'+esc(T(k))+'</span>';
+    $('#themeBtn').setAttribute('aria-label',T('au.theme')+': '+T(k));
+  }
+
+  document.addEventListener('submit',function(e){if(e.target.id==='f'){e.preventDefault();submit();}});
+  document.addEventListener('click',function(e){
+    var el;
+    if(e.target.closest('#eye')){sync();S.show=!S.show;render('#eye');return;}
+    if(e.target.closest('#forgot')){sync();S.forgot=!S.forgot;render('#forgot');return;}
+    if((el=e.target.closest('#lang [data-lang]'))){sync();I18N.setLang(el.dataset.lang);return;}
+  });
+  document.addEventListener('input',function(e){
+    if(e.target.id==='u'&&S.errU){S.errU='';e.target.removeAttribute('aria-invalid');$('#uE').hidden=true;}
+    if(e.target.id==='p'&&S.errP){S.errP='';e.target.removeAttribute('aria-invalid');$('#pE').hidden=true;}
+  });
+  document.addEventListener('change',function(e){if(e.target.id==='pvScn'){apply(e.target.value);history.replaceState(null,'','?s='+e.target.value);chrome();$('#pvScn').focus();}});
+  document.addEventListener('langchange',function(){if(S.errU)S.errU=T('au.user.req');if(S.errP)S.errP=T('au.pass.req');render();chrome();});
+  new MutationObserver(chrome).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  document.addEventListener('DOMContentLoaded',function(){apply(S.scn);chrome();if(!S.note&&!S.busy)$('#u').focus();});
+})();
+</script>
+</body>
+</html>
