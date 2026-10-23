@@ -30,6 +30,9 @@ import { TaskListFilters, FilterChips } from './TaskListFilters';
 import { TaskListGrid, type TaskRowAction } from './TaskListGrid';
 import { TaskListModals } from './TaskListModals';
 import { TaskViewSwitch } from './TaskViewSwitch';
+import { DraftList } from './DraftList';
+import { PhaseBBadge } from '@/shared/ui/PhaseBBadge';
+import { useDrafts } from '../TaskForm/useDrafts';
 import { TaskBoard, type PendingDrop } from './TaskBoard';
 import { useBoardData } from './useBoardData';
 import { useTaskListState } from './useTaskListState';
@@ -88,12 +91,15 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
   const { state, update, apiFilters, tracking } = useTaskListState(role);
   const searchParams = useSearchParams();
   const mode = resolveViewMode(searchParams.get('mode'), rememberedMode);
-  const board = mode === 'board';
+  // Tab "Nháp trên máy này" (A2-4b, Phase B): ?view=drafts — thuần client (localStorage), không gọi API danh sách
+  const draftsView = searchParams.get('view') === 'drafts';
+  const board = mode === 'board' && !draftsView;
   const modals = useTaskListModals();
   const [fOpen, setFOpen] = React.useState(false);
   const fBtn = React.useRef<HTMLButtonElement>(null);
 
-  const { data, isLoading, isError, refetch } = useTaskList(apiFilters, { enabled: !board });
+  const { data, isLoading, isError, refetch } = useTaskList(apiFilters, { enabled: !board && !draftsView });
+  const drafts = useDrafts(currentUserId);
   const bd = useBoardData(apiFilters, tracking, board);
   const fetching = useIsFetching({ queryKey: ['tasks'] });
   const [pending, setPending] = React.useState<PendingDrop | null>(null);
@@ -104,11 +110,11 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
   const toggleStar = useToggleImportant();
 
   const listTasks = data?.data ?? [];
-  const pagination = board ? undefined : data?.pagination;
+  const pagination = board || draftsView ? undefined : data?.pagination;
   /** Việc đang hiển thị (cho hộp thoại + ‹ › của ngăn chi tiết) */
   const tasks = board ? bd.tasks : listTasks;
   const total = board ? (bd.loading ? undefined : bd.total) : pagination?.total;
-  const tab = activeTab(state);
+  const tab = draftsView ? 'drafts' : activeTab(state);
   const nFilters = filterCount(state);
   const filtered = nFilters > 0 || !!state.search;
   const sortKey = normalizedSortKey(state);
@@ -162,6 +168,7 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
     }
   }
 
+  const openCreate = (draftId: string | null = null) => { modals.setCreateDraftId(draftId); modals.setShowCreate(true); };
   const tabCount = (k: ListTab) =>
     k === 'starred' ? counters?.important : k === 'unseen' ? counters?.unseen : k === tab ? total : undefined;
 
@@ -193,7 +200,7 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
               <span className="max-[680px]:sr-only">{t('tl.seenAll._')}</span>
             </Button>
           )}
-          <Button type="button" size="md" onClick={() => modals.setShowCreate(true)} className="max-[680px]:h-11">
+          <Button type="button" size="md" onClick={() => openCreate()} className="max-[680px]:h-11" data-testid="tl-new">
             <Plus aria-hidden />{t('page.new')}
           </Button>
         </div>
@@ -201,7 +208,11 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
 
       {/* ── Tab + công cụ ───────────────────────────────────────────────── */}
       <div className="mb-4 flex items-end gap-4 border-b border-line max-[1399px]:block max-[1399px]:border-b-0">
-        <Tabs value={tab} onValueChange={(v) => update(tabUpdate(v as ListTab))} className="min-w-0 flex-1">
+        <Tabs
+          value={tab}
+          onValueChange={(v) => update(v === 'drafts' ? { view: 'drafts', status: undefined, page: undefined } : tabUpdate(v as ListTab))}
+          className="min-w-0 flex-1"
+        >
           <TabsList
             aria-label={t('tlx.views')}
             className="border-b-0 max-[1399px]:border-b max-[680px]:-mx-4 max-[680px]:px-4"
@@ -211,9 +222,12 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
                 {t(TAB_LABEL[k])}
               </TabsTrigger>
             ))}
+            <TabsTrigger value="drafts" count={drafts.length} className="max-[680px]:h-11" data-testid="tab-drafts">
+              {t('dr.tab')}<PhaseBBadge />
+            </TabsTrigger>
           </TabsList>
         </Tabs>
-        <div className="flex flex-none items-center gap-2 pb-2 max-[1399px]:pt-3 max-[1399px]:pb-0">
+        <div className={cn('flex flex-none items-center gap-2 pb-2 max-[1399px]:pt-3 max-[1399px]:pb-0', draftsView && 'hidden')}>
           <SearchBox value={state.search} onChange={onSearch} />
           <Button
             ref={fBtn}
@@ -246,10 +260,12 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
         </div>
       </div>
 
-      {fOpen && (
+      {fOpen && !draftsView && (
         <TaskListFilters state={state} priorities={priorities} taskTypes={taskTypes} onUpdate={update} onClose={closeFilters} />
       )}
-      <FilterChips state={state} priorities={priorities} taskTypes={taskTypes} onUpdate={update} />
+      {!draftsView && <FilterChips state={state} priorities={priorities} taskTypes={taskTypes} onUpdate={update} />}
+
+      {draftsView && <DraftList userId={currentUserId} drafts={drafts} onOpen={(id) => openCreate(id)} />}
 
       {tab === 'cancelled' && role !== 'ADMIN' && (
         <p className="mb-3 flex items-center gap-2 text-[13px] text-ink-2">
@@ -259,7 +275,7 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
       )}
 
       {/* ── Bảng Kanban (A2-4a) | Danh sách ─────────────────────────────── */}
-      {board ? (
+      {draftsView ? null : board ? (
         <TaskBoard
           columns={bd.columns}
           error={bd.error}
@@ -274,7 +290,7 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
           onShowMore={bd.showMore}
           onOpenColumn={(col: BoardCol) => update({ ...modeUpdate('list'), status: col, view: undefined })}
           onShowDone={() => update(tabUpdate('done'))}
-          onCreate={() => modals.setShowCreate(true)}
+          onCreate={() => openCreate()}
         />
       ) : (
       <TaskListGrid
@@ -288,7 +304,7 @@ export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) 
         selectedId={modals.quickViewTaskId}
         filtered={filtered}
         onClearFilters={nFilters ? () => update(clearFiltersUpdate(state)) : undefined}
-        onCreateClick={() => modals.setShowCreate(true)}
+        onCreateClick={() => openCreate()}
         onAction={onAction}
         onSort={(v) => update(sortUpdate(v, tracking))}
       />

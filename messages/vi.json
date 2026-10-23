@@ -256,6 +256,38 @@
       "start": "Đang kéo thẻ {id}. Chỉ cột {s} nhận thẻ."
     }
   },
+  "dr": {
+    "ask": {
+      "d": "Bạn đã nhập một số nội dung. Lưu nháp để làm tiếp sau; nháp chỉ lưu trên trình duyệt này.",
+      "d2": "Nháp có thay đổi chưa lưu.",
+      "discard": "Bỏ",
+      "discard2": "Bỏ thay đổi",
+      "keep": "Tiếp tục sửa",
+      "t": "Lưu thành bản nháp?",
+      "t2": "Lưu thay đổi vào nháp?"
+    },
+    "del": {
+      "d": "Nội dung nháp sẽ mất và không khôi phục được.",
+      "t": "Xóa nháp này?"
+    },
+    "empty": {
+      "d": "Đang tạo việc mà đóng ngăn giữa chừng, bạn có thể lưu nháp. Nháp chưa phải công việc, chưa có mã và chỉ nằm trên trình duyệt này.",
+      "t": "Chưa có bản nháp"
+    },
+    "local": "Chỉ lưu trên trình duyệt này",
+    "menu": {
+      "_": "Thao tác cho nháp “{t}”",
+      "open": "Mở nháp"
+    },
+    "saved": "Lưu {w}",
+    "tab": "Nháp trên máy này",
+    "toast": {
+      "deleted": "Đã xóa nháp.",
+      "reopen": "Mở lại",
+      "saved": "Đã lưu nháp trên máy này."
+    },
+    "untitled": "(Chưa có tiêu đề)"
+  },
   "due": {
     "doneOnTime": "Xong đúng hạn",
     "in": "Còn {n} ngày",
@@ -786,10 +818,202 @@
       "type": "“{f}” không đúng định dạng. Chỉ nhận PDF, JPG, PNG, Word, Excel, PowerPoint.",
       "undo": "Hoàn tác"
     },
+    "backTask": "Về chi tiết công việc",
+    "boss": {
+      "h": "Dành cho Vice Manager và Admin"
+    },
+    "busy": {
+      "create": "Đang tạo công việc…",
+      "save": "Đang lưu thay đổi…"
+    },
+    "crumb": {
+      "edit": "Sửa"
+    },
+    "draft": {
+      "del": "Xóa nháp",
+      "note": "Nháp chỉ lưu trên trình duyệt này, chưa có mã việc và chưa gửi cho ai. Bấm Tạo công việc để tạo thật.",
+      "save": "Lưu nháp",
+      "title": "Nháp trên máy này"
+    },
+    "due": {
+      "ext": "Đổi hạn sẽ tự từ chối {n} đơn gia hạn đang chờ."
+    },
+    "e": {
+      "desc": "Nhập mô tả công việc.",
+      "descMax": "Mô tả tối đa {n} ký tự ({x}/{n}).",
+      "due": "Chọn hạn hoàn thành.",
+      "dueOrder": "Hạn hoàn thành phải từ ngày bắt đầu trở đi.",
+      "people": "Chọn ít nhất 1 người làm.",
+      "server": {
+        "d": "Máy chủ không phản hồi. Nội dung bạn nhập vẫn còn nguyên, hãy thử lại sau ít phút.",
+        "t": "Chưa lưu được công việc"
+      },
+      "start": "Chọn ngày bắt đầu.",
+      "sum": "Còn {n} mục cần sửa trước khi lưu.",
+      "title": "Nhập tiêu đề.",
+      "titleMax": "Tiêu đề tối đa {n} ký tự ({x}/{n})."
+    },
+    "ed": {
+      "b": "In đậm (Ctrl+B)",
+      "i": "In nghiêng (Ctrl+I)",
+      "ol": "Danh sách số",
+      "toolbar": "Định dạng",
+      "u": "Gạch chân (Ctrl+U)",
+      "ul": "Danh sách chấm"
+    },
+    "f": {
+      "desc": {
+        "_": "Mô tả",
+        "ph": "Cần làm gì, yêu cầu ra sao, kết quả mong đợi…"
+      },
+      "due": "Hạn hoàn thành",
+      "mode": "Chế độ quy trình",
+      "people": "Người làm",
+      "start": "Ngày bắt đầu",
+      "title": {
+        "_": "Tiêu đề",
+        "ph": "Ví dụ: Cấp quyền VPN cho chi nhánh Đà Nẵng"
+      },
+      "type": "Loại công việc"
+    },
+    "force": {
+      "_": "Bắt buộc",
+      "d": "Người làm không được từ chối hay chuyển giao việc này.",
+      "off": "Chỉ bật được khi chọn Phê duyệt."
+    },
+    "full": "Mở dạng trang đầy đủ",
+    "fx": {
+      "bossApproval": "Việc giữ nguyên trạng thái hiện tại; xong việc sẽ qua nghiệm thu.",
+      "forceOff": "Đã tắt Bắt buộc vì chỉ dùng được với Phê duyệt.",
+      "noReview": "Từ giờ người làm báo cáo xong là việc hoàn tất, không qua nghiệm thu.",
+      "toApproval": "Việc quay về Chờ duyệt, Vice Manager hoặc Admin cần duyệt lại.",
+      "toWait": "Lưu xong, việc bỏ qua bước duyệt và chuyển sang Chờ nhận việc."
+    },
+    "leave": {
+      "d": "Những gì bạn vừa nhập sẽ mất.",
+      "ok": "Rời trang",
+      "t": "Rời trang mà không lưu?"
+    },
+    "mode": {
+      "approval": {
+        "d": {
+          "boss": "Bạn bỏ qua duyệt, vẫn nghiệm thu sau.",
+          "emp": "Vice Manager hoặc Admin duyệt trước và nghiệm thu."
+        }
+      },
+      "direct": {
+        "d": "Giao ngay, báo cáo xong là hoàn tất."
+      },
+      "lock": {
+        "acked": "Chỉ chuyển sang Phê duyệt được khi việc còn Chờ nhận việc và chưa ai nhận.",
+        "approved": "Chỉ chuyển về Trực tiếp được khi việc còn Chờ duyệt.",
+        "notCreator": "Chỉ người tạo việc, Vice Manager hoặc Admin mới đổi được chế độ.",
+        "review": "Việc đang chờ nghiệm thu nên không chuyển về Trực tiếp được."
+      }
+    },
+    "na": {
+      "approved": "Việc theo Phê duyệt đã được duyệt nên kế hoạch bị khoá. Chỉ Vice Manager hoặc Admin sửa được.",
+      "closed": "Việc đã ở trạng thái {s} nên không sửa được nữa.",
+      "other": "Chỉ Admin, Vice Manager, người tạo việc hoặc người đang làm việc Trực tiếp mới sửa được.",
+      "review": "Việc đang Chờ nghiệm thu nên không sửa được.",
+      "t": "Bạn không sửa được việc này"
+    },
     "paste": {
       "alt": "Ảnh vừa dán",
       "ok": "Thêm vào tệp đính kèm",
       "t": "Đính kèm ảnh vừa dán"
+    },
+    "people": {
+      "added": "{n} người mới sẽ cần bấm Nhận việc",
+      "creator": "Người tạo",
+      "declined": "Đã từ chối",
+      "lockHint": "Người đã nhận việc và người tạo việc không gỡ được.",
+      "locked": "Đã nhận việc",
+      "n": "Đã chọn {n} người",
+      "none": "Không có ai tên “{q}”.",
+      "search": "Tìm theo tên",
+      "you": "(bạn)"
+    },
+    "save": "Lưu thay đổi",
+    "sec": {
+      "content": "Nội dung",
+      "setup": "Thiết lập"
+    },
+    "star": {
+      "_": "Đánh dấu quan trọng",
+      "d": "Hiện trong mục Quan trọng, dùng chung cho Vice Manager và Admin."
+    },
+    "sub": {
+      "by": "Tạo bởi {a}",
+      "new": "Mô tả việc bên trái, chọn người làm và hạn bên phải."
+    },
+    "sum": {
+      "approval": "Sẽ gửi yêu cầu duyệt cho Vice Manager và Admin",
+      "changes": "{n} thay đổi chưa lưu",
+      "give": "Sẽ giao ngay cho {a}",
+      "move": "Lưu xong, việc chuyển sang",
+      "n": "{n} người",
+      "nochange": "Chưa có thay đổi",
+      "none": "Chọn người làm để tạo việc",
+      "self": "Giao cho chính bạn, không cần bấm Nhận việc",
+      "skip": "Bỏ qua bước duyệt, giao ngay cho {a}",
+      "start": "Bắt đầu ở",
+      "you": "bạn"
+    },
+    "title": {
+      "edit": "Sửa công việc",
+      "new": "Tạo công việc"
+    },
+    "toast": {
+      "created": "Đã tạo {id}, việc đang ở “{s}”.",
+      "err": "Chưa lưu được. Thử lại sau ít phút.",
+      "nochange": "Chưa có thay đổi nào để lưu.",
+      "saved": "Đã lưu thay đổi cho {id}."
+    },
+    "ty": {
+      "acc": "Tài khoản",
+      "hw": "Phần cứng",
+      "net": "Mạng",
+      "oth": "Khác",
+      "sec": "Bảo mật",
+      "sup": "Hỗ trợ",
+      "sw": "Phần mềm"
+    }
+  },
+  "tfx": {
+    "ask": {
+      "edit": {
+        "d": "Những thay đổi bạn vừa nhập sẽ mất.",
+        "t": "Đóng mà không lưu?"
+      }
+    },
+    "draft": {
+      "nf": {
+        "d": "Nháp có thể đã bị xóa hoặc được lưu trên trình duyệt khác.",
+        "t": "Không tìm thấy nháp"
+      },
+      "noFiles": "Tệp đính kèm không được lưu trong nháp. Khi mở lại nháp cần đính kèm lại.",
+      "saveErr": "Không lưu được nháp trên trình duyệt này."
+    },
+    "e": {
+      "priority": "Chọn mức ưu tiên.",
+      "type": "Chọn loại công việc."
+    },
+    "ed": {
+      "hr": "Đường kẻ ngang"
+    },
+    "editOf": "Sửa {id}",
+    "force": {
+      "direct": "Chỉ có hiệu lực khi chọn Phê duyệt."
+    },
+    "mode": {
+      "fixed": "Không đổi được chế độ ở bước này."
+    },
+    "people": {
+      "loading": "Đang tải danh sách…"
+    },
+    "sum": {
+      "dirty": "Có thay đổi chưa lưu"
     }
   },
   "tl": {

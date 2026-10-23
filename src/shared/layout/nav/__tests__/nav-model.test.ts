@@ -117,6 +117,8 @@ describe('buildCrumbs — breadcrumb từ pathname', () => {
     ['/tasks', 'important', [{ label: 'nav.tasks', href: '/tasks' }, { label: 'nav.starred' }]],
     ['/tasks', 'unseen', [{ label: 'nav.tasks', href: '/tasks' }, { label: 'nav.unseen' }]],
     ['/tasks/ck123', null, [{ label: 'nav.tasks', href: '/tasks' }, { taskId: 'ck123', mono: true }]],
+    ['/tasks', 'drafts', [{ label: 'nav.tasks', href: '/tasks' }, { label: 'dr.tab' }]],
+    ['/tasks/new', null, [{ label: 'nav.tasks', href: '/tasks' }, { label: 'tf.title.new' }]],
     ['/helpdesk', null, [{ label: 'nav.helpdesk' }]],
     ['/analytics', null, [{ label: 'nav.reports' }]],
     ['/analytics/task-list', null, [{ label: 'nav.reports', href: '/analytics' }, { label: 'nav.sub.taskList' }]],

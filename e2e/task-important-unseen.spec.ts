@@ -46,16 +46,17 @@ test.describe.serial('V2 — ★ Quan trọng & Hoàn thành chưa xem', () => {
     await page.getByRole('button', { name: 'Tạo công việc' }).first().click();
     const sheet = page.getByRole('dialog');
 
-    await sheet.getByPlaceholder('Nhập tiêu đề công việc...').fill(TITLE);
+    // V2 A2-4b: biểu mẫu Tạo trong ngăn trượt mới
+    await sheet.locator('#tf-title').fill(TITLE);
     const editor = sheet.locator('[contenteditable]');
     await editor.click();
     for (const line of LONG_LINES) { await page.keyboard.type(line); await page.keyboard.press('Enter'); }
 
     // ★ chỉ Boss/Admin thấy
-    const star = sheet.getByRole('button', { name: /Đánh dấu quan trọng/ });
-    await expect(star).toHaveAttribute('aria-pressed', 'false');
-    await star.click();
-    await expect(star).toHaveAttribute('aria-pressed', 'true');
+    const star = sheet.locator('#tf-star');
+    await expect(star).not.toBeChecked();
+    await star.check();
+    await expect(star).toBeChecked();
 
     // Người thực hiện: bỏ Boss (mặc định), chọn nhân viên E2E
     await sheet.locator('label', { hasText: '(bạn)' }).locator('input').uncheck();
@@ -63,9 +64,9 @@ test.describe.serial('V2 — ★ Quan trọng & Hoàn thành chưa xem', () => {
 
     // Loại công việc + Ưu tiên: form chọn sẵn mặc định
     const end = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
-    await sheet.locator('input[type="date"]').nth(1).fill(end);
+    await sheet.locator('#tf-due').fill(end);
 
-    await sheet.getByRole('button', { name: 'Tạo công việc' }).click();
+    await sheet.getByTestId('tf-submit').click();
     await expect(sheet).toBeHidden({ timeout: 20_000 });
 
     const t = await findTask(page, TITLE);

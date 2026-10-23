@@ -256,6 +256,38 @@
       "start": "Dragging {id}. Only the {s} column accepts it."
     }
   },
+  "dr": {
+    "ask": {
+      "d": "You’ve entered some details. Save a draft to finish later; it’s kept in this browser only.",
+      "d2": "The draft has unsaved changes.",
+      "discard": "Discard",
+      "discard2": "Discard changes",
+      "keep": "Keep editing",
+      "t": "Save as a draft?",
+      "t2": "Save changes to the draft?"
+    },
+    "del": {
+      "d": "The draft will be gone for good.",
+      "t": "Delete this draft?"
+    },
+    "empty": {
+      "d": "If you close the New task panel halfway, you can save a draft. A draft isn’t a task yet, has no ID and lives only in this browser.",
+      "t": "No drafts"
+    },
+    "local": "Saved in this browser only",
+    "menu": {
+      "_": "Actions for draft “{t}”",
+      "open": "Open draft"
+    },
+    "saved": "Saved {w}",
+    "tab": "Drafts on this device",
+    "toast": {
+      "deleted": "Draft deleted.",
+      "reopen": "Reopen",
+      "saved": "Draft saved on this device."
+    },
+    "untitled": "(Untitled)"
+  },
   "due": {
     "doneOnTime": "Done on time",
     "in": "Due in {n}d",
@@ -786,10 +818,202 @@
       "type": "“{f}” isn’t supported. Use PDF, JPG, PNG, Word, Excel or PowerPoint.",
       "undo": "Undo"
     },
+    "backTask": "Back to task",
+    "boss": {
+      "h": "Vice Managers and Admins"
+    },
+    "busy": {
+      "create": "Creating task…",
+      "save": "Saving changes…"
+    },
+    "crumb": {
+      "edit": "Edit"
+    },
+    "draft": {
+      "del": "Delete draft",
+      "note": "This draft lives only in this browser, has no task ID and hasn’t been sent. Click Create task to create it for real.",
+      "save": "Save draft",
+      "title": "Draft on this device"
+    },
+    "due": {
+      "ext": "Changing the date auto-declines {n} pending extension request(s)."
+    },
+    "e": {
+      "desc": "Describe the task.",
+      "descMax": "Description can be up to {n} characters ({x}/{n}).",
+      "due": "Pick a due date.",
+      "dueOrder": "The due date can’t be before the start date.",
+      "people": "Pick at least one assignee.",
+      "server": {
+        "d": "The server didn’t respond. Everything you entered is still here. Try again in a moment.",
+        "t": "Couldn’t save the task"
+      },
+      "start": "Pick a start date.",
+      "sum": "{n} fields need fixing before you can save.",
+      "title": "Enter a title.",
+      "titleMax": "Title can be up to {n} characters ({x}/{n})."
+    },
+    "ed": {
+      "b": "Bold (Ctrl+B)",
+      "i": "Italic (Ctrl+I)",
+      "ol": "Numbered list",
+      "toolbar": "Formatting",
+      "u": "Underline (Ctrl+U)",
+      "ul": "Bulleted list"
+    },
+    "f": {
+      "desc": {
+        "_": "Description",
+        "ph": "What needs doing, any requirements, the expected result…"
+      },
+      "due": "Due date",
+      "mode": "Workflow",
+      "people": "Assignees",
+      "start": "Start date",
+      "title": {
+        "_": "Title",
+        "ph": "e.g. Grant VPN access for the Da Nang branch"
+      },
+      "type": "Type"
+    },
+    "force": {
+      "_": "Mandatory",
+      "d": "Assignees can’t decline or transfer this task.",
+      "off": "Only available with Approval."
+    },
+    "full": "Open full page",
+    "fx": {
+      "bossApproval": "It keeps its current status and will be reviewed at the end.",
+      "forceOff": "Mandatory was turned off because it only works with Approval.",
+      "noReview": "From now on, the task is done as soon as everyone reports. No review.",
+      "toApproval": "It goes back to Awaiting approval for a Vice Manager or Admin to re-approve.",
+      "toWait": "After saving, it skips approval and moves to Waiting to accept."
+    },
+    "leave": {
+      "d": "What you’ve entered will be lost.",
+      "ok": "Leave page",
+      "t": "Leave without saving?"
+    },
+    "mode": {
+      "approval": {
+        "d": {
+          "boss": "You skip approval; still reviewed at the end.",
+          "emp": "A Vice Manager or Admin approves first and signs off."
+        }
+      },
+      "direct": {
+        "d": "Assigned now, done once reported."
+      },
+      "lock": {
+        "acked": "It can switch to Approval only while it’s waiting and nobody has accepted.",
+        "approved": "It can switch to Direct only while it awaits approval.",
+        "notCreator": "Only the creator, a Vice Manager or an Admin can change the workflow.",
+        "review": "It’s awaiting review, so it can’t switch to Direct."
+      }
+    },
+    "na": {
+      "approved": "This Approval task has been approved, so its plan is locked. Only a Vice Manager or Admin can edit it.",
+      "closed": "It’s {s}, so it can no longer be edited.",
+      "other": "Only Admins, Vice Managers, the creator, or someone working on a Direct task can edit it.",
+      "review": "The task is in review, so it can’t be edited.",
+      "t": "You can’t edit this task"
+    },
     "paste": {
       "alt": "Pasted image",
       "ok": "Add to attachments",
       "t": "Attach pasted image"
+    },
+    "people": {
+      "added": "{n} new people will need to accept",
+      "creator": "Creator",
+      "declined": "Declined",
+      "lockHint": "People who accepted, and the creator, can’t be removed.",
+      "locked": "Accepted",
+      "n": "{n} selected",
+      "none": "No one matches “{q}”.",
+      "search": "Search by name",
+      "you": "(you)"
+    },
+    "save": "Save changes",
+    "sec": {
+      "content": "Details",
+      "setup": "Setup"
+    },
+    "star": {
+      "_": "Star this task",
+      "d": "Shows under Starred, shared by Vice Managers and Admins."
+    },
+    "sub": {
+      "by": "Created by {a}",
+      "new": "Describe the work on the left, pick assignees and dates on the right."
+    },
+    "sum": {
+      "approval": "Will be sent to Vice Managers and Admins for approval",
+      "changes": "Unsaved changes: {n}",
+      "give": "Will be assigned to {a} right away",
+      "move": "After saving, it moves to",
+      "n": "{n} people",
+      "nochange": "No changes yet",
+      "none": "Pick assignees to create the task",
+      "self": "Assigned to yourself, no need to accept",
+      "skip": "Skips approval, assigned to {a} right away",
+      "start": "Starts in",
+      "you": "you"
+    },
+    "title": {
+      "edit": "Edit task",
+      "new": "New task"
+    },
+    "toast": {
+      "created": "Created {id}, now in “{s}”.",
+      "err": "Couldn’t save. Try again in a moment.",
+      "nochange": "There’s nothing to save yet.",
+      "saved": "Saved changes to {id}."
+    },
+    "ty": {
+      "acc": "Accounts",
+      "hw": "Hardware",
+      "net": "Network",
+      "oth": "Other",
+      "sec": "Security",
+      "sup": "Support",
+      "sw": "Software"
+    }
+  },
+  "tfx": {
+    "ask": {
+      "edit": {
+        "d": "The changes you just made will be lost.",
+        "t": "Close without saving?"
+      }
+    },
+    "draft": {
+      "nf": {
+        "d": "It may have been deleted or saved in another browser.",
+        "t": "Draft not found"
+      },
+      "noFiles": "Attachments aren’t saved in drafts. Add them again when you reopen the draft.",
+      "saveErr": "Couldn’t save the draft in this browser."
+    },
+    "e": {
+      "priority": "Pick a priority.",
+      "type": "Pick a type."
+    },
+    "ed": {
+      "hr": "Horizontal line"
+    },
+    "editOf": "Edit {id}",
+    "force": {
+      "direct": "Only takes effect with Approval."
+    },
+    "mode": {
+      "fixed": "The workflow can’t be changed at this stage."
+    },
+    "people": {
+      "loading": "Loading people…"
+    },
+    "sum": {
+      "dirty": "Unsaved changes"
     }
   },
   "tl": {

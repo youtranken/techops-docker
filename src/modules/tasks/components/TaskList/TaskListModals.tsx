@@ -2,8 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Users } from 'lucide-react';
-import { CreateTaskSheet } from '../CreateTask/CreateTaskSheet';
-import { EditTaskModal } from '../TaskModals/EditTaskModal';
+import { TaskFormDrawer } from '../TaskForm/TaskFormDrawer';
 import { CompleteTaskModal } from '../../actions/components/modals/CompleteTaskModal';
 import { TransferModal } from '../../actions/components/modals/TransferModal';
 import { ReasonModal } from '../../actions/components/modals/ReasonModal';
@@ -34,6 +33,7 @@ interface TaskListModalsProps {
   currentUserId: string;
   role: string;
   showCreate: boolean;
+  createDraftId: string | null;
   editingTask: string | null;
   quickViewTaskId: string | null;
   completeTaskId: string | null;
@@ -48,6 +48,7 @@ interface TaskListModalsProps {
   approveExtState: { taskId: string; extId: string } | null;
   confirmState: { kind: ListConfirmKind; taskId: string } | null;
   setShowCreate: (v: boolean) => void;
+  setCreateDraftId: (v: string | null) => void;
   setEditingTask: (v: string | null) => void;
   setQuickViewTaskId: (v: string | null) => void;
   setCompleteTaskId: (v: string | null) => void;
@@ -65,10 +66,10 @@ interface TaskListModalsProps {
 
 export function TaskListModals({
   tasks, currentUserId, role,
-  showCreate, editingTask, quickViewTaskId,
+  showCreate, createDraftId, editingTask, quickViewTaskId,
   completeTaskId, transferTaskId, rejectTaskId, rejectReviewId,
   cancelTaskId, restoreTaskId, supplementTaskId, rejectPlanTaskId, extensionTaskId, approveExtState, confirmState,
-  setShowCreate, setEditingTask, setQuickViewTaskId,
+  setShowCreate, setCreateDraftId, setEditingTask, setQuickViewTaskId,
   setCompleteTaskId, setTransferTaskId, setRejectTaskId, setRejectReviewId,
   setCancelTaskId, setRestoreTaskId, setSupplementTaskId, setRejectPlanTaskId, setExtensionTaskId, setApproveExtState, setConfirmState,
 }: TaskListModalsProps) {
@@ -107,8 +108,15 @@ export function TaskListModals({
 
   return (
     <>
-      <CreateTaskSheet open={showCreate} onClose={() => setShowCreate(false)} />
-      <EditTaskModal taskId={editingTask} onClose={() => setEditingTask(null)} />
+      {/* V2 A2-4b: Tạo / Sửa trong ngăn trượt phải (nháp Tạo việc chỉ lưu trên trình duyệt) */}
+      <TaskFormDrawer
+        open={showCreate}
+        mode="create"
+        draftId={createDraftId}
+        onClose={() => { setShowCreate(false); setCreateDraftId(null); }}
+        onReopenDraft={(id) => { setCreateDraftId(id); setShowCreate(true); }}
+      />
+      <TaskFormDrawer open={!!editingTask} mode="edit" taskId={editingTask} onClose={() => setEditingTask(null)} />
 
       {/* V2 A2-1: ngăn xem nhanh mới (‹ › theo thứ tự danh sách đang hiển thị) */}
       <TaskDetailDrawer

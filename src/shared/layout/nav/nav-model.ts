@@ -231,8 +231,10 @@ export function buildCrumbs(pathname: string, view?: string | null): Crumb[] {
       if (!b) {
         if (view === 'important') return [{ label: 'nav.tasks', href: '/tasks' }, { label: 'nav.starred' }];
         if (view === 'unseen') return [{ label: 'nav.tasks', href: '/tasks' }, { label: 'nav.unseen' }];
+        if (view === 'drafts') return [{ label: 'nav.tasks', href: '/tasks' }, { label: 'dr.tab' }];
         return [{ label: 'nav.tasks' }];
       }
+      if (b === 'new' && seg.length === 2) return [{ label: 'nav.tasks', href: '/tasks' }, { label: 'tf.title.new' }];
       if (seg.length === 2) return [{ label: 'nav.tasks', href: '/tasks' }, { taskId: b, mono: true }];
       return [{ label: 'nav.tasks', href: '/tasks' }];
     case 'helpdesk':
