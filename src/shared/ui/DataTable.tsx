@@ -39,7 +39,10 @@ export interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
   /** id dòng đang chọn (viền trái màu chính) */
   selectedId?: string;
+  /** Lớp thêm cho từng dòng (vd tô dòng cần chú ý) */
+  rowClassName?: (row: T) => string | false | null | undefined;
   className?: string;
+  'data-testid'?: string;
 }
 
 const track = (c: { width?: string }) => c.width ?? 'minmax(0,1fr)';
@@ -65,7 +68,8 @@ function FullRow({ children }: { children: React.ReactNode }) {
 }
 
 export function DataTable<T>({
-  ariaLabel, columns, rows, getRowId, loading = false, skeletonRows = 6, error, onRetry, empty, onRowClick, selectedId, className,
+  ariaLabel, columns, rows, getRowId, loading = false, skeletonRows = 6, error, onRetry, empty, onRowClick, selectedId, rowClassName, className,
+  'data-testid': testId,
 }: DataTableProps<T>) {
   const g = gridTemplates(columns);
   const style = { '--cols-xl': g.xl, '--cols-lg': g.lg, '--cols-md': g.md } as React.CSSProperties;
@@ -93,7 +97,7 @@ export function DataTable<T>({
         <div
           key={id}
           role="row"
-          className={cn('v2-tr', selectedId === id && 'is-sel')}
+          className={cn('v2-tr', selectedId === id && 'is-sel', rowClassName?.(row))}
           tabIndex={onRowClick ? 0 : undefined}
           onClick={onRowClick ? () => onRowClick(row) : undefined}
           onKeyDown={
@@ -117,7 +121,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div role="table" aria-label={ariaLabel} aria-busy={loading || undefined} className={cn('v2-tbl', className)} style={style}>
+    <div role="table" aria-label={ariaLabel} aria-busy={loading || undefined} className={cn('v2-tbl', className)} style={style} data-testid={testId}>
       <div role="rowgroup">
         <div role="row" className="v2-thead">
           {columns.map((c) => (

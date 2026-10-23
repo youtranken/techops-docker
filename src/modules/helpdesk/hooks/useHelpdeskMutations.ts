@@ -1,6 +1,13 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toApiError, ApiError } from '@/lib/errors';
+import { countBulkFailures } from '../components/HelpdeskPage/hd-logic';
+
+/** Lỗi gán/xoá hàng loạt: `failed` = số ticket không thành công (giao diện tự dịch) */
+export class BulkError extends ApiError {
+  constructor(public failed: number) { super(`${failed} ticket thất bại`, 'BULK_PARTIAL'); }
+}
 
 export function useAssignHelpdesk() {
   const qc = useQueryClient();
@@ -11,8 +18,8 @@ export function useAssignHelpdesk() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ assigneeId }),
       });
-      const json = await res.json() as { error?: { message: string } };
-      if (!res.ok) throw new Error(json.error?.message ?? 'Khong the gan IT Support');
+      const json = await res.json().catch(() => null) as { error?: { message: string } } | null;
+      if (!res.ok) throw toApiError(json, 'Không thể gán IT Support', res.status);
       return json;
     },
     onSuccess: () => {
@@ -29,7 +36,7 @@ export function useDeleteHelpdesk() {
       const res = await fetch(`/api/integrations/helpdesk/unassigned/${id}`, {
         method: 'DELETE',
       });
-      if (!res.ok && res.status !== 204) throw new Error('Khong the xoa ticket');
+      if (!res.ok && res.status !== 204) throw toApiError(await res.json().catch(() => null), 'Không thể xóa ticket', res.status);
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['helpdesk-pending'] });
@@ -51,10 +58,11 @@ export function useBulkAssignHelpdesk() {
           }),
         ),
       );
-      const failed = results.filter((r) => r.status === 'rejected').length;
-      if (failed > 0) throw new Error(`${failed} ticket gán thất bại`);
+      // V1 chỉ đếm lỗi mạng → HTTP 4xx/5xx bị báo "thành công". V2 đếm cả HTTP lỗi.
+      const failed = countBulkFailures(results);
+      if (failed > 0) throw new BulkError(failed);
     },
-    onSuccess: () => {
+    onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['helpdesk-pending'] });
       void qc.invalidateQueries({ queryKey: ['helpdesk-filter-options'] });
     },
@@ -68,10 +76,10 @@ export function useBulkDeleteHelpdesk() {
       const results = await Promise.allSettled(
         ids.map((id) => fetch(`/api/integrations/helpdesk/unassigned/${id}`, { method: 'DELETE' })),
       );
-      const failed = results.filter((r) => r.status === 'rejected').length;
-      if (failed > 0) throw new Error(`${failed} ticket xóa thất bại`);
+      const failed = countBulkFailures(results);
+      if (failed > 0) throw new BulkError(failed);
     },
-    onSuccess: () => {
+    onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['helpdesk-pending'] });
       void qc.invalidateQueries({ queryKey: ['helpdesk-filter-options'] });
     },

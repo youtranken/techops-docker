@@ -20,12 +20,13 @@ async function saveConfig(patch: Partial<Pick<CronConfig, 'enabled' | 'hour' | '
   return json;
 }
 
-export function useHelpdeskCronConfig() {
+export function useHelpdeskCronConfig(enabled = true) {
   const qc = useQueryClient();
 
   const query = useQuery({
     queryKey: ['helpdesk-cron-config'],
     queryFn:  fetchConfig,
+    enabled,
   });
 
   const mutation = useMutation({

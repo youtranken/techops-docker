@@ -448,6 +448,344 @@
     "label": "Task workflow",
     "mine": "{n} on you"
   },
+  "hd": {
+    "act": {
+      "assign": "Assign",
+      "create": "Create task",
+      "del": "Delete"
+    },
+    "as": {
+      "err": "Choose a handler",
+      "hintMatch": "Preselected from Helpdesk IT Support: {n}.",
+      "hintNoMatch": "IT Support “{n}” doesn’t match any user. Pick someone.",
+      "hintNone": "This ticket has no IT Support in Helpdesk.",
+      "label": "Handler",
+      "pick": "Choose a handler"
+    },
+    "attn": {
+      "t": "Needs attention"
+    },
+    "bulk": {
+      "clear": "Clear selection",
+      "label": "Bulk actions",
+      "n": "{n} tickets selected"
+    },
+    "col": {
+      "as": "Handler",
+      "at": "Created",
+      "req": "Requester",
+      "status": "Helpdesk status",
+      "ticket": "Ticket"
+    },
+    "cron": {
+      "errEmpty": "Enter a time",
+      "errSame": "Same time as slot 1",
+      "last": "Last scheduled run: {t} · {r}",
+      "off": "Off",
+      "s1": "Time slot 1",
+      "s2": "Time slot 2 (optional)",
+      "save": "Save schedule",
+      "short": "Scheduled: {t}",
+      "sub": "Pull data from Helpdesk daily, up to 2 time slots",
+      "sum": "Every day at {t} (Vietnam time).",
+      "sumOff": "Scheduled sync is off. Data is only pulled when you click “Sync now”.",
+      "time": "Run at",
+      "title": "Sync schedule"
+    },
+    "dlg": {
+      "bAssign": {
+        "d": "Each ticket becomes a Done task assigned to the same person.",
+        "ok": "Assign and create {n} tasks",
+        "t": "Assign {n} tickets"
+      },
+      "bCreate": {
+        "d": "The handler comes from Helpdesk IT Support. Only completed tickets whose IT Support matches a user get a task; the rest are skipped.",
+        "t": "Create tasks for {n} tickets?"
+      },
+      "create": {
+        "d": "The task is created as Done and assigned to this person. The completion date comes from Helpdesk.",
+        "t": "Create task from ticket"
+      },
+      "del": {
+        "d": "The ticket is removed from the queue and this can’t be undone. If it still exists in Helpdesk, the next sync brings it back."
+      },
+      "del1": {
+        "t": "Delete ticket {id}?"
+      },
+      "delN": {
+        "ok": "Delete {n} tickets",
+        "t": "Delete {n} tickets?"
+      }
+    },
+    "dr": {
+      "label": "Ticket details"
+    },
+    "empty": {
+      "dBoss": "Click “Sync now” to pull tickets from Helpdesk.",
+      "dEmp": "Tickets will show up here after the next sync.",
+      "t": "No tickets yet"
+    },
+    "err": {
+      "timeout": "Could not reach the Helpdesk API: ETIMEDOUT"
+    },
+    "f": {
+      "all": "All",
+      "apply": "Apply",
+      "clear": "Clear filters",
+      "errRange": "End date must be after start date",
+      "from": "From",
+      "it": "IT Support",
+      "itNone": "No IT Support",
+      "remove": "Remove filter {f}",
+      "title": "Filter tickets",
+      "to": "To"
+    },
+    "hist": {
+      "btn": "History",
+      "empty": "No syncs yet.",
+      "line": "{a} new tasks · {b} awaiting assignment · {c} skipped · {f} fetched",
+      "sub": "Last 5 runs",
+      "title": "Sync history"
+    },
+    "imp": {
+      "api": "Helpdesk API",
+      "apiD": "Calls the Helpdesk system directly; only this year’s tickets.",
+      "apiErrD": "Nothing was imported. Try again in a few minutes, or paste JSON taken from Helpdesk.",
+      "apiErrT": "The Helpdesk API isn’t responding",
+      "apiNote": "TechOps calls the Helpdesk API and shows new, duplicate and invalid tickets before anything is imported.",
+      "apiNoteV1": "TechOps calls the Helpdesk API and imports right away: completed tickets whose IT Support matches a person become tasks; the rest go to the waiting list.",
+      "bNote": "Previewing before import (dry run) isn’t in V1 and needs a new API.",
+      "back": "Back",
+      "btn": "Import",
+      "check": "Check data",
+      "doneT": "Import finished. The run is recorded in sync history.",
+      "e": {
+        "big": "Up to 500 tickets at a time (found {n})",
+        "empty": "Paste JSON data above",
+        "json": "Invalid JSON, check the syntax",
+        "row": "Row is not a ticket",
+        "title": "Missing title"
+      },
+      "errDetail": "Error details",
+      "fetch": "Fetch and preview",
+      "fetching": "Calling the Helpdesk API…",
+      "fetchingD": "Up to 15 seconds. Nothing has been saved yet.",
+      "fetchingV1": "Up to 15 seconds. Data is imported as soon as it arrives.",
+      "go": "Import {n} tickets",
+      "json": "Paste JSON",
+      "jsonD": "Use when the API is down: paste a response taken from Helpdesk.",
+      "jsonL": "JSON data",
+      "next": "Continue",
+      "nothing": "No new tickets to import.",
+      "p": {
+        "dup": "Already exists, skip",
+        "dupD": "Ticket is already in TechOps",
+        "err": "Errors",
+        "errD": "Can’t be imported, see below",
+        "new": "Create task now",
+        "newD": "Completed, and IT Support matches a user",
+        "wait": "Add to queue",
+        "waitD": "Not completed or handler unclear"
+      },
+      "prevApi": "Helpdesk returned {n} tickets; {f} not from this year were dropped.",
+      "prevJson": "The data has {n} tickets.",
+      "prevNote": "Nothing is saved yet. Import to write to TechOps.",
+      "preview": "Preview",
+      "r": {
+        "dup": "Skipped",
+        "dupD": "Already existed",
+        "err": "Errors",
+        "new": "New tasks",
+        "newD": "Created as Done",
+        "wait": "Awaiting assignment",
+        "waitD": "Added to the queue"
+      },
+      "runApi": "Fetch and import",
+      "runJson": "Import data",
+      "running": "Importing…",
+      "runningD": "Creating tasks and updating the queue.",
+      "s1": "Source",
+      "s2": "Preview",
+      "s3": "Result",
+      "sample": "Paste sample",
+      "srcL": "Get data from",
+      "steps": "Steps",
+      "title": "Import Helpdesk data",
+      "useJson": "Paste JSON instead"
+    },
+    "it": {
+      "nomatch": "No matching TechOps user",
+      "none": "None"
+    },
+    "kv": {
+      "created": "Created",
+      "desc": "Description",
+      "done": "Completed",
+      "imp": "Imported",
+      "it": "Handler",
+      "itHd": "Helpdesk says: {n}",
+      "noTask": "Not created",
+      "req": "Requester",
+      "sync": "Sync",
+      "task": "Task",
+      "type": "Request type",
+      "upd": "Updated"
+    },
+    "loadErr": {
+      "d": "Check your connection and try again.",
+      "t": "Couldn’t load tickets"
+    },
+    "mode": {
+      "auto": "Scheduled",
+      "manual": "Manual"
+    },
+    "more": "More actions",
+    "na": {
+      "back": "Back to overview",
+      "d": "Ask a Vice Manager or an Admin to grant you the Helpdesk menu in Permissions.",
+      "t": "You don’t have access to Helpdesk"
+    },
+    "none": {
+      "_": "No tickets",
+      "attn": "No tickets need attention",
+      "d": "Try removing filters or changing the search."
+    },
+    "note": {
+      "attn": "This ticket is completed in Helpdesk but has no IT Support, so there is no matching task.",
+      "attnBoss": "This ticket is completed in Helpdesk but has no IT Support, so no task could be created. Pick a handler to create one.",
+      "nomatch": "IT Support “{n}” in Helpdesk doesn’t match any TechOps user. Pick a handler when creating the task.",
+      "pushed": "Task {id} was created from this ticket."
+    },
+    "openTask": "Open task {id}",
+    "pb": {
+      "_": "Phase B",
+      "bulk": "V1 only has “Push all to tasks”. Creating tasks for just the selected tickets is Phase B.",
+      "s": "B",
+      "tip": "Phase B: needs a new backend or a logic change from V1"
+    },
+    "pg": {
+      "next": "Next page",
+      "per": "{n} / page",
+      "prev": "Previous page",
+      "range": "{a} of {n} tickets",
+      "size": "Tickets per page"
+    },
+    "push": {
+      "d": "Creates tasks for {n} completed tickets that have an IT Support. Tickets that already have a task are skipped; no task is created when the IT Support doesn’t match a person.",
+      "menu": "Push all to tasks",
+      "ok": "Push to tasks",
+      "res": "Created {a} tasks · skipped {b} (already exist) · {c} with no matching person",
+      "t": "Push tickets to tasks?"
+    },
+    "res": {
+      "err": "{n} errors",
+      "line": "{a} new tasks · {b} awaiting assignment · {c} skipped"
+    },
+    "reset": {
+      "adminOnly": "Only an Admin can do this.",
+      "done": "Deleted {t} tasks and {p} tickets",
+      "e6": "The code has 6 digits",
+      "eBad": "Code is wrong or has expired",
+      "l1": "{n} tasks sourced from Helpdesk, with assignees and activity logs",
+      "l2": "All {n} tickets in the list",
+      "l3": "The sync schedule and sync history are kept",
+      "menu": "Reset data…",
+      "ok": "Delete data",
+      "otpL": "Verification code",
+      "otpTo": "To confirm, a 6-digit code will be sent to {e}, valid for 10 minutes.",
+      "resend": "Resend code",
+      "send": "Send code",
+      "sending": "Sending code…",
+      "sent": "Verification code sent to {e}",
+      "step2": "Enter the 6-digit code sent to {e}.",
+      "title": "Reset Helpdesk data",
+      "warn": "This permanently deletes data and can’t be undone."
+    },
+    "search": "Search HD code, title, requester",
+    "selOne": "Select {id}",
+    "selPage": "Select all tickets on this page",
+    "src": "Helpdesk ticket",
+    "st": {
+      "approved": "Approved",
+      "closed": "Closed",
+      "done": "Completed",
+      "pending": "Pending",
+      "progress": "In progress",
+      "rejected": "Rejected"
+    },
+    "sub": {
+      "_": "{n} tickets from Helpdesk, {m} without a task",
+      "attn": "{n} tickets from Helpdesk, {m} without a task, {a} need attention"
+    },
+    "sync": {
+      "btn": "Sync now",
+      "btnRun": "Syncing…",
+      "failed": "Sync failed",
+      "label": "Helpdesk sync",
+      "last": "Last synced {t} · {m}",
+      "running": "Fetching data from Helpdesk…",
+      "runningD": "This can take up to 15 seconds. You can keep browsing."
+    },
+    "tabs": "Ticket groups",
+    "title": "Helpdesk",
+    "toast": {
+      "bAssign": "Created {n} tasks for {p}",
+      "bCreate": "Created {a} tasks, skipped {b} tickets",
+      "created": "Created task {id} from {hd}",
+      "cron": "Sync schedule saved: {t}",
+      "cronOff": "Scheduled sync turned off",
+      "del1": "Deleted ticket {id}",
+      "delN": "Deleted {n} tickets",
+      "export": "Exporting {n} tickets to Excel…",
+      "imported": "Import finished: {r}",
+      "synced": "Sync finished: {r}"
+    },
+    "view": {
+      "all": "All",
+      "attn": "Needs attention",
+      "open": "No task yet",
+      "pushed": "Task created"
+    }
+  },
+  "hdx": {
+    "as": {
+      "loading": "Loading people…"
+    },
+    "bulk": {
+      "fail": "{n} tickets failed"
+    },
+    "cron": {
+      "loadErr": "Couldn’t load the sync schedule."
+    },
+    "export": {
+      "err": "Couldn’t export to Excel"
+    },
+    "hist": {
+      "loadErr": "Couldn’t load sync history."
+    },
+    "imp": {
+      "errList": "Tickets with errors",
+      "failD": "The server reported the error below. Check the data or try again later.",
+      "failT": "Import failed",
+      "jsonH": "An array of tickets or '{ success, data: [...] }', up to 500 tickets at a time."
+    },
+    "note": {
+      "pushed": "A task was created from this ticket."
+    },
+    "push": {
+      "d": "Creates tasks for every completed ticket in the list that has an IT Support. Tickets that already have a task are skipped; no task is created when the IT Support doesn’t match a person.",
+      "err": "Errors on tickets: {ids}"
+    },
+    "reset": {
+      "otpTo": "To confirm, a 6-digit code will be sent to your email.",
+      "sent": "Verification code sent to your email",
+      "step2": "Enter the 6-digit code sent to your email."
+    },
+    "sync": {
+      "never": "Never synced"
+    },
+    "total": "{n} tickets from Helpdesk in total"
+  },
   "idle": {
     "d": "You’ve been inactive for almost {m} minutes. Signing out in",
     "expired": {

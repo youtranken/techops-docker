@@ -36,6 +36,8 @@ export function cleanupE2E() {
     DELETE FROM "TaskAuditLog" WHERE "performedById" IN (SELECT id FROM "User" WHERE username IN (${usernames}));
     DELETE FROM "UserActivityLog" WHERE "userId" IN (SELECT id FROM "User" WHERE username IN (${usernames}));
     DELETE FROM "Notification" WHERE title LIKE '[E2E]%';
+    -- ticket Helpdesk chèn trong E2E (helpdesk-v2.spec.ts)
+    DELETE FROM "HelpdeskPendingTask" WHERE "hdId" LIKE 'E2E-%' OR "tieuDe" LIKE '[E2E]%';
     DELETE FROM "User" WHERE username IN (${usernames});
     -- mức ưu tiên tạo trong E2E (chưa gắn task nào)
     DELETE FROM "Priority" WHERE name LIKE '[E2E]%'
