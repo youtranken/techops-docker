@@ -51,7 +51,8 @@ tasks/
   components/
     TaskList/                     # Danh sách task V2 (A2-3) — bảng + bộ lọc + menu ⋯
     TaskDetail/                   # Chi tiết task V2 — DÙNG CHUNG cho trang /tasks/[id] (TaskDetailPage) và ngăn xem nhanh (TaskDetailDrawer)
-    TaskModals/                   # Các modal (tạo, sửa, xóa, v.v.)
+    TaskForm/                     # Biểu mẫu Tạo / Sửa V2 (A2-4b) — ngăn trượt + trang /tasks/new + nháp localStorage
+    CreateTask/                   # còn lại: attachment-rules.ts, usePasteImage.ts, useRichEditor.ts (dùng chung)
     ActionModals/                 # Modals cho các action workflow
     action-buttons/               # Nút hành động theo trạng thái
     Comments/                     # Bình luận
@@ -143,3 +144,12 @@ Xem `config/taskActionMatrix.ts` — đây là nguồn sự thật duy nhất ch
 - Luật kéo thả (đã chốt): chỉ tiến 1 bước, đúng vai trò; thả → mở hộp thoại A2-2 (không gọi API); Đóng/hủy → thẻ về chỗ cũ (`pending` trong `TaskListClient` giữ bản sao thẻ ở cột đích tới khi hộp đóng + bảng tải lại). Không kéo lùi/hủy/sắp thứ tự; không có cột Nháp. Tắt kéo khi ≤680px hoặc không có chuột chính xác → nút hành động trên thẻ + menu ⋯ (cũng là lối bàn phím).
 - Ánh xạ: Chờ duyệt→Chờ nhận việc = Duyệt (Boss/Admin) · Chờ nhận việc→Đang làm = Nhận việc (người làm PENDING) · Đang làm→Chờ nghiệm thu (Phê duyệt, hoặc người làm đang REVISION_REQUIRED) / →Đã xong (Trực tiếp) = Báo cáo hoàn thành (người làm) · Chờ nghiệm thu→Đã xong = Nghiệm thu (Boss/Admin). Nhiều người làm: việc chỉ đổi cột khi mọi người xong (service V1).
 - E2E `e2e/task-board-v2.spec.ts`.
+
+## Tạo / Sửa công việc V2 (A2-4b)
+
+- `components/TaskForm/`: `TaskFormDrawer` (ngăn trượt phải 720px, `mode='create'|'edit'`; mở từ `TaskListModals` và `DetailActions`), `TaskFormPage` (trang `/tasks/new`, `?draft=<id>`, `?from=panel` nhận dữ liệu + tệp từ ngăn qua `handoff.ts`), `TaskFormFields` (ô: tiêu đề, mô tả soạn thảo V1 `useRichEditor`, Thiết lập, tệp `AttachmentField`), `useTaskForm` (state + tải tệp + gọi `useCreateTask`/`useUpdateTask`), `ChoiceDialog` (hỏi khi đóng).
+- Logic thuần + test: `form-logic.ts` — `blankCreateValues` (mặc định V1), `editValuesFromTask`, `validateForm` (chạy CHÍNH zod `create-task.schema`/`update-task.schema`, chỉ đổi chữ lỗi sang khoá i18n), `createPayload`/`updatePayload` (body GIỐNG HỆT V1 — đối chiếu `__tests__/v1-form.fixture.ts`), `lockedAssignees` (người tạo + người đã tiếp nhận không gỡ được), `omitUnchangedImportant`, `initialStatus` (bản sao `resolveInitialStatus` để hiện dòng "Bắt đầu ở…"), `canSwitchWorkflow`, `isFormDirty`.
+- Nháp (Phase B): `draft-store.ts` — CHỈ localStorage, khoá `techops.taskDrafts:<userId>` = `{v:1, items:[{id, ts, f}]}`; JSON hỏng / khác version / storage ném lỗi → coi như rỗng, không vỡ; không lưu tệp. `useDrafts(userId)` (useSyncExternalStore, sự kiện `techops:drafts` + `storage`). KHÔNG tạo việc DRAFT trong DB (V1 không có luồng này). Tạo thành công từ nháp → xoá nháp.
+- Danh sách: tab "Nháp trên máy này" (`?view=drafts`, nhãn Phase B) = `TaskList/DraftList.tsx`; bấm nháp → ngăn Tạo có sẵn dữ liệu; ⋯ Mở nháp · Mở trang đầy đủ · Xóa nháp. Tab này không gọi API danh sách.
+- Đóng ngăn Tạo khi có thay đổi (Esc / bấm nền / ×) → [Bỏ][Tiếp tục sửa][Lưu nháp]; ngăn Sửa → [Bỏ thay đổi][Tiếp tục sửa] (không có nháp sửa). Trang `/tasks/new` có thay đổi mà rời trang → hỏi (link trong app + beforeunload).
+- Đổi luật kiểm tra / payload / mặc định ở `form-logic.ts` = đổi nghiệp vụ → Phase B.

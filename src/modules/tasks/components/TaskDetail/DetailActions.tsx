@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { useErrorMessage } from '@/lib/useErrorMessage';
 import { TaskActionModals } from '../../actions/components/buttons/TaskActionPanel';
 import { useToggleImportant } from '../../hooks/useTaskTracking';
-import { EditTaskModal } from '../TaskModals/EditTaskModal';
+import { TaskFormDrawer } from '../TaskForm/TaskFormDrawer';
 import type { DetailActionKey } from './detail-logic';
 import type { TaskDetailModel } from './useTaskDetailModel';
 
@@ -153,7 +153,7 @@ export function DetailModals({ model }: { model: TaskDetailModel }) {
         taskAssignees={task.assignees}
         task={{ code: task.taskCode, title: task.title, workflowMode: task.workflowMode }}
       />
-      <EditTaskModal taskId={model.editOpen ? task.id : null} onClose={() => model.setEditOpen(false)} />
+      <TaskFormDrawer open={model.editOpen} mode="edit" taskId={task.id} onClose={() => model.setEditOpen(false)} />
     </>
   );
 }

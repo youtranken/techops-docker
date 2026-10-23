@@ -5,6 +5,8 @@ export type ListConfirmKind = 'acknowledge' | 'approve-plan' | 'approve-review';
 
 export function useTaskListModals() {
   const [showCreate,       setShowCreate]       = useState(false);
+  /** Mở ngăn Tạo việc từ nháp (localStorage) — A2-4b */
+  const [createDraftId,    setCreateDraftId]    = useState<string | null>(null);
   const [editingTask,      setEditingTask]      = useState<string | null>(null);
   const [quickViewTaskId,  setQuickViewTaskId]  = useState<string | null>(null);
   const [completeTaskId,   setCompleteTaskId]   = useState<string | null>(null);
@@ -21,6 +23,7 @@ export function useTaskListModals() {
 
   return {
     showCreate,       setShowCreate,
+    createDraftId,    setCreateDraftId,
     editingTask,      setEditingTask,
     quickViewTaskId,  setQuickViewTaskId,
     completeTaskId,   setCompleteTaskId,

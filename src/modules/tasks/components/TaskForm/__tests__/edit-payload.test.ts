@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { omitUnchangedImportant } from '../edit-payload';
+import { omitUnchangedImportant } from '../form-logic';
 
 describe('omitUnchangedImportant — form Sửa không ghi đè ★ dùng chung', () => {
   it('không đổi ★ trong form → bỏ isImportant khỏi payload (giữ nguyên ★ hiện tại trên server)', () => {

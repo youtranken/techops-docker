@@ -211,6 +211,21 @@ const vi = {
   'tbx.outFilter': 'Không thuộc bộ lọc trạng thái',
   'tbx.doneHidden': 'Việc đã xong không hiện ở tab Đang mở.',
   'tbx.seeDone': 'Xem việc đã xong',
+  // ── A2-4b Tạo / Sửa công việc + nháp (tfx.*: chữ của V1/form thật không có trong copy.js) ──
+  'tfx.e.priority': 'Chọn mức ưu tiên.',
+  'tfx.e.type': 'Chọn loại công việc.',
+  'tfx.ask.edit.t': 'Đóng mà không lưu?',
+  'tfx.ask.edit.d': 'Những thay đổi bạn vừa nhập sẽ mất.',
+  'tfx.draft.noFiles': 'Tệp đính kèm không được lưu trong nháp. Khi mở lại nháp cần đính kèm lại.',
+  'tfx.draft.nf.t': 'Không tìm thấy nháp',
+  'tfx.draft.nf.d': 'Nháp có thể đã bị xóa hoặc được lưu trên trình duyệt khác.',
+  'tfx.draft.saveErr': 'Không lưu được nháp trên trình duyệt này.',
+  'tfx.people.loading': 'Đang tải danh sách…',
+  'tfx.force.direct': 'Chỉ có hiệu lực khi chọn Phê duyệt.',
+  'tfx.mode.fixed': 'Không đổi được chế độ ở bước này.',
+  'tfx.sum.dirty': 'Có thay đổi chưa lưu',
+  'tfx.editOf': 'Sửa {id}',
+  'tfx.ed.hr': 'Đường kẻ ngang',
 };
 
 const en = {
@@ -414,6 +429,21 @@ const en = {
   'tbx.outFilter': 'Not in the status filter',
   'tbx.doneHidden': 'Done tasks don’t show in the Open tab.',
   'tbx.seeDone': 'See done tasks',
+  // ── A2-4b New / edit task + drafts ──
+  'tfx.e.priority': 'Pick a priority.',
+  'tfx.e.type': 'Pick a type.',
+  'tfx.ask.edit.t': 'Close without saving?',
+  'tfx.ask.edit.d': 'The changes you just made will be lost.',
+  'tfx.draft.noFiles': 'Attachments aren’t saved in drafts. Add them again when you reopen the draft.',
+  'tfx.draft.nf.t': 'Draft not found',
+  'tfx.draft.nf.d': 'It may have been deleted or saved in another browser.',
+  'tfx.draft.saveErr': 'Couldn’t save the draft in this browser.',
+  'tfx.people.loading': 'Loading people…',
+  'tfx.force.direct': 'Only takes effect with Approval.',
+  'tfx.mode.fixed': 'The workflow can’t be changed at this stage.',
+  'tfx.sum.dirty': 'Unsaved changes',
+  'tfx.editOf': 'Edit {id}',
+  'tfx.ed.hr': 'Horizontal line',
 };
 
 export const EXTRA = { vi, en };

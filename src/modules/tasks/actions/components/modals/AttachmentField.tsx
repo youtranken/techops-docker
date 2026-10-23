@@ -18,19 +18,21 @@ export interface FileEntry { fileName: string; filePath: string; fileSize: numbe
 
 const toEntry = (f: File): FileEntry => ({ fileName: f.name, filePath: `reports/${Date.now()}_${f.name}`, fileSize: f.size, _file: f });
 
-export function AttachmentField({ files, onChange, active }: { files: FileEntry[]; onChange: (f: FileEntry[]) => void; active: boolean }) {
+/** `baseCount`: số tệp đã có sẵn tính vào giới hạn (form Sửa: tệp cũ chưa bị đánh dấu xoá — V1 EditTaskFooter `keptCount`). */
+export function AttachmentField({ files, onChange, active, baseCount = 0 }: { files: FileEntry[]; onChange: (f: FileEntry[]) => void; active: boolean; baseCount?: number }) {
   const t = useTranslations();
   const locale = useLocale();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [err, setErr] = React.useState<Msg | null>(null);
   const [hot, setHot] = React.useState(false);
   const [pasted, setPasted] = React.useState<File | null>(null);
-  const full = files.length >= MAX_FILE_COUNT;
+  const have = files.length + baseCount;
+  const full = have >= MAX_FILE_COUNT;
 
   React.useEffect(() => { if (!active) { setErr(null); setPasted(null); } }, [active]);
 
   function add(list: File[]) {
-    const e = attachmentError(list, files.length, locale);
+    const e = attachmentError(list, have, locale);
     setErr(e);
     if (e) return false;
     onChange([...files, ...list.map(toEntry)]);
@@ -38,7 +40,7 @@ export function AttachmentField({ files, onChange, active }: { files: FileEntry[
   }
 
   usePasteImage(active && !pasted, (img) => {
-    if (files.length >= MAX_FILE_COUNT) { setErr({ key: 'tf.att.full', values: { n: MAX_FILE_COUNT } }); return; }
+    if (have >= MAX_FILE_COUNT) { setErr({ key: 'tf.att.full', values: { n: MAX_FILE_COUNT } }); return; }
     setErr(null);
     setPasted(img);
   });
@@ -49,7 +51,7 @@ export function AttachmentField({ files, onChange, active }: { files: FileEntry[
         <div id="att-lbl" className="mb-1.5 text-[13px] font-medium text-ink">
           {t('app.att.label')} <span className="font-normal text-ink-3">({t('app.opt')})</span>
         </div>
-        <span className="font-mono text-xs text-ink-3">{t('tf.att.count', { x: files.length, n: MAX_FILE_COUNT })}</span>
+        <span className="font-mono text-xs text-ink-3">{t('tf.att.count', { x: have, n: MAX_FILE_COUNT })}</span>
       </div>
       <label
         className={cn(
@@ -137,7 +139,7 @@ function Thumb({ file }: { file?: File }) {
   return <FileText aria-hidden className="size-4 flex-none text-ink-3" />;
 }
 
-/** Hộp xem trước ảnh vừa dán (thay PasteImageModal V1 trong hộp Báo cáo; CreateTask vẫn dùng bản V1 tới A2-5). */
+/** Hộp xem trước ảnh vừa dán (thay PasteImageModal V1 — dùng ở hộp Báo cáo/Bổ sung và biểu mẫu Tạo/Sửa A2-4b). */
 function PastePreview({ file, onConfirm, onCancel }: { file: File | null; onConfirm: (f: File) => void; onCancel: () => void }) {
   const t = useTranslations();
   const locale = useLocale();
