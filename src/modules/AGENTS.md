@@ -46,7 +46,7 @@ Module không được import trực tiếp từ module khác (chỉ qua API).
 | `settings/` | Cài đặt hệ thống, Hồ sơ cá nhân | [xem](settings/AGENTS.md) |
 | `logs/` | Nhật ký hoạt động người dùng | — |
 | `auth/` | Xác thực (NextAuth wrapper) | — |
-| `dashboard/` | Tổng quan dashboard | — |
+| `dashboard/` | Tổng quan dashboard | [xem](dashboard/AGENTS.md) |
 
 ## Quy ước đặt tên
 

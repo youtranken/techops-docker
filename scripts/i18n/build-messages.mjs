@@ -40,6 +40,7 @@ export const INCLUDE = {
     'dr', // A2-4b nháp lưu trên trình duyệt (Phase B)
     'nt', // A3-2 trang Thông báo
     'pf', // A3-2 Hồ sơ của tôi
+    'db', // A3-1 Tổng quan
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
@@ -60,6 +61,7 @@ export const INCLUDE = {
     'nt.pb', 'nt.type', 'nt.clear', 'nt.empty.type', // A3-2: lọc theo loại thông báo — Phase B (API V1 không có tham số loại)
     'pf.pb', 'pf.email.ok', 'pf.email.pending', 'pf.email.resend', 'pf.email.sent', 'pf.email.note', // A3-2: xác nhận email — Phase B
     'pf.av.rm', 'pf.saved.avRm', 'pf.pw.last', // A3-2: bỏ ảnh / ngày đổi mật khẩu — V1 không có
+    'db.pv.', // thanh điều khiển preview Tổng quan
   ],
 };
 
