@@ -29,7 +29,7 @@ export function TaskDetailClient({ task }: Props) {
   useMarkSeenOnOpen(task, roleName);
 
   return (
-    <div className="-m-6 h-full flex">
+    <div className="v2-bleed h-full flex">
 
       {/* ── Left col: fixed sections + TabPanel fills remaining ── */}
       <div className="flex-1 min-w-0 flex flex-col overflow-hidden border-r border-slate-200 dark:border-slate-700">

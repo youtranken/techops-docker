@@ -43,5 +43,13 @@ export function useMyPermissions() {
     return features.includes(featureKey);
   }
 
-  return { hasFeature, isPrivileged, isLoading: query.isLoading };
+  return {
+    hasFeature,
+    isPrivileged,
+    isLoading: query.isLoading,
+    /** Dữ liệu quyền menu (nhân viên). Sidebar dùng để lọc menu — xem src/shared/layout/nav/nav-model.ts */
+    data: query.data,
+    /** Đã tải xong (thành công hoặc lỗi) — tương đương `menuLoaded` của Sidebar V1 */
+    settled: query.isSuccess || query.isError,
+  };
 }

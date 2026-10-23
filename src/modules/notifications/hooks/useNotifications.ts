@@ -1,16 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { NotificationWithTask } from '../services/notification.service';
 
+export const NOTIFICATIONS_KEY = ['notifications'] as const;
+
+export async function fetchNotifications(): Promise<NotificationWithTask[]> {
+  const res = await fetch('/api/notifications');
+  if (!res.ok) throw new Error('Failed to fetch notifications');
+  const response = await res.json();
+  // API returns { data, total, page, limit } - extract data array
+  return response.data || [];
+}
+
 export function useNotifications() {
   return useQuery<NotificationWithTask[]>({
-    queryKey: ['notifications'],
-    queryFn: async () => {
-      const res = await fetch('/api/notifications');
-      if (!res.ok) throw new Error('Failed to fetch notifications');
-      const response = await res.json();
-      // API returns { data, total, page, limit } - extract data array
-      return response.data || [];
-    },
+    queryKey: NOTIFICATIONS_KEY,
+    queryFn: fetchNotifications,
     refetchInterval: 30_000, // Poll every 30s
     refetchOnWindowFocus: true,
   });
