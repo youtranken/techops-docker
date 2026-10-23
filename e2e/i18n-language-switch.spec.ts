@@ -20,8 +20,10 @@ test('đổi ngôn ngữ VI → EN → (reload giữ EN) → VI', async ({ page 
 
   // Mặc định: tiếng Việt
   await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
-  await expect(page.getByRole('button', { name: /Chuyển sang giao diện (tối|sáng)/ })).toBeVisible();
   let menu = await openMenu(page);
+  // A1-4: nút Sáng/Tối chuyển từ topbar vào menu người dùng
+  await expect(menu.getByRole('menuitemradio', { name: 'Tối' })).toBeVisible();
+  await expect(menu.getByRole('menuitemradio', { name: 'Sáng' })).toBeVisible();
   await expect(menu.getByRole('menuitem', { name: 'Đăng xuất' })).toBeVisible();
   await expect(menu.getByRole('menuitem', { name: 'Hồ sơ' })).toBeVisible();
   await expect(menu.getByRole('menuitemradio', { name: 'Tiếng Việt' })).toHaveAttribute('aria-checked', 'true');
@@ -30,8 +32,9 @@ test('đổi ngôn ngữ VI → EN → (reload giữ EN) → VI', async ({ page 
   await menu.getByRole('menuitemradio', { name: 'English' }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page).toHaveURL(/\/tasks$/); // không đổi URL
-  await expect(page.getByRole('button', { name: /Switch to (dark|light) mode/ })).toBeVisible();
   menu = await openMenu(page);
+  await expect(menu.getByRole('menuitemradio', { name: 'Dark' })).toBeVisible();
+  await expect(menu.getByRole('menuitemradio', { name: 'Light' })).toBeVisible();
   await expect(menu.getByRole('menuitem', { name: 'Sign out' })).toBeVisible();
   await expect(menu.getByRole('menuitem', { name: 'Profile' })).toBeVisible();
   await expect(menu.getByText('Language')).toBeVisible();

@@ -281,3 +281,31 @@
     .v2-td[data-m="hide"] { display: none; }
   }
 }
+
+/* ===================== Khung app V2 (A1-4) =====================
+ * Vùng nội dung (preview `.content`): padding 20 · 24 ngang (--content-px) · ≤1023: 16.
+ * Đáy 24 (preview để 88 vì có thanh điều khiển xem trước — app thật không có).
+ * `.v2-bleed`: khối tràn sát mép vùng nội dung (thay `-m-6` cũ của trang chi tiết việc).
+ */
+@layer components {
+  .v2-content {
+    --content-px: 24px;
+    --content-pt: 20px;
+    --content-pb: 24px;
+    padding: var(--content-pt) var(--content-px) var(--content-pb);
+  }
+  @media (max-width: 1023px) {
+    .v2-content {
+      --content-px: 16px;
+      --content-pt: 16px;
+      --content-pb: 16px;
+    }
+  }
+  .v2-bleed {
+    margin: calc(-1 * var(--content-pt, 24px)) calc(-1 * var(--content-px, 24px)) calc(-1 * var(--content-pb, 24px));
+  }
+  /* khối cao bằng vùng nội dung: phủ luôn phần padding trên/dưới */
+  .v2-bleed.h-full {
+    height: calc(100% + var(--content-pt, 24px) + var(--content-pb, 24px));
+  }
+}

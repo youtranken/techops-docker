@@ -258,6 +258,7 @@
   "er": {
     "403": {
       "d": "Trang này chỉ dành cho Vice Manager hoặc Admin. Nếu công việc cần, hãy nhờ Admin cấp quyền trong mục Nhân sự.",
+      "dShort": "Tài khoản của bạn chưa được cấp quyền vào trang này. Nếu công việc cần, hãy nhờ Admin cấp quyền trong mục Nhân sự.",
       "t": "Bạn không có quyền xem trang này"
     },
     "404": {
@@ -266,6 +267,7 @@
     },
     "500": {
       "d": "Thao tác vừa rồi chưa được lưu. Thử lại sau ít phút; nếu vẫn lỗi, gửi mã lỗi bên dưới cho phòng IT.",
+      "dShort": "Trang chưa tải được. Thử lại sau ít phút; nếu vẫn lỗi, gửi mã lỗi bên dưới cho phòng IT.",
       "t": "Hệ thống đang gặp sự cố"
     },
     "back": "Quay lại",
@@ -360,6 +362,10 @@
   },
   "idle": {
     "d": "Bạn không thao tác gần {m} phút. Tự đăng xuất sau",
+    "expired": {
+      "d": "Bạn đã bị đăng xuất do không hoạt động.",
+      "t": "Phiên làm việc đã hết hạn"
+    },
     "keep": "Tiếp tục làm việc",
     "kept": "Đã giữ phiên làm việc.",
     "t": "Phiên làm việc sắp hết hạn"
@@ -376,7 +382,11 @@
     "transfer": "{a} chuyển giao “{t}” cho bạn"
   },
   "nav": {
+    "close": "Đóng menu",
+    "collapse": "Thu gọn thanh bên",
+    "count": "{label}: {n}",
     "crumbs": "Đường dẫn",
+    "expand": "Mở rộng thanh bên",
     "group": {
       "admin": "Quản trị",
       "granted": "Được cấp riêng",
@@ -391,6 +401,33 @@
     "reports": "Báo cáo",
     "settings": "Cài đặt",
     "starred": "Quan trọng",
+    "sub": {
+      "digest": "Báo cáo định kỳ",
+      "g": {
+        "account": "Tài khoản",
+        "admin": "Quản trị",
+        "security": "Bảo mật",
+        "system": "Hệ thống"
+      },
+      "general": "Cài đặt chung",
+      "logRef": "Tra cứu công việc",
+      "logTask": "Nhật ký công việc",
+      "logUser": "Nhật ký người dùng",
+      "notifications": "Thông báo",
+      "overdue": "Nhắc quá hạn",
+      "overview": "Tổng quan",
+      "perms": "Phân quyền",
+      "priorities": "Mức ưu tiên",
+      "research": "Quá hạn & khối lượng",
+      "security": "Bảo mật",
+      "smtp": "Email (SMTP)",
+      "staff": "Nhân viên",
+      "taskList": "Danh sách công việc",
+      "taskPerms": "Quyền công việc riêng",
+      "taskTypes": "Loại công việc",
+      "templates": "Mẫu hoàn thành"
+    },
+    "taskDetail": "Chi tiết",
     "tasks": "Công việc",
     "unseen": "Mới xong"
   },
@@ -398,9 +435,13 @@
     "adminNoMail": "Admin không nhận email thông báo công việc, chỉ nhận trong ứng dụng.",
     "all": "Xem tất cả",
     "earlier": "Trước đó",
+    "empty": "Không có thông báo",
+    "emptyD": "Mọi thứ đang yên tĩnh.",
+    "loadFailed": "Không tải được thông báo",
     "readAll": "Đánh dấu đã đọc",
     "title": "Thông báo",
-    "today": "Hôm nay"
+    "today": "Hôm nay",
+    "unread": "{n} chưa đọc"
   },
   "page": {
     "export": "Xuất Excel",
@@ -472,10 +513,15 @@
     }
   },
   "top": {
+    "appearance": "Giao diện",
     "notifications": "Thông báo",
     "profile": "Hồ sơ",
     "search": "Tìm công việc hoặc mã HD",
-    "signout": "Đăng xuất"
+    "signout": "Đăng xuất",
+    "theme": {
+      "dark": "Tối",
+      "light": "Sáng"
+    }
   },
   "ui": {
     "confirm": "Xác nhận",

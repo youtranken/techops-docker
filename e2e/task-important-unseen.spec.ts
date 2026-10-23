@@ -87,7 +87,7 @@ test.describe.serial('V2 — ★ Quan trọng & Hoàn thành chưa xem', () => {
     await expect(page.getByText(TITLE)).toBeVisible();
 
     await expect(page.getByRole('link', { name: /Quan trọng/ })).toHaveCount(0);
-    await expect(page.getByRole('link', { name: /chưa xem/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Mới xong/ })).toHaveCount(0);
     await expect(page.locator('button[title*="quan trọng"]')).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Tạo công việc' }).first().click();
@@ -117,7 +117,7 @@ test.describe.serial('V2 — ★ Quan trọng & Hoàn thành chưa xem', () => {
     await expect(firstCard).toContainText('Mới hoàn thành');
 
     // Mục "Hoàn thành – chưa xem": trạng thái khoá ở Hoàn thành
-    await page.getByRole('link', { name: /chưa xem/ }).click();
+    await page.getByRole('link', { name: /Mới xong/ }).click();
     await expect(page.getByRole('heading', { name: 'Hoàn thành – chưa xem', exact: true })).toBeVisible();
     await expect(page.getByRole('combobox').filter({ hasText: 'Hoàn thành' })).toBeDisabled();
     await expect(page.getByText(TITLE)).toBeVisible();

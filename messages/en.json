@@ -258,6 +258,7 @@
   "er": {
     "403": {
       "d": "This page is for Vice Managers and Admins. If you need it for your work, ask an Admin to grant access under People.",
+      "dShort": "Your account doesn’t have access to this page yet. If you need it for your work, ask an Admin to grant access under People.",
       "t": "You don’t have access to this page"
     },
     "404": {
@@ -266,6 +267,7 @@
     },
     "500": {
       "d": "Your last action wasn’t saved. Try again in a few minutes; if it keeps failing, send the error code below to IT.",
+      "dShort": "This page didn’t load. Try again in a few minutes; if it keeps failing, send the error code below to IT.",
       "t": "Something went wrong on our side"
     },
     "back": "Go back",
@@ -360,6 +362,10 @@
   },
   "idle": {
     "d": "You’ve been inactive for almost {m} minutes. Signing out in",
+    "expired": {
+      "d": "You were signed out because you were inactive.",
+      "t": "Your session has ended"
+    },
     "keep": "Keep working",
     "kept": "Your session is still active.",
     "t": "Your session is about to end"
@@ -376,7 +382,11 @@
     "transfer": "{a} handed “{t}” over to you"
   },
   "nav": {
+    "close": "Close menu",
+    "collapse": "Collapse sidebar",
+    "count": "{label}: {n}",
     "crumbs": "Breadcrumb",
+    "expand": "Expand sidebar",
     "group": {
       "admin": "Admin",
       "granted": "Granted to you",
@@ -391,6 +401,33 @@
     "reports": "Reports",
     "settings": "Settings",
     "starred": "Starred",
+    "sub": {
+      "digest": "Scheduled digest",
+      "g": {
+        "account": "Account",
+        "admin": "Admin",
+        "security": "Security",
+        "system": "System"
+      },
+      "general": "General",
+      "logRef": "Task lookup",
+      "logTask": "Task activity",
+      "logUser": "User activity",
+      "notifications": "Notifications",
+      "overdue": "Overdue reminders",
+      "overview": "Overview",
+      "perms": "Permissions",
+      "priorities": "Priorities",
+      "research": "Overdue & workload",
+      "security": "Security",
+      "smtp": "Email (SMTP)",
+      "staff": "Staff",
+      "taskList": "Task list",
+      "taskPerms": "Custom task permissions",
+      "taskTypes": "Task types",
+      "templates": "Completion templates"
+    },
+    "taskDetail": "Details",
     "tasks": "Tasks",
     "unseen": "Just done"
   },
@@ -398,9 +435,13 @@
     "adminNoMail": "Admins don’t get task emails, only in-app notifications.",
     "all": "See all",
     "earlier": "Earlier",
+    "empty": "No notifications",
+    "emptyD": "All quiet for now.",
+    "loadFailed": "Couldn’t load notifications",
     "readAll": "Mark all read",
     "title": "Notifications",
-    "today": "Today"
+    "today": "Today",
+    "unread": "{n} unread"
   },
   "page": {
     "export": "Export to Excel",
@@ -472,10 +513,15 @@
     }
   },
   "top": {
+    "appearance": "Appearance",
     "notifications": "Notifications",
     "profile": "Profile",
     "search": "Search tasks or HD code",
-    "signout": "Sign out"
+    "signout": "Sign out",
+    "theme": {
+      "dark": "Dark",
+      "light": "Light"
+    }
   },
   "ui": {
     "confirm": "Confirm",

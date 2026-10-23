@@ -1,117 +1,79 @@
 'use client';
 
+/** Một dòng thông báo (preview `.n-item`, chấm chưa đọc bên phải). Icon theo loại thông báo như V1. */
 import { formatDistanceToNow } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { vi, enUS } from 'date-fns/locale';
+import { useLocale } from 'next-intl';
 import {
-  ClipboardList,
-  CheckCircle,
-  XCircle,
-  ArrowLeftRight,
-  CalendarClock,
-  Search,
-  PenLine,
-  PartyPopper,
-  MessageSquare,
-  AlarmClock,
-  Siren,
-  FileText,
-  Bell,
+  ClipboardList, CheckCircle, XCircle, ArrowLeftRight, CalendarClock, Search, PenLine, PartyPopper,
+  MessageSquare, AlarmClock, Siren, FileText, Bell,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NotificationWithTask } from '../services/notification.service';
 
-const TYPE_META: Record<string, {
-  icon: React.ReactNode;
-  bg: string;
-  darkBg: string;
-  iconColor: string;
-}> = {
-  TASK_ASSIGNED:           { icon: <ClipboardList className="w-4 h-4" />,  bg: 'bg-blue-50',    darkBg: 'dark:bg-blue-500/10',    iconColor: 'text-blue-600 dark:text-blue-400' },
-  TASK_APPROVED:           { icon: <CheckCircle className="w-4 h-4" />,    bg: 'bg-green-50',   darkBg: 'dark:bg-green-500/10',   iconColor: 'text-green-600 dark:text-green-400' },
-  TASK_REJECTED:           { icon: <XCircle className="w-4 h-4" />,        bg: 'bg-red-50',     darkBg: 'dark:bg-red-500/10',     iconColor: 'text-red-600 dark:text-red-400' },
-  TRANSFER_RECEIVED:       { icon: <ArrowLeftRight className="w-4 h-4" />, bg: 'bg-purple-50',  darkBg: 'dark:bg-purple-500/10',  iconColor: 'text-purple-600 dark:text-purple-400' },
-  EXTENSION_REQUESTED:     { icon: <CalendarClock className="w-4 h-4" />,  bg: 'bg-yellow-50',  darkBg: 'dark:bg-yellow-500/10',  iconColor: 'text-yellow-600 dark:text-yellow-500' },
-  EXTENSION_APPROVED:      { icon: <CheckCircle className="w-4 h-4" />,    bg: 'bg-green-50',   darkBg: 'dark:bg-green-500/10',   iconColor: 'text-green-600 dark:text-green-400' },
-  EXTENSION_REJECTED:      { icon: <XCircle className="w-4 h-4" />,        bg: 'bg-red-50',     darkBg: 'dark:bg-red-500/10',     iconColor: 'text-red-600 dark:text-red-400' },
-  REVIEW_REQUIRED:         { icon: <Search className="w-4 h-4" />,         bg: 'bg-orange-50',  darkBg: 'dark:bg-orange-500/10',  iconColor: 'text-orange-600 dark:text-orange-400' },
-  REVISION_REQUIRED:       { icon: <PenLine className="w-4 h-4" />,        bg: 'bg-amber-50',   darkBg: 'dark:bg-amber-500/10',   iconColor: 'text-amber-600 dark:text-amber-500' },
-  TASK_COMPLETED:          { icon: <PartyPopper className="w-4 h-4" />,    bg: 'bg-emerald-50', darkBg: 'dark:bg-emerald-500/10', iconColor: 'text-emerald-600 dark:text-emerald-400' },
-  COMMENT_ADDED:           { icon: <MessageSquare className="w-4 h-4" />,  bg: 'bg-sky-50',     darkBg: 'dark:bg-sky-500/10',     iconColor: 'text-sky-600 dark:text-sky-400' },
-  DEADLINE_REMINDER:       { icon: <AlarmClock className="w-4 h-4" />,     bg: 'bg-red-50',     darkBg: 'dark:bg-red-500/10',     iconColor: 'text-red-600 dark:text-red-400' },
-  ALL_FAILED:              { icon: <Siren className="w-4 h-4" />,          bg: 'bg-red-50',     darkBg: 'dark:bg-red-500/10',     iconColor: 'text-red-600 dark:text-red-400' },
-  PLAN_APPROVAL_REQUESTED: { icon: <FileText className="w-4 h-4" />,       bg: 'bg-indigo-50',  darkBg: 'dark:bg-indigo-500/10',  iconColor: 'text-indigo-600 dark:text-indigo-400' },
+type Tone = 'primary' | 'done' | 'danger' | 'review' | 'approval' | 'pickup' | 'muted';
+const TONE: Record<Tone, string> = {
+  primary: 'text-c-progress bg-[color-mix(in_srgb,var(--c-progress)_12%,var(--surface))]',
+  done: 'text-c-done bg-[color-mix(in_srgb,var(--c-done)_12%,var(--surface))]',
+  danger: 'text-danger bg-[color-mix(in_srgb,var(--danger)_12%,var(--surface))]',
+  review: 'text-c-review bg-[color-mix(in_srgb,var(--c-review)_12%,var(--surface))]',
+  approval: 'text-c-approval bg-[color-mix(in_srgb,var(--c-approval)_12%,var(--surface))]',
+  pickup: 'text-c-pickup bg-[color-mix(in_srgb,var(--c-pickup)_12%,var(--surface))]',
+  muted: 'text-ink-3 bg-surface-2',
 };
-
-const FALLBACK = {
-  icon: <Bell className="w-4 h-4" />,
-  bg: 'bg-gray-100',
-  darkBg: 'dark:bg-white/[0.06]',
-  iconColor: 'text-gray-500 dark:text-gray-400',
+type IconCmp = React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+const TYPE_META: Record<string, [IconCmp, Tone]> = {
+  TASK_ASSIGNED: [ClipboardList, 'primary'],
+  TASK_APPROVED: [CheckCircle, 'done'],
+  TASK_REJECTED: [XCircle, 'danger'],
+  TRANSFER_RECEIVED: [ArrowLeftRight, 'approval'],
+  EXTENSION_REQUESTED: [CalendarClock, 'review'],
+  EXTENSION_APPROVED: [CheckCircle, 'done'],
+  EXTENSION_REJECTED: [XCircle, 'danger'],
+  REVIEW_REQUIRED: [Search, 'review'],
+  REVISION_REQUIRED: [PenLine, 'review'],
+  TASK_COMPLETED: [PartyPopper, 'done'],
+  COMMENT_ADDED: [MessageSquare, 'pickup'],
+  DEADLINE_REMINDER: [AlarmClock, 'danger'],
+  ALL_FAILED: [Siren, 'danger'],
+  PLAN_APPROVAL_REQUESTED: [FileText, 'approval'],
 };
 
 interface NotificationItemProps {
   notification: NotificationWithTask;
-  onMarkRead: (id: string) => void;
+  unread: boolean;
+  onClick: () => void;
 }
 
-export function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
+export function NotificationItem({ notification, unread, onClick }: NotificationItemProps) {
+  const locale = useLocale();
+  const [Icon, tone] = TYPE_META[notification.type] ?? [Bell, 'muted' as Tone];
   const taskCode = notification.task?.taskCode;
-  const meta = TYPE_META[notification.type] ?? FALLBACK;
-  const isUnread = !notification.isRead;
+  const created = new Date(notification.createdAt);
 
   return (
     <button
-      onClick={() => onMarkRead(notification.id)}
-      className={cn(
-        'w-full text-left flex gap-3 px-4 py-3 transition-colors relative',
-        'hover:bg-gray-50 dark:hover:bg-white/[0.04]',
-        isUnread && 'bg-blue-50/40 dark:bg-blue-500/[0.06]',
-      )}
+      type="button"
+      onClick={onClick}
+      data-unread={unread || undefined}
+      className="relative flex w-full gap-2.5 border-0 bg-transparent px-3.5 py-2.5 text-left transition-colors hover:bg-surface-2 focus-visible:bg-surface-2 focus-visible:outline-none"
     >
-      {isUnread && (
-        <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-blue-500" />
-      )}
-
-      <span className={cn(
-        'shrink-0 w-9 h-9 rounded-full flex items-center justify-center mt-0.5',
-        meta.bg, meta.darkBg, meta.iconColor,
-      )}>
-        {meta.icon}
+      <span aria-hidden className={cn('grid size-8 shrink-0 place-items-center rounded-full', TONE[tone])}>
+        <Icon className="size-4" />
       </span>
-
-      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-        <div className="flex items-start justify-between gap-2">
-          <p className={cn(
-            'text-[13px] leading-snug flex-1',
-            isUnread
-              ? 'font-semibold text-gray-900 dark:text-white'
-              : 'font-medium text-gray-600 dark:text-gray-400',
-          )}>
-            {notification.title}
-          </p>
-          {isUnread && (
-            <span className="shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-1" />
-          )}
-        </div>
-
-        <p className="text-[12px] text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
-          {notification.message}
-        </p>
-
-        <div className="flex items-center gap-2 mt-0.5">
-          {taskCode && (
-            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium">
-              {taskCode}
-            </span>
-          )}
-          <span className="text-[11px] text-gray-400 dark:text-gray-500">
-            {formatDistanceToNow(new Date(notification.createdAt), {
-              addSuffix: true,
-              locale: vi,
-            })}
-          </span>
-        </div>
-      </div>
+      <span className={cn('min-w-0 flex-1', unread && 'pr-4')}>
+        <span className={cn('block text-[13px] leading-snug', unread ? 'font-semibold text-ink' : 'font-medium text-ink-2')}>
+          {notification.title}
+        </span>
+        <span className="mt-0.5 line-clamp-2 block text-[13px] leading-[1.45] text-ink-2">{notification.message}</span>
+        <span className="mt-0.5 flex items-center gap-2 text-xs text-ink-3">
+          {taskCode && <span className="font-mono text-ink-2">{taskCode}</span>}
+          <time dateTime={created.toISOString()}>
+            {formatDistanceToNow(created, { addSuffix: true, locale: locale === 'en' ? enUS : vi })}
+          </time>
+        </span>
+      </span>
+      {unread && <span aria-hidden className="absolute right-3.5 top-4 size-2 rounded-full bg-primary-text" />}
     </button>
   );
 }
