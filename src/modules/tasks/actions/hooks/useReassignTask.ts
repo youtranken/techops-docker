@@ -2,10 +2,13 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
+import { toApiError } from '@/lib/errors';
 
 interface ReassignPayload { taskId: string; newAssigneeIds: string[] }
 
 export function useReassignTask() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, newAssigneeIds }: ReassignPayload) => {
@@ -16,7 +19,7 @@ export function useReassignTask() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Giao lại thất bại');
+        throw toApiError(body, 'Giao lại thất bại', res.status);
       }
     },
     onSuccess: (_data, { taskId }) => {
@@ -24,6 +27,6 @@ export function useReassignTask() {
       qc.invalidateQueries({ queryKey: ['tasks'] });
       qc.invalidateQueries({ queryKey: ['task', taskId] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }

@@ -2,6 +2,7 @@
 
 /** Chip bộ lọc đang áp (preview `.fchip`): "Nhãn: giá trị ✕". */
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export interface FilterChipProps {
@@ -12,13 +13,14 @@ export interface FilterChipProps {
 }
 
 export function FilterChip({ label, value, onRemove, className }: FilterChipProps) {
+  const t = useTranslations();
   return (
     <span className={cn('inline-flex h-7 items-center gap-1 rounded-pill border border-line-2 bg-surface pl-2.5 pr-1 text-[13px] text-ink', className)}>
       <b className="font-medium text-ink-2">{label}:</b>
       <span>{value}</span>
       <button
         type="button"
-        aria-label={`Bỏ lọc ${label}`}
+        aria-label={t('ui.removeFilter', { f: label })}
         onClick={onRemove}
         className="grid size-[22px] place-items-center rounded-full text-ink-3 hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >

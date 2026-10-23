@@ -5,6 +5,7 @@ import { Loader2, Send, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSendTestDigest } from '../hooks/useDigestConfig';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 interface Props {
   emailSubject: string;
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function DigestTemplateFields({ emailSubject, emailGreeting, onChange }: Props) {
+  const errMsg = useErrorMessage();
   const [testEmail, setTestEmail] = useState('');
   const sendTest = useSendTestDigest();
 
@@ -23,7 +25,7 @@ export function DigestTemplateFields({ emailSubject, emailGreeting, onChange }: 
       toast.success(result.message);
       setTestEmail('');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi gửi');
+      toast.error(errMsg(err, 'Lỗi khi gửi'));
     }
   }
 

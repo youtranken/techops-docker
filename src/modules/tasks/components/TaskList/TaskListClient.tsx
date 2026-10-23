@@ -19,6 +19,7 @@ import { TaskListPagination } from './TaskListPagination';
 import { TaskListModals } from './TaskListModals';
 import type { TaskListItem, TaskSortField, TaskSortOrder } from '../../services/task-query.service';
 import type { TaskStatus } from '@prisma/client';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 const VALID_TASK_STATUSES: TaskStatus[] = [
   'PENDING_APPROVAL', 'IN_PROGRESS', 'PENDING_REVIEW', 'WAITING_ACKNOWLEDGE', 'COMPLETED', 'CANCELLED',
@@ -48,6 +49,7 @@ const VIEW_HEADER: Record<TaskView, { title: string; Icon: typeof ListTodo }> = 
 };
 
 export function TaskListClient() {
+  const errMsg = useErrorMessage();
   const { data: session } = useSession();
   const currentUserId = session?.user?.id ?? '';
   const role          = session?.user?.role?.name ?? '';
@@ -173,7 +175,7 @@ export function TaskListClient() {
               disabled={markAllSeen.isPending}
               onClick={() => markAllSeen.mutate(undefined, {
                 onSuccess: (r: { count?: number }) => toast.success(`Đã đánh dấu đã xem ${r.count ?? 0} công việc`),
-                onError: (e) => toast.error(e.message),
+                onError: (e) => toast.error(errMsg(e)),
               })}
             >
               <CheckCheck className="h-4 w-4" />Đánh dấu đã xem tất cả

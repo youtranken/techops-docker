@@ -1,6 +1,7 @@
 /** Trạng thái rỗng / lỗi / đang tải (preview `.state`, `.state.bad`, `.sk`). */
 import * as React from 'react';
 import { Inbox, AlertTriangle, RotateCw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -14,11 +15,12 @@ export interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({ title = 'Không có dữ liệu', description, icon: Icon = Inbox, action, className }: EmptyStateProps) {
+export function EmptyState({ title, description, icon: Icon = Inbox, action, className }: EmptyStateProps) {
+  const t = useTranslations();
   return (
     <div className={cn('flex flex-col items-center px-6 py-10 text-center', className)}>
       <Icon aria-hidden className="mb-3 size-9 stroke-[1.5] text-ink-3" />
-      <b className="mb-1 block text-sm font-medium text-ink">{title}</b>
+      <b className="mb-1 block text-sm font-medium text-ink">{title ?? t('ui.noData')}</b>
       {description && <span className="max-w-[440px] text-[13px] text-ink-3">{description}</span>}
       {action && <div className="mt-5 flex flex-wrap justify-center gap-2">{action}</div>}
     </div>
@@ -33,23 +35,18 @@ export interface ErrorStateProps {
   className?: string;
 }
 
-export function ErrorState({
-  title = 'Không tải được dữ liệu',
-  description,
-  onRetry,
-  retryText = 'Thử lại',
-  className,
-}: ErrorStateProps) {
+export function ErrorState({ title, description, onRetry, retryText, className }: ErrorStateProps) {
+  const t = useTranslations();
   return (
     <div role="alert" className={cn('flex flex-col items-center px-6 py-10 text-center', className)}>
       <AlertTriangle aria-hidden className="mb-3 size-9 stroke-[1.5] text-danger" />
-      <b className="mb-1 block text-sm font-medium text-ink">{title}</b>
+      <b className="mb-1 block text-sm font-medium text-ink">{title ?? t('ui.loadFailed')}</b>
       {description && <span className="max-w-[440px] text-[13px] text-ink-3">{description}</span>}
       {onRetry && (
         <div className="mt-5">
           <Button type="button" variant="outline" size="md" onClick={onRetry}>
             <RotateCw aria-hidden />
-            {retryText}
+            {retryText ?? t('app.retry')}
           </Button>
         </div>
       )}

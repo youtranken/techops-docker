@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useResetPassword } from '../hooks/useResetPassword';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 interface PasswordPolicy {
   minLength: number;
@@ -58,6 +59,7 @@ interface Props {
 }
 
 export function ChangePasswordModal({ userId, displayName, onClose }: Props) {
+  const errMsg = useErrorMessage();
   const reset = useResetPassword();
   const [policy, setPolicy] = useState<PasswordPolicy>(DEFAULT_POLICY);
 
@@ -89,7 +91,7 @@ export function ChangePasswordModal({ userId, displayName, onClose }: Props) {
       toast.success(`Đã đổi mật khẩu cho ${displayName ?? 'người dùng'}`);
       handleClose();
     } catch (err: unknown) {
-      toast.error((err as Error).message ?? 'Đổi mật khẩu thất bại');
+      toast.error(errMsg(err, 'Đổi mật khẩu thất bại'));
     }
   }
 

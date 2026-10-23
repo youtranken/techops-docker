@@ -2,8 +2,11 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
+import { toApiError } from '@/lib/errors';
 
 export function useRequestExtension() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, reason, requestedDate }: { taskId: string; reason: string; requestedDate: string }) => {
@@ -14,7 +17,7 @@ export function useRequestExtension() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Xin gia hạn thất bại');
+        throw toApiError(body, 'Xin gia hạn thất bại', res.status);
       }
     },
     onSuccess: (_data, { taskId }) => {
@@ -22,11 +25,12 @@ export function useRequestExtension() {
       qc.invalidateQueries({ queryKey: ['task', taskId] });
       qc.invalidateQueries({ queryKey: ['tasks'] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }
 
 export function useApproveExtension() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, extId, responseNote }: { taskId: string; extId: string; responseNote?: string }) => {
@@ -37,7 +41,7 @@ export function useApproveExtension() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Duyệt gia hạn thất bại');
+        throw toApiError(body, 'Duyệt gia hạn thất bại', res.status);
       }
     },
     onSuccess: (_data, { taskId }) => {
@@ -45,11 +49,12 @@ export function useApproveExtension() {
       qc.invalidateQueries({ queryKey: ['task', taskId] });
       qc.invalidateQueries({ queryKey: ['tasks'] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }
 
 export function useRejectExtension() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, extId, responseNote }: { taskId: string; extId: string; responseNote?: string }) => {
@@ -60,31 +65,32 @@ export function useRejectExtension() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Từ chối gia hạn thất bại');
+        throw toApiError(body, 'Từ chối gia hạn thất bại', res.status);
       }
     },
     onSuccess: (_data, { taskId }) => {
       toast.success('Đã từ chối yêu cầu gia hạn');
       qc.invalidateQueries({ queryKey: ['task', taskId] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }
 
 export function useWithdrawExtension() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, extId }: { taskId: string; extId: string }) => {
       const res = await fetch(`/api/tasks/${taskId}/extension/${extId}`, { method: 'DELETE' });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Rút yêu cầu thất bại');
+        throw toApiError(body, 'Rút yêu cầu thất bại', res.status);
       }
     },
     onSuccess: (_data, { taskId }) => {
       toast.success('Đã rút yêu cầu gia hạn');
       qc.invalidateQueries({ queryKey: ['task', taskId] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }

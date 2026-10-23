@@ -1,11 +1,13 @@
 'use client';
 
 import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
 import { Sun, Moon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const t = useTranslations();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Avoid hydration mismatch — only render icon after mount
@@ -20,7 +22,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      aria-label={isDark ? 'Chuyển sang Light mode' : 'Chuyển sang Dark mode'}
+      aria-label={isDark ? t('ui.theme.toLight') : t('ui.theme.toDark')}
       className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
     >
       {/* Render placeholder until mounted to avoid hydration flash */}

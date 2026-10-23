@@ -2,11 +2,14 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
+import { toApiError } from '@/lib/errors';
 
 interface RejectReviewEntry { assigneeId?: string; reason?: string }
 interface RejectReviewPayload { taskId: string; entries: RejectReviewEntry[] }
 
 export function useRejectReview() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, entries }: RejectReviewPayload) => {
@@ -17,7 +20,7 @@ export function useRejectReview() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Từ chối kết quả thất bại');
+        throw toApiError(body, 'Từ chối kết quả thất bại', res.status);
       }
     },
     onSuccess: (_data, { taskId }) => {
@@ -25,6 +28,6 @@ export function useRejectReview() {
       qc.invalidateQueries({ queryKey: ['tasks'] });
       qc.invalidateQueries({ queryKey: ['task', taskId] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }

@@ -1,7 +1,8 @@
 /** Cờ ưu tiên + chữ (preview `.pr .pr-<tone>`). Tông suy từ `level` của bảng Priority; tên lấy từ DB. */
 import { Flag } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { priorityTone, PRIORITY_TONE_META } from './status-meta';
+import { priorityTone, PRIORITY_TONE_META, metaLabel } from './status-meta';
 
 export interface PriorityFlagProps {
   level?: number | null;
@@ -13,9 +14,10 @@ export interface PriorityFlagProps {
 }
 
 export function PriorityFlag({ level, name, iconOnly, className }: PriorityFlagProps) {
+  const t = useTranslations();
   const tone = priorityTone(level);
   const meta = PRIORITY_TONE_META[tone];
-  const label = name ?? meta.label;
+  const label = name ?? metaLabel(meta, t);
   return (
     <span
       data-tone={tone}

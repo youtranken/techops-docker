@@ -10,6 +10,7 @@
 import * as React from 'react';
 import * as Menu from '@radix-ui/react-dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export interface QuickMenuItem {
@@ -33,14 +34,15 @@ export interface QuickMenuProps {
 
 const stop = (e: React.SyntheticEvent) => e.stopPropagation();
 
-export function QuickMenu({ groups, label = 'Thao tác nhanh', align = 'end', className, triggerClassName }: QuickMenuProps) {
+export function QuickMenu({ groups, label, align = 'end', className, triggerClassName }: QuickMenuProps) {
+  const t = useTranslations();
   const visible = groups.filter((g) => g.length > 0);
   if (visible.length === 0) return null;
 
   return (
     <Menu.Root modal={false}>
       <Menu.Trigger
-        aria-label={label}
+        aria-label={label ?? t('ui.quickActions')}
         onClick={stop}
         onKeyDown={stop}
         onPointerDown={stop}

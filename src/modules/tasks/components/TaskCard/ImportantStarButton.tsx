@@ -4,6 +4,7 @@ import { Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useToggleImportant } from '../../hooks/useTaskTracking';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 interface Props {
   taskId: string;
@@ -17,6 +18,7 @@ interface Props {
 
 /** V2 — ★ Quan trọng (Boss/Admin, dùng chung) */
 export function ImportantStarButton({ taskId, isImportant, canToggle, size = 'sm', className }: Props) {
+  const errMsg = useErrorMessage();
   const toggle = useToggleImportant();
   if (!canToggle) return null;
 
@@ -31,7 +33,7 @@ export function ImportantStarButton({ taskId, isImportant, canToggle, size = 'sm
         e.stopPropagation();
         toggle.mutate(
           { id: taskId, isImportant: !isImportant },
-          { onError: (err) => toast.error(err.message) },
+          { onError: (err) => toast.error(errMsg(err)) },
         );
       }}
       className={cn(

@@ -10,8 +10,10 @@ import { useConfirm } from '@/shared/ui/ConfirmDialog';
 import { useTaskTypes, useCreateTaskType, useUpdateTaskType, useDeleteTaskType, type TaskType } from '../hooks/useTaskTypes';
 import { TaskTypeIcon } from './TaskTypeIcon';
 import { TaskTypeForm } from './TaskTypeForm';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 export function TaskTypesSection() {
+  const errMsg = useErrorMessage();
   const { data: taskTypes = [], isLoading } = useTaskTypes();
   const create = useCreateTaskType();
   const update = useUpdateTaskType();
@@ -26,7 +28,7 @@ export function TaskTypesSection() {
       setShowCreate(false);
       toast.success('Đã thêm loại công việc');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi thêm');
+      toast.error(errMsg(err, 'Lỗi khi thêm'));
     }
   }
 
@@ -37,7 +39,7 @@ export function TaskTypesSection() {
       setEditing(null);
       toast.success('Đã cập nhật');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi cập nhật');
+      toast.error(errMsg(err, 'Lỗi khi cập nhật'));
     }
   }
 
@@ -50,7 +52,7 @@ export function TaskTypesSection() {
     });
     if (!ok) return;
     try { await remove.mutateAsync(t.id); } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể xóa — đang được sử dụng');
+      toast.error(errMsg(err, 'Không thể xóa — đang được sử dụng'));
     }
   }
 

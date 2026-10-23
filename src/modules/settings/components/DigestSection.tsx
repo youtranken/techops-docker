@@ -10,6 +10,7 @@ import { DigestScheduleFields } from './DigestScheduleFields';
 import { DigestContentFields } from './DigestContentFields';
 import { DigestTemplateFields } from './DigestTemplateFields';
 import type { DigestConfigInput, DigestContentType } from '../types';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 const DEFAULT: DigestConfigInput = {
   enabled: false,
@@ -33,6 +34,7 @@ const SECTIONS: { key: Section; label: string; icon: React.ElementType }[] = [
 ];
 
 export function DigestSection() {
+  const errMsg = useErrorMessage();
   const { data, isLoading } = useDigestConfig();
   const update = useUpdateDigestConfig();
   const [form, setForm] = useState<DigestConfigInput>(DEFAULT);
@@ -68,7 +70,7 @@ export function DigestSection() {
       toast.success('Đã lưu cài đặt báo cáo định kỳ');
       setIsDirty(false);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi lưu');
+      toast.error(errMsg(err, 'Lỗi khi lưu'));
     }
   }
 

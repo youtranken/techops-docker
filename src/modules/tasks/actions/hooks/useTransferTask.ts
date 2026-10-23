@@ -2,10 +2,13 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
+import { toApiError } from '@/lib/errors';
 
 interface TransferPayload { taskId: string; newAssigneeId: string; notes?: string }
 
 export function useTransferTask() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, newAssigneeId, notes }: TransferPayload) => {
@@ -16,7 +19,7 @@ export function useTransferTask() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Chuyển giao thất bại');
+        throw toApiError(body, 'Chuyển giao thất bại', res.status);
       }
     },
     onSuccess: (_data, { taskId }) => {
@@ -24,6 +27,6 @@ export function useTransferTask() {
       qc.invalidateQueries({ queryKey: ['tasks'] });
       qc.invalidateQueries({ queryKey: ['task', taskId] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }

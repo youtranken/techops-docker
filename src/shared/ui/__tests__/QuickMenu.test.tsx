@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { render } from '@/test/intl';
 import { QuickMenu, type QuickMenuGroup } from '../QuickMenu';
 
 const groups = (onPick = vi.fn()): QuickMenuGroup[] => [
@@ -77,5 +78,10 @@ describe('QuickMenu (⋯)', () => {
   it('nhãn nút có thể đổi', () => {
     render(<QuickMenu groups={groups()} label="Thao tác cho 26-0033" />);
     expect(screen.getByRole('button', { name: 'Thao tác cho 26-0033' })).toBeInTheDocument();
+  });
+
+  it('EN: nhãn mặc định của nút ⋯ theo ngôn ngữ', () => {
+    render(<QuickMenu groups={groups()} />, { locale: 'en' });
+    expect(screen.getByRole('button', { name: 'Quick actions' })).toBeInTheDocument();
   });
 });

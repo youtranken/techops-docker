@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { dueTone, dueInfo, dayDiffInZone, APP_TIMEZONE } from '../due';
+import { translator } from '@/test/translator';
+import { dueTone, dueInfo, dueLabel, dayDiffInZone, APP_TIMEZONE } from '../due';
+
+// Nhãn hạn giờ là khoá due.* + giá trị (A1.3); dịch bằng translator thật của next-intl
+const tVi = translator('vi');
+const tEn = translator('en');
 
 // "Bây giờ" = 23/10/2026 10:00 giờ VN (03:00 UTC)
 const NOW = new Date('2026-10-23T03:00:00Z');
@@ -59,7 +64,7 @@ describe('dueTone', () => {
 });
 
 describe('dueInfo — nhãn tiếng Việt', () => {
-  const label = (d: Date | null, s = 'IN_PROGRESS') => dueInfo(d, NOW, s as never).label;
+  const label = (d: Date | null, s = 'IN_PROGRESS') => dueLabel(dueInfo(d, NOW, s as never, { locale: 'vi' }), tVi);
   it('Trễ n ngày', () => expect(label(at('2026-10-20T17:00:00'))).toBe('Trễ 3 ngày'));
   it('Hạn hôm nay', () => expect(label(at('2026-10-23T17:00:00'))).toBe('Hạn hôm nay'));
   it('Hạn ngày mai', () => expect(label(at('2026-10-24T08:00:00'))).toBe('Hạn ngày mai'));
@@ -76,5 +81,30 @@ describe('dueInfo — nhãn tiếng Việt', () => {
   it('trả kèm số ngày chênh', () => {
     expect(dueInfo(at('2026-10-20T17:00:00'), NOW, 'IN_PROGRESS').days).toBe(-3);
     expect(dueInfo(null, NOW, 'IN_PROGRESS').days).toBeNull();
+  });
+});
+
+describe('dueInfo — trả về khoá + giá trị (hàm thuần, không phụ thuộc React)', () => {
+  it('khoá due.* và tham số', () => {
+    expect(dueInfo(at('2026-10-20T17:00:00'), NOW, 'IN_PROGRESS')).toMatchObject({ key: 'due.overdue', values: { n: 3 } });
+    expect(dueInfo(at('2026-10-23T17:00:00'), NOW, 'IN_PROGRESS')).toMatchObject({ key: 'due.today' });
+    expect(dueInfo(at('2026-10-25T08:00:00'), NOW, 'IN_PROGRESS')).toMatchObject({ key: 'due.in', values: { n: 2 } });
+    expect(dueInfo(null, NOW, 'IN_PROGRESS')).toMatchObject({ key: 'due.none' });
+  });
+  it('ngày cụ thể định dạng theo locale (vi dd/MM, en MMM d), mặc định vi', () => {
+    expect(dueInfo(at('2026-11-05T08:00:00'), NOW, 'IN_PROGRESS')).toMatchObject({ key: 'due.on', values: { d: '05/11' } });
+    expect(dueInfo(at('2026-11-05T08:00:00'), NOW, 'IN_PROGRESS', { locale: 'en' })).toMatchObject({ key: 'due.on', values: { d: 'Nov 5' } });
+  });
+});
+
+describe('dueLabel — nhãn tiếng Anh', () => {
+  const label = (d: Date | null, s = 'IN_PROGRESS') => dueLabel(dueInfo(d, NOW, s as never, { locale: 'en' }), tEn);
+  it('3d overdue · Due today · Due tomorrow · Due in 2d · Due Nov 5 · No due date', () => {
+    expect(label(at('2026-10-20T17:00:00'))).toBe('3d overdue');
+    expect(label(at('2026-10-23T17:00:00'))).toBe('Due today');
+    expect(label(at('2026-10-24T08:00:00'))).toBe('Due tomorrow');
+    expect(label(at('2026-10-25T08:00:00'))).toBe('Due in 2d');
+    expect(label(at('2026-11-05T08:00:00'))).toBe('Due Nov 5');
+    expect(label(null)).toBe('No due date');
   });
 });

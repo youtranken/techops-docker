@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 const TIMEZONES = [
   { value: 'Asia/Bangkok',        label: 'Asia/Bangkok (UTC+7) — Việt Nam / Thái Lan' },
@@ -27,6 +28,7 @@ const TIMEZONES = [
 ];
 
 export function GeneralSection() {
+  const errMsg = useErrorMessage();
   const [timezone, setTimezone] = useState('Asia/Bangkok');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -54,7 +56,7 @@ export function GeneralSection() {
       }
       toast.success('Cài đặt chung đã được cập nhật. Thay đổi có hiệu lực sau khi khởi động lại server.');
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Lỗi không xác định');
+      toast.error(errMsg(e, 'Lỗi không xác định'));
     } finally {
       setSaving(false);
     }

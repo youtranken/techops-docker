@@ -1,38 +1,512 @@
 {
+  "act": {
+    "accept": "Accept",
+    "approve": "Approve",
+    "cancel": "Cancel task",
+    "decline": "Decline",
+    "edit": "Edit",
+    "extend": "Ask for more time",
+    "open": "Open",
+    "reassign": "Reassign",
+    "report": "Report done",
+    "restore": "Restore",
+    "review": "Sign off",
+    "rework": "Send back",
+    "supplement": "Add to report",
+    "transfer": "Hand over"
+  },
+  "ago": {
+    "hour": "{n} h ago",
+    "min": "{n} min ago",
+    "now": "Just now",
+    "yday": "Yesterday {h}"
+  },
+  "app": {
+    "account": "Account",
+    "att": {
+      "drop": "Drop files here or",
+      "hint": "Preview only: files are not uploaded.",
+      "label": "Attachments",
+      "paste": "Tip: press Win+Shift+S, then Ctrl+V to paste a screenshot.",
+      "pick": "choose files",
+      "remove": "Remove {f}"
+    },
+    "close": "Close",
+    "dlg": {
+      "accept": {
+        "d": "You’re taking on “{t}”. It moves to {s}.",
+        "multi": "This task has {n} assignees and each accepts their own part. {x} of {n} have accepted so far.",
+        "t": "Accept this task?"
+      },
+      "approve": {
+        "d": "“{t}” will move to {s} and the assignees will be notified.",
+        "t": "Approve this task?"
+      },
+      "cancel": {
+        "d": "The task moves to Cancelled and everyone involved gets the reason. Pending extension requests are declined automatically.",
+        "label": "Why cancel",
+        "ph": "E.g. the request was handled in another task",
+        "t": "Cancel this task?"
+      },
+      "cmDel": {
+        "d": "It’s removed for everyone and can’t be recovered.",
+        "dOther": "{a}’s comment is removed for everyone and can’t be recovered.",
+        "ok": "Delete comment",
+        "t": "Delete this comment?"
+      },
+      "decline": {
+        "back": "{a} handed this part to you. If you decline, it goes back to {a}, who gets a “Task returned” notification.",
+        "ph": "E.g. busy with another urgent task, please assign someone else",
+        "t": "Decline this task?"
+      },
+      "ext": {
+        "blockPending": "There are already 2 pending requests, the maximum. Wait for a decision or withdraw one first.",
+        "blockT": "You can’t ask for more time yet",
+        "blockTotal": "All 5 extension requests for this task have been used. Talk to a Vice Manager in the comments.",
+        "cur": "Current due date",
+        "dateErr": "Pick a date after {d}: later than the current due date, today and any pending request.",
+        "new": "New due date",
+        "ph": "Why you need more time…",
+        "quota": "{n} of 5 extension requests and {p} of 2 pending slots left. A Vice Manager or Admin will decide.",
+        "send": "Send request",
+        "t": "Ask for more time"
+      },
+      "extNo": {
+        "d": "Only the requester is notified, with your reply.",
+        "t": "Decline the extension?"
+      },
+      "extOk": {
+        "d": "The new due date is {d}. All assignees are notified.",
+        "t": "Approve the extension?"
+      },
+      "forceNote": "Mandatory task: it can’t be declined or handed over.",
+      "minErr": "Write at least 10 characters ({n}/10).",
+      "next": {
+        "approval": "Once sent, the task moves to In review for a Vice Manager or Admin to check.",
+        "direct": "This task was assigned directly, so there’s no review: once sent, it moves to Done.",
+        "wait": "{n} other assignee(s) haven’t reported yet. The task moves on only when everyone has reported."
+      },
+      "ra": {
+        "d": "Everyone assigned declined or handed it over. Pick one or more people; the task goes back to Awaiting pickup and they get a “Reassigned” notification.",
+        "err": "Pick at least one person.",
+        "n": "{n} selected",
+        "pick": "New assignees",
+        "t": "Reassign task"
+      },
+      "reason": "Reason",
+      "reasonErr": "Enter a reason.",
+      "reject": {
+        "d": "The task moves to Cancelled and the creator is notified. A rejected plan can’t be restored.",
+        "ok": "Reject plan",
+        "ph": "Optional. E.g. needs a quote before work starts",
+        "t": "Reject the plan?"
+      },
+      "reply": {
+        "_": "Reply",
+        "ph": "A note for the requester (optional)"
+      },
+      "report": {
+        "label": "Report",
+        "ph": "What you did, the result, anything to watch out for…",
+        "send": "Send report",
+        "t": "Report work done",
+        "ver": "This report will be version {v}."
+      },
+      "restore": {
+        "d": "The task goes back to its status before it was cancelled: {s}.",
+        "ppl": "Every assignee starts over (Not accepted yet) and has to accept again.",
+        "t": "Restore this task?"
+      },
+      "review": {
+        "d": "Confirm “{t}” meets the requirements. It moves to {s}.",
+        "t": "Sign off this task?"
+      },
+      "rework": {
+        "d": "Pick who needs to redo their part and give each a reason. The task goes back to In progress; everyone else keeps their report.",
+        "errPick": "Pick at least one person.",
+        "ph": "What to fix or add…",
+        "pick": "Who needs to redo it",
+        "reason": "Reason for {a}",
+        "t": "Send back for rework"
+      },
+      "supp": {
+        "label": "What’s new",
+        "ph": "New results, screenshots or notes…",
+        "send": "Send update",
+        "t": "Add to your report"
+      },
+      "tpl": {
+        "_": "Completion template",
+        "hint": "General templates plus those for “{ty}”. Picking one replaces what you typed.",
+        "none": "No templates yet. Admins or Vice Managers add them in Settings → Completion templates.",
+        "ph": "Pick a template to prefill…"
+      },
+      "tr": {
+        "d": "The person you pick takes over your part and needs to accept it. If they decline, it comes back to you.",
+        "err": "Choose who takes it over.",
+        "hint": "People already on this task (including anyone who declined or handed it over) aren’t listed, so it can’t loop back.",
+        "in": "already on this task",
+        "loop": "{a} just handed this to you, so it can’t go back to them.",
+        "note": "Hand-over note",
+        "noteErr": "Enter a hand-over note.",
+        "ok": "Hand over",
+        "ph": "What’s done and what’s left…",
+        "t": "Hand over your part",
+        "to": "Hand over to"
+      },
+      "wd": {
+        "d": "Your request to move the due date to {d} will be withdrawn. It still counts toward the limit.",
+        "ok": "Withdraw",
+        "t": "Withdraw this request?"
+      }
+    },
+    "loading": "Loading…",
+    "name": "TechOps",
+    "opt": "optional",
+    "org": "IT Department · PMH",
+    "phaseB": {
+      "_": "Phase B",
+      "d": "Not in V1 yet, planned for Phase B"
+    },
+    "pv": {
+      "label": "Preview controls"
+    },
+    "req": "required",
+    "retry": "Try again",
+    "skip": "Skip to main content",
+    "soon": "This page is still being designed and will come in a later preview.",
+    "toast": {
+      "accepted": "You’ve accepted your part of {id}.",
+      "allFailed": "Declined {id}. Everyone assigned has declined and the creator was told.",
+      "cancelled": "{id} cancelled.",
+      "close": "Dismiss",
+      "cmDel": "Comment deleted.",
+      "declined": "Declined {id}; the assigner has been told.",
+      "extNo": "Extension declined.",
+      "extOk": "Extension approved. New due date: {d}.",
+      "extSent": "Extension request to {d} sent.",
+      "extWd": "Extension request withdrawn.",
+      "files": "{n} file(s) added.",
+      "moved": "{id} moved to “{s}”.",
+      "partial": "Your report is in. The task moves to review once every assignee has reported.",
+      "partialDirect": "Your report is in. The task completes once every assignee has reported.",
+      "reassigned": "Reassigned {id} to {n} people. It’s now Awaiting pickup.",
+      "rejected": "Plan rejected. {id} is now cancelled.",
+      "restored": "{id} restored to “{s}”.",
+      "returned": "Declined {id}. The part went back to {a}.",
+      "rework": "Sent back to {n} assignee(s). {id} is in progress again.",
+      "supp": "Report update {v} sent.",
+      "transferred": "Handed over to {a}."
+    }
+  },
+  "auth": {
+    "forgotPassword": "Forgot Password",
+    "login": "Login",
+    "logout": "Logout",
+    "password": "Password",
+    "rememberMe": "Remember Me",
+    "username": "Username"
+  },
+  "card": {
+    "comments": "{n} comments",
+    "files": "{n} files",
+    "more": "More actions",
+    "new": "Just done",
+    "star": "Star",
+    "unassigned": "Unassigned",
+    "unseen": "Unseen",
+    "unstar": "Unstar"
+  },
   "common": {
-    "save": "Save",
+    "back": "Back",
     "cancel": "Cancel",
+    "create": "Create",
     "delete": "Delete",
     "edit": "Edit",
-    "create": "Create",
-    "search": "Search",
-    "filter": "Filter",
+    "error": "Error",
     "export": "Export",
+    "filter": "Filter",
     "import": "Import",
-    "back": "Back",
+    "loading": "Loading...",
     "next": "Next",
     "previous": "Previous",
-    "loading": "Loading...",
-    "error": "Error",
+    "save": "Save",
+    "search": "Search",
     "success": "Success"
   },
-  "task": {
-    "title": "Task",
-    "status": "Status",
-    "priority": "Priority",
-    "type": "Task Type",
+  "due": {
+    "doneOnTime": "Done on time",
+    "in": "Due in {n}d",
+    "none": "No due date",
+    "on": "Due {d}",
+    "overdue": "{n}d overdue",
+    "today": "Due today",
+    "tomorrow": "Due tomorrow"
+  },
+  "empty": {
+    "cancelled": {
+      "t": "No cancelled tasks"
+    },
+    "done": {
+      "t": "No finished tasks yet"
+    },
+    "mine": {
+      "d": "Tasks you need to accept, approve or review show up here.",
+      "t": "Nothing is waiting on you"
+    }
+  },
+  "er": {
+    "403": {
+      "d": "This page is for Vice Managers and Admins. If you need it for your work, ask an Admin to grant access under People.",
+      "t": "You don’t have access to this page"
+    },
+    "404": {
+      "d": "The link may be old or mistyped. If you opened it from an email, the task may have been deleted.",
+      "t": "Page not found"
+    },
+    "500": {
+      "d": "Your last action wasn’t saved. Try again in a few minutes; if it keeps failing, send the error code below to IT.",
+      "t": "Something went wrong on our side"
+    },
+    "back": "Go back",
+    "code": "Error code",
+    "copied": "Error code copied",
+    "copy": "Copy error code",
+    "crumb": "Error",
+    "home": "Back to Tasks",
+    "offline": {
+      "d": "Check your Wi-Fi or network cable. This page reloads when you’re back online.",
+      "t": "You’re offline"
+    },
+    "pv": {
+      "403": "No access (403)",
+      "404": "Not found (404)",
+      "500": "Server error (500)",
+      "offline": "Offline",
+      "toast": "Sample error toast",
+      "type": "Error type"
+    },
+    "retrying": "Retrying…",
+    "still": "Still not working. Try again in a few minutes.",
+    "toast": {
+      "403": "You don’t have permission to do that.",
+      "429": "You’re going a bit fast. Wait {n} seconds and try again.",
+      "500": "The server hit a problem and your change wasn’t saved. Try again in a few minutes.",
+      "net": "Can’t reach the server. Check your connection and try again."
+    }
+  },
+  "err": {
+    "assigneesRequired": "Pick at least one assignee.",
+    "auth": "Your session has ended. Please sign in again.",
+    "commentNotFound": "We couldn’t find that comment. It may have been deleted.",
+    "emailFailed": "The email couldn’t be sent. Check the SMTP settings and try again.",
+    "extDate": "That date doesn’t work: it must be after the current due date, today and any pending request.",
+    "extMax": "All 5 extension requests for this task have been used.",
+    "extNotFound": "We couldn’t find that extension request. It may already have been handled.",
+    "extPending": "There are already 2 pending requests, the maximum. Wait for a decision or withdraw one first.",
+    "failed": "That didn’t go through. Try again in a few minutes.",
+    "fileLimit": "Up to 3 files, 10 MB each.",
+    "fileTooLarge": "The file is too large.",
+    "fileTooLargeNamed": "{name} is larger than {max} MB.",
+    "fileType": "{ext} files aren’t allowed. Only PDF files are accepted.",
+    "fileTypeAny": "This file type isn’t allowed.",
+    "flowSwitch": "The workflow can’t be changed at this stage.",
+    "forbidden": "You don’t have permission to do that.",
+    "forceMode": "Mandatory task: it can’t be declined or handed over.",
+    "forceModeApproval": "Mandatory mode only works with the approval workflow.",
+    "generic": "Something went wrong and the action wasn’t completed.",
+    "genericCode": "Something went wrong and the action wasn’t completed (code {code}).",
+    "helpdeskConfig": "The Helpdesk connection isn’t set up yet.",
+    "inUse": "This item is in use, so it can’t be deleted yet.",
+    "invalid": "Some fields aren’t valid. Check what you entered.",
+    "network": "Can’t reach the server. Check your connection and try again.",
+    "notAssignee": "You’re no longer an assignee on this task, or it’s already been handled.",
+    "notFound": "We couldn’t find that. It may have been deleted.",
+    "origin": "The request was blocked because it didn’t come from TechOps. Reload the page and try again.",
+    "otp": "The OTP code is wrong or has expired.",
+    "passwordRequired": "Enter a password.",
+    "priorityInUse": "This priority is used by some tasks, so it can’t be deleted yet.",
+    "rateLimit": "You’re going a bit fast. Wait a moment and try again.",
+    "reportRequired": "Write your report first.",
+    "samePassword": "The new password must be different from the current one.",
+    "sameUser": "You can’t hand a task over to yourself.",
+    "server": "The server hit a problem and your change wasn’t saved. Try again in a few minutes.",
+    "smtp": "Can’t connect to the mail server. Check the SMTP settings.",
+    "smtpDecrypt": "The saved SMTP settings can’t be read (the encryption key changed). Enter the SMTP settings again and save.",
+    "smtpKey": "The server has no SMTP encryption key configured. Contact your system admin.",
+    "statusChanged": "This task’s status has changed. Reload the page and try again.",
+    "taskNotFound": "We couldn’t find that task. It may have been deleted.",
+    "taskTypeInUse": "This task type is used by some tasks, so it can’t be deleted yet.",
+    "unavailable": "The service is temporarily unavailable. Try again in a few minutes.",
+    "userDuplicate": "That username or email is already taken.",
+    "userHasTasks": "This user still has tasks, so they can’t be deleted yet.",
+    "userInactive": "This account is deactivated.",
+    "userNotFound": "That user no longer exists.",
+    "weakPassword": "The password doesn’t meet the password policy.",
+    "wrongPassword": "Your current password is incorrect."
+  },
+  "filter": {
     "assignee": "Assignee",
+    "btn": "Filter",
+    "due": "Due",
+    "priority": "Priority",
+    "search": "Search by title",
+    "status": "Status"
+  },
+  "flow": {
+    "count": "Tasks: {n}",
+    "label": "Task workflow",
+    "mine": "{n} on you"
+  },
+  "idle": {
+    "d": "You’ve been inactive for almost {m} minutes. Signing out in",
+    "keep": "Keep working",
+    "kept": "Your session is still active.",
+    "t": "Your session is about to end"
+  },
+  "lane": {
+    "empty": "Nothing here"
+  },
+  "lang": {
+    "en": "EN",
+    "vi": "VI"
+  },
+  "n": {
+    "allFailed": "Everyone assigned declined “{t}”. You can cancel it or ask an Admin to reassign it.",
+    "transfer": "{a} handed “{t}” over to you"
+  },
+  "nav": {
+    "crumbs": "Breadcrumb",
+    "group": {
+      "admin": "Admin",
+      "granted": "Granted to you",
+      "work": "Work"
+    },
+    "helpdesk": "Helpdesk",
+    "home": "Overview",
+    "label": "Main navigation",
+    "logs": "Activity log",
+    "open": "Open menu",
+    "people": "People",
+    "reports": "Reports",
+    "settings": "Settings",
+    "starred": "Starred",
+    "tasks": "Tasks",
+    "unseen": "Just done"
+  },
+  "notif": {
+    "adminNoMail": "Admins don’t get task emails, only in-app notifications.",
+    "all": "See all",
+    "earlier": "Earlier",
+    "readAll": "Mark all read",
+    "title": "Notifications",
+    "today": "Today"
+  },
+  "page": {
+    "export": "Export to Excel",
+    "new": "New task",
+    "sub": "{n} open, {m} waiting on you",
+    "title": "Tasks"
+  },
+  "pr": {
+    "high": "High",
+    "low": "Low",
+    "normal": "Normal",
+    "urgent": "Urgent"
+  },
+  "qa": {
+    "copied": "Copied {id}",
+    "copy": "Copy ID",
+    "menu": "Quick actions for {id}",
+    "starOff": "Unstarred {id}",
+    "starOn": "Starred {id}",
+    "view": "Quick view"
+  },
+  "role": {
+    "admin": "Admin",
+    "boss": "Vice Manager",
+    "emp": "Staff"
+  },
+  "st": {
+    "CANCELLED": "Cancelled",
+    "COMPLETED": "Done",
+    "DRAFT": "Draft",
+    "IN_PROGRESS": "In progress",
+    "PENDING_APPROVAL": "Awaiting approval",
+    "PENDING_REVIEW": "In review",
+    "WAITING_ACKNOWLEDGE": "Awaiting pickup"
+  },
+  "task": {
+    "assignee": "Assignee",
+    "attachments": "Attachments",
     "creator": "Creator",
     "deadline": "Deadline",
     "description": "Description",
-    "attachments": "Attachments"
+    "priority": "Priority",
+    "status": "Status",
+    "title": "Task",
+    "type": "Task Type"
   },
-  "auth": {
-    "login": "Login",
-    "logout": "Logout",
-    "username": "Username",
-    "password": "Password",
-    "forgotPassword": "Forgot Password",
-    "rememberMe": "Remember Me"
+  "td": {
+    "as": {
+      "ACCEPTED": "Accepted",
+      "COMPLETED": "Reported",
+      "DECLINED": "Declined",
+      "IN_PROGRESS": "Working",
+      "PENDING": "Not accepted yet",
+      "REJECTED": "Declined",
+      "REPORTED": "Reported",
+      "REVISION_REQUIRED": "Needs rework",
+      "REWORK": "Needs rework",
+      "TRANSFERRED": "Handed over"
+    }
+  },
+  "tl": {
+    "pg": {
+      "nav": "Pagination",
+      "next": "Next page",
+      "of": "{a}–{b} of {n} tasks",
+      "page": "Page {n}",
+      "prev": "Previous page",
+      "size": "Per page"
+    }
+  },
+  "top": {
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "search": "Search tasks or HD code",
+    "signout": "Sign out"
+  },
+  "ui": {
+    "confirm": "Confirm",
+    "lang": {
+      "en": "English",
+      "label": "Language",
+      "vi": "Tiếng Việt"
+    },
+    "loadFailed": "Couldn’t load data",
+    "noData": "No data",
+    "quickActions": "Quick actions",
+    "removeFilter": "Remove filter {f}",
+    "saveChanges": "Save changes",
+    "saving": "Saving…",
+    "summary": "Summary",
+    "theme": {
+      "toDark": "Switch to dark mode",
+      "toLight": "Switch to light mode"
+    },
+    "undo": "Undo",
+    "unsaved": "You have unsaved changes",
+    "userMenu": "Account menu"
+  },
+  "view": {
+    "board": "Board",
+    "cancelled": "Cancelled",
+    "done": "Done",
+    "list": "List",
+    "mine": "Needs me",
+    "open": "Open",
+    "starred": "Starred",
+    "unseen": "Just done"
   }
 }

@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type { CommentItem } from '../services/comment.service';
 import type { PaginatedResult } from '@/lib/types/pagination';
+import { useErrorMessage } from '@/lib/useErrorMessage';
+import { toApiError } from '@/lib/errors';
 
 export function useComments(taskId: string, page = 1) {
   return useQuery<PaginatedResult<CommentItem>>({
@@ -18,6 +20,7 @@ export function useComments(taskId: string, page = 1) {
 }
 
 export function useCreateComment() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({
@@ -36,18 +39,19 @@ export function useCreateComment() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Gửi bình luận thất bại');
+        throw toApiError(body, 'Gửi bình luận thất bại', res.status);
       }
       return res.json() as Promise<CommentItem>;
     },
     onSuccess: (_data, { taskId }) => {
       qc.invalidateQueries({ queryKey: ['comments', taskId] });
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }
 
 export function useUpdateComment() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({
@@ -66,7 +70,7 @@ export function useUpdateComment() {
       });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Cập nhật bình luận thất bại');
+        throw toApiError(body, 'Cập nhật bình luận thất bại', res.status);
       }
       return res.json() as Promise<CommentItem>;
     },
@@ -74,24 +78,25 @@ export function useUpdateComment() {
       qc.invalidateQueries({ queryKey: ['comments', taskId] });
       toast.success('Đã cập nhật bình luận');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }
 
 export function useDeleteComment() {
+  const errMsg = useErrorMessage();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ taskId, commentId }: { taskId: string; commentId: string }) => {
       const res = await fetch(`/api/tasks/${taskId}/comments/${commentId}`, { method: 'DELETE' });
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body.error?.message ?? 'Xóa bình luận thất bại');
+        throw toApiError(body, 'Xóa bình luận thất bại', res.status);
       }
     },
     onSuccess: (_data, { taskId }) => {
       qc.invalidateQueries({ queryKey: ['comments', taskId] });
       toast.success('Đã xóa bình luận');
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => toast.error(errMsg(err)),
   });
 }

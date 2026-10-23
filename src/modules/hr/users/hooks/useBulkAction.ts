@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 export type BulkActionType = 'deactivate' | 'activate' | 'changeRole' | 'forceChangePassword';
 
@@ -32,6 +33,7 @@ const ACTION_LABELS: Record<BulkActionType, string> = {
 };
 
 export function useBulkAction(onSuccess?: () => void) {
+  const errMsg = useErrorMessage();
   const queryClient = useQueryClient();
 
   return useMutation<{ affected: number }, Error, BulkActionPayload>({
@@ -43,7 +45,7 @@ export function useBulkAction(onSuccess?: () => void) {
       onSuccess?.();
     },
     onError: (err) => {
-      toast.error(err.message ?? 'Thao tác thất bại');
+      toast.error(errMsg(err, 'Thao tác thất bại'));
     },
   });
 }

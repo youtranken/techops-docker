@@ -6,6 +6,7 @@ import { Camera, Loader2 } from 'lucide-react';
 import { useUpdateProfile, useUploadAvatar } from '../hooks/useProfile';
 import { toast } from 'sonner';
 import type { UserProfileData } from '../types';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 function getInitials(name: string) {
   const w = name.trim().split(/\s+/).filter(Boolean);
@@ -21,6 +22,7 @@ const COLOR_PRESETS = [
 interface Props { profile: UserProfileData }
 
 export function ProfileAvatar({ profile }: Props) {
+  const errMsg = useErrorMessage();
   const fileRef = useRef<HTMLInputElement>(null);
   const upload = useUploadAvatar();
   const update = useUpdateProfile();
@@ -51,7 +53,7 @@ export function ProfileAvatar({ profile }: Props) {
       await update.mutateAsync({ avatarUrl: url });
       toast.success('Đã cập nhật ảnh đại diện');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi upload');
+      toast.error(errMsg(err, 'Lỗi upload'));
     }
     e.target.value = '';
   }

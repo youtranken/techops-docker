@@ -7,8 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 export function ChangePasswordSection() {
+  const errMsg = useErrorMessage();
   const router = useRouter();
   const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [show, setShow] = useState({ current: false, next: false, confirm: false });
@@ -38,7 +40,7 @@ export function ChangePasswordSection() {
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error?.message ?? 'Đổi mật khẩu thất bại');
+        toast.error(errMsg(json.error, 'Đổi mật khẩu thất bại'));
         return;
       }
       toast.success('Đã đổi mật khẩu thành công');

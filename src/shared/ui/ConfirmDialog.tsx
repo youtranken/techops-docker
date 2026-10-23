@@ -9,6 +9,7 @@
  */
 import * as React from 'react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -39,6 +40,7 @@ interface Pending {
 }
 
 export function ConfirmProvider({ children }: { children: React.ReactNode }) {
+  const t = useTranslations();
   const [pending, setPending] = React.useState<Pending | null>(null);
   const [open, setOpen] = React.useState(false);
   const pendingRef = React.useRef<Pending | null>(null);
@@ -100,12 +102,12 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
             <AlertDialog.Description
               className={o?.description ? 'overflow-y-auto px-5 pb-[18px] pt-1.5 text-sm text-ink-2' : 'sr-only'}
             >
-              {o?.description ?? (typeof o?.title === 'string' ? o.title : 'Xác nhận')}
+              {o?.description ?? (typeof o?.title === 'string' ? o.title : t('ui.confirm'))}
             </AlertDialog.Description>
             <div className="flex justify-end gap-2 border-t border-line px-4 py-3 max-[680px]:pb-[max(12px,env(safe-area-inset-bottom))] max-[680px]:[&>button]:flex-1">
               <AlertDialog.Cancel asChild>
                 <Button type="button" variant="outline" size="md">
-                  {o?.closeText ?? 'Đóng'}
+                  {o?.closeText ?? t('app.close')}
                 </Button>
               </AlertDialog.Cancel>
               <AlertDialog.Action asChild>
@@ -116,7 +118,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                   data-variant={o?.danger ? 'danger' : 'default'}
                   onClick={(e) => { e.preventDefault(); settle(true); }}
                 >
-                  {o?.confirmText ?? 'Xác nhận'}
+                  {o?.confirmText ?? t('ui.confirm')}
                 </Button>
               </AlertDialog.Action>
             </div>

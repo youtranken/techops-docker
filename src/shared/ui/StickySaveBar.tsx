@@ -5,6 +5,7 @@
  * ≥681: thẻ nổi dính đáy vùng nội dung; ≤680: tràn ngang, cố định đáy màn, nút cao 42.
  */
 import { Undo2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -24,12 +25,16 @@ export function StickySaveBar({
   onSave,
   onReset,
   saving = false,
-  message = 'Bạn có thay đổi chưa lưu',
-  saveText = 'Lưu thay đổi',
-  resetText = 'Hoàn tác',
+  message: messageProp,
+  saveText: saveTextProp,
+  resetText: resetTextProp,
   className,
 }: StickySaveBarProps) {
+  const t = useTranslations();
   if (!dirty) return null;
+  const message = messageProp ?? t('ui.unsaved');
+  const saveText = saveTextProp ?? t('ui.saveChanges');
+  const resetText = resetTextProp ?? t('ui.undo');
   return (
     <div
       role="region"
@@ -49,7 +54,7 @@ export function StickySaveBar({
         {resetText}
       </Button>
       <Button type="button" size="md" disabled={saving} onClick={onSave} className="max-[680px]:h-[42px] max-[680px]:flex-1">
-        {saving ? 'Đang lưu…' : saveText}
+        {saving ? t('ui.saving') : saveText}
       </Button>
     </div>
   );

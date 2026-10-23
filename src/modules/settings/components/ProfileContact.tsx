@@ -8,10 +8,12 @@ import { Loader2, Mail, Phone, AtSign } from 'lucide-react';
 import { useUpdateProfile } from '../hooks/useProfile';
 import { toast } from 'sonner';
 import type { UserProfileData } from '../types';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 interface Props { profile: UserProfileData }
 
 export function ProfileContact({ profile }: Props) {
+  const errMsg = useErrorMessage();
   const update = useUpdateProfile();
   const [email, setEmail] = useState(profile.email ?? '');
   const [phone, setPhone] = useState(profile.profile?.phone ?? '');
@@ -23,7 +25,7 @@ export function ProfileContact({ profile }: Props) {
       toast.success('Đã lưu thông tin liên hệ');
       setDirty(false);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi lưu');
+      toast.error(errMsg(err, 'Lỗi khi lưu'));
     }
   }
 

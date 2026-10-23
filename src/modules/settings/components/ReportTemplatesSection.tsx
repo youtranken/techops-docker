@@ -21,6 +21,7 @@ import {
   type ReportTemplateInput,
 } from '../hooks/useReportTemplates';
 import { useTaskTypes } from '../hooks/useTaskTypes';
+import { useErrorMessage } from '@/lib/useErrorMessage';
 
 interface FormState {
   title: string;
@@ -115,6 +116,7 @@ function TemplateForm({ initial = EMPTY_FORM, isPending, onSave, onCancel }: Tem
 }
 
 export function ReportTemplatesSection() {
+  const errMsg = useErrorMessage();
   const { data: templates = [], isLoading } = useReportTemplates();
   const { data: taskTypes = [] } = useTaskTypes();
   const create = useCreateReportTemplate();
@@ -132,7 +134,7 @@ export function ReportTemplatesSection() {
       setShowCreate(false);
       toast.success('Đã thêm mẫu báo cáo');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi thêm');
+      toast.error(errMsg(err, 'Lỗi khi thêm'));
     }
   }
 
@@ -143,7 +145,7 @@ export function ReportTemplatesSection() {
       setEditing(null);
       toast.success('Đã cập nhật');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi khi cập nhật');
+      toast.error(errMsg(err, 'Lỗi khi cập nhật'));
     }
   }
 
@@ -167,7 +169,7 @@ export function ReportTemplatesSection() {
       await remove.mutateAsync(t.id);
       toast.success('Đã xóa');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể xóa');
+      toast.error(errMsg(err, 'Không thể xóa'));
     }
   }
 

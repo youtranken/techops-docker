@@ -3,7 +3,8 @@
 import { signOut } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { Menu, UserCircle } from 'lucide-react';
+import { Menu, UserCircle, Languages } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -11,12 +12,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ROLE_LABELS } from '@/lib/constants';
 import { NotificationBell } from '@/modules/notifications/components/NotificationBell';
 import { ThemeToggle } from '@/shared/ui/ThemeToggle';
+import { LOCALES, resolveLocale } from '@/i18n/locale';
+import { useSetLocale } from '@/i18n/useSetLocale';
 
 interface UserProfile {
   displayName: string;
@@ -42,6 +47,9 @@ function getInitials(name: string): string {
 }
 
 export function Header({ displayName, roleName, onSidebarToggle }: HeaderProps) {
+  const t = useTranslations();
+  const locale = resolveLocale(useLocale());
+  const { setLocale, pending: localePending } = useSetLocale();
   const { data: profile } = useQuery<UserProfile>({
     queryKey: ['profile'],
     queryFn: async () => {
@@ -72,7 +80,7 @@ export function Header({ displayName, roleName, onSidebarToggle }: HeaderProps) 
         <button
           onClick={onSidebarToggle}
           className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors lg:hidden"
-          aria-label="Toggle sidebar"
+          aria-label={t('nav.open')}
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -115,15 +123,31 @@ export function Header({ displayName, roleName, onSidebarToggle }: HeaderProps) 
             <DropdownMenuItem asChild>
               <Link href="/settings/profile" className="flex items-center gap-2 cursor-pointer">
                 <UserCircle className="h-4 w-4" />
-                Profile
+                {t('top.profile')}
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {/* Ngôn ngữ (A1.3) — đặt tạm ở menu người dùng; A1-4 dựng lại khung */}
+            <DropdownMenuLabel className="flex items-center gap-2 text-xs font-normal text-muted-foreground">
+              <Languages aria-hidden className="h-3.5 w-3.5" />
+              {t('ui.lang.label')}
+            </DropdownMenuLabel>
+            <DropdownMenuRadioGroup
+              value={locale}
+              onValueChange={(v) => { const next = resolveLocale(v); if (next !== locale) setLocale(next); }}
+            >
+              {LOCALES.map((l) => (
+                <DropdownMenuRadioItem key={l} value={l} lang={l} disabled={localePending} className="cursor-pointer">
+                  {t(`ui.lang.${l}`)}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleLogout}
               className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 cursor-pointer"
             >
-              Đăng xuất
+              {t('top.signout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

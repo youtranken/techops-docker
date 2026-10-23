@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
+import { render } from '@/test/intl';
 import { StickySaveBar } from '../StickySaveBar';
 
 describe('StickySaveBar', () => {
@@ -43,5 +44,11 @@ describe('StickySaveBar', () => {
     expect(screen.getByRole('region')).toBeInTheDocument();
     rerender(<StickySaveBar dirty={false} onSave={() => {}} onReset={() => {}} />);
     expect(screen.queryByRole('region')).not.toBeInTheDocument();
+  });
+
+  it('EN: lời nhắc + nút theo ngôn ngữ', () => {
+    render(<StickySaveBar dirty onSave={() => {}} onReset={() => {}} />, { locale: 'en' });
+    expect(screen.getByRole('region', { name: 'You have unsaved changes' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['Undo', 'Save changes']);
   });
 });
