@@ -182,6 +182,26 @@ const vi = {
   'tdx.dlg.rework.all': 'Tất cả ({n} người)',
   'tdx.dlg.rework.latest': 'Báo cáo mới nhất',
   'tdx.dlg.paste.size': 'Ảnh {s}, vượt giới hạn {m} MB.',
+  // ── A2-3 danh sách công việc (tlx.*: chữ của V1 không có trong copy.js) ──
+  'tlx.total': '{n} công việc',
+  'tlx.views': 'Nhóm công việc',
+  'tlx.viewMode': 'Chế độ xem',
+  'tlx.loadErr': 'Không thể tải danh sách công việc.',
+  'tlx.f.stActive': 'Chưa hoàn thành',
+  'tlx.f.stAll': 'Tất cả trạng thái',
+  'tlx.sort': 'Sắp xếp',
+  'tlx.sort.smart': 'Mặc định (chưa xem → ★ → ưu tiên)',
+  'tlx.sort.createdAt_desc': 'Mới nhất',
+  'tlx.sort.createdAt_asc': 'Cũ nhất',
+  'tlx.sort.scheduleEnd_asc': 'Hạn gần nhất',
+  'tlx.sort.scheduleEnd_desc': 'Hạn xa nhất',
+  'tlx.sort.title_asc': 'Tên A → Z',
+  'tlx.sort.title_desc': 'Tên Z → A',
+  'tlx.sort.status_asc': 'Trạng thái',
+  'tlx.qa.declineTask': 'Từ chối nhận',
+  'tlx.qa.approveExt': 'Duyệt gia hạn ({d})',
+  'tlx.mention': 'có nhắc đến bạn',
+  'tlx.extPending': 'Đơn gia hạn đang chờ duyệt (đến {d})',
 };
 
 const en = {
@@ -356,6 +376,26 @@ const en = {
   'tdx.dlg.rework.all': 'All ({n})',
   'tdx.dlg.rework.latest': 'Latest report',
   'tdx.dlg.paste.size': 'This image is {s}, over the {m} MB limit.',
+  // ── A2-3 ──
+  'tlx.total': '{n, plural, one {# task} other {# tasks}}',
+  'tlx.views': 'Task views',
+  'tlx.viewMode': 'View',
+  'tlx.loadErr': 'Couldn’t load the task list.',
+  'tlx.f.stActive': 'Not finished',
+  'tlx.f.stAll': 'All statuses',
+  'tlx.sort': 'Sort',
+  'tlx.sort.smart': 'Default (unseen → ★ → priority)',
+  'tlx.sort.createdAt_desc': 'Newest',
+  'tlx.sort.createdAt_asc': 'Oldest',
+  'tlx.sort.scheduleEnd_asc': 'Due soonest',
+  'tlx.sort.scheduleEnd_desc': 'Due latest',
+  'tlx.sort.title_asc': 'Title A → Z',
+  'tlx.sort.title_desc': 'Title Z → A',
+  'tlx.sort.status_asc': 'Status',
+  'tlx.qa.declineTask': 'Decline',
+  'tlx.qa.approveExt': 'Approve extension ({d})',
+  'tlx.mention': 'mentions you',
+  'tlx.extPending': 'Extension request pending (to {d})',
 };
 
 export const EXTRA = { vi, en };

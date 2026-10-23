@@ -1,6 +1,7 @@
 'use client';
 
-/** Thanh phân trang (preview tasks-list `.pager`): "a–b / n" · ‹ 1 … 4 5 6 … 20 › · Mỗi trang [20]. */
+/** Thanh phân trang (preview tasks-list `.pager`): "a–b / n" · ‹ 1 … 4 5 6 … 20 › · Mỗi trang [20].
+ *  ≤680: chỉ ‹ [trang hiện tại] › (nút 44px, không tràn ngang ở 390). */
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
@@ -19,7 +20,7 @@ export interface PaginationProps {
 }
 
 const ring = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
-const navBtn = cn('grid size-8 place-items-center rounded-md text-ink-2 hover:bg-surface-2 disabled:pointer-events-none disabled:opacity-40', ring);
+const navBtn = cn('grid size-8 place-items-center rounded-md text-ink-2 hover:bg-surface-2 disabled:pointer-events-none disabled:opacity-40 max-[680px]:size-11', ring);
 
 export function Pagination({ page, pageSize, total, onPageChange, onPageSizeChange, pageSizes = PAGE_SIZES, className }: PaginationProps) {
   const t = useTranslations();
@@ -38,7 +39,7 @@ export function Pagination({ page, pageSize, total, onPageChange, onPageSizeChan
         </button>
         {pageRange(page, pages).map((x, i) =>
           x === '…' ? (
-            <span key={`gap${i}`} aria-hidden className="min-w-5 text-center text-ink-3">…</span>
+            <span key={`gap${i}`} aria-hidden className="min-w-5 text-center text-ink-3 max-[680px]:hidden">…</span>
           ) : (
             <button
               key={x}
@@ -49,7 +50,7 @@ export function Pagination({ page, pageSize, total, onPageChange, onPageSizeChan
               className={cn(
                 'h-8 min-w-8 rounded-md border border-transparent px-1.5 font-mono text-xs text-ink-2 hover:bg-surface-2',
                 ring,
-                x === page && 'border-line-2 bg-surface font-semibold text-ink',
+                x === page ? 'border-line-2 bg-surface font-semibold text-ink max-[680px]:h-11 max-[680px]:min-w-11' : 'max-[680px]:hidden',
               )}
             >
               {x}
@@ -66,7 +67,7 @@ export function Pagination({ page, pageSize, total, onPageChange, onPageSizeChan
           <select
             value={pageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className={cn('h-8 w-[76px] rounded-md border border-line-2 bg-surface px-2 text-[13px] text-ink', ring)}
+            className={cn('h-8 w-[76px] rounded-md border border-line-2 bg-surface px-2 text-[13px] text-ink max-[680px]:h-11', ring)}
           >
             {pageSizes.map((n) => (
               <option key={n} value={n}>{n}</option>

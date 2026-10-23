@@ -764,6 +764,45 @@
     }
   },
   "tl": {
+    "colId": "ID",
+    "colMore": "Actions",
+    "colTask": "Task",
+    "cx": {
+      "note": "Only Admins can restore a cancelled task."
+    },
+    "f": {
+      "apply": "Apply",
+      "chipRm": "Remove {x}",
+      "clear": "Clear filters",
+      "from": "From",
+      "n": "Filter · {n}",
+      "none": "No tasks match these filters",
+      "noneD": "Try removing a filter or clear them all.",
+      "prAll": "All priorities",
+      "priority": "Priority",
+      "rangeErr": "The end date must be after the start date.",
+      "source": "Source",
+      "src": {
+        "helpdesk": "Helpdesk",
+        "techops": "TechOps"
+      },
+      "srcAll": "All sources",
+      "stAll": "All in this tab",
+      "status": "Status",
+      "t": {
+        "30d": "Next 30 days",
+        "7d": "Next 7 days",
+        "custom": "From – to",
+        "overdue": "Overdue",
+        "today": "Today"
+      },
+      "tAll": "Any time",
+      "time": "Due date",
+      "title": "Filters",
+      "to": "To",
+      "tyAll": "All types",
+      "type": "Task type"
+    },
     "pg": {
       "nav": "Pagination",
       "next": "Next page",
@@ -771,7 +810,40 @@
       "page": "Page {n}",
       "prev": "Previous page",
       "size": "Per page"
-    }
+    },
+    "seenAll": {
+      "_": "Mark all as seen",
+      "done": "Marked {n} tasks as seen."
+    },
+    "sortBy": "Sort by {c}",
+    "waiting": "{n} waiting on you"
+  },
+  "tlx": {
+    "extPending": "Extension request pending (to {d})",
+    "f": {
+      "stActive": "Not finished",
+      "stAll": "All statuses"
+    },
+    "loadErr": "Couldn’t load the task list.",
+    "mention": "mentions you",
+    "qa": {
+      "approveExt": "Approve extension ({d})",
+      "declineTask": "Decline"
+    },
+    "sort": {
+      "_": "Sort",
+      "createdAt_asc": "Oldest",
+      "createdAt_desc": "Newest",
+      "scheduleEnd_asc": "Due soonest",
+      "scheduleEnd_desc": "Due latest",
+      "smart": "Default (unseen → ★ → priority)",
+      "status_asc": "Status",
+      "title_asc": "Title A → Z",
+      "title_desc": "Title Z → A"
+    },
+    "total": "{n, plural, one {# task} other {# tasks}}",
+    "viewMode": "View",
+    "views": "Task views"
   },
   "top": {
     "appearance": "Appearance",

@@ -100,7 +100,7 @@ export function DetailMoreMenu({ model, drawer, triggerClassName }: { model: Tas
   );
 }
 
-/** ★ quan trọng — chỉ Boss/Admin (V1 `ImportantStarButton`, cùng API). */
+/** ★ quan trọng — chỉ Boss/Admin (như ImportantStarButton V1 — đã xoá ở A2-3; cùng API). */
 export function StarButton({ model, className }: { model: TaskDetailModel; className?: string }) {
   const t = useTranslations();
   const errMsg = useErrorMessage();

@@ -23,6 +23,11 @@ import { useSupplementReport } from '../../actions/hooks/useSupplementReport';
 import { ConfirmActionModal } from '../../actions/components/modals/ConfirmActionModal';
 import { SupplementReportModal } from '../../actions/components/modals/SupplementReportModal';
 import { useRequestExtension, useApproveExtension, useRejectExtension } from '../../actions/hooks/useExtensions';
+import { useAcknowledgeTask } from '../../actions/hooks/useAcknowledgeTask';
+import { useApprovePlan } from '../../actions/hooks/useApprovePlan';
+import { useApproveReview } from '../../actions/hooks/useApproveReview';
+import { acceptProgress } from '../../actions/components/modals/action-dialog-rules';
+import type { ListConfirmKind } from '../../hooks/useTaskListModals';
 
 interface TaskListModalsProps {
   tasks: TaskListItem[];
@@ -41,6 +46,7 @@ interface TaskListModalsProps {
   rejectPlanTaskId: string | null;
   extensionTaskId: string | null;
   approveExtState: { taskId: string; extId: string } | null;
+  confirmState: { kind: ListConfirmKind; taskId: string } | null;
   setShowCreate: (v: boolean) => void;
   setEditingTask: (v: string | null) => void;
   setQuickViewTaskId: (v: string | null) => void;
@@ -54,16 +60,17 @@ interface TaskListModalsProps {
   setRejectPlanTaskId: (v: string | null) => void;
   setExtensionTaskId: (v: string | null) => void;
   setApproveExtState: (v: { taskId: string; extId: string } | null) => void;
+  setConfirmState: (v: { kind: ListConfirmKind; taskId: string } | null) => void;
 }
 
 export function TaskListModals({
   tasks, currentUserId, role,
   showCreate, editingTask, quickViewTaskId,
   completeTaskId, transferTaskId, rejectTaskId, rejectReviewId,
-  cancelTaskId, restoreTaskId, supplementTaskId, rejectPlanTaskId, extensionTaskId, approveExtState,
+  cancelTaskId, restoreTaskId, supplementTaskId, rejectPlanTaskId, extensionTaskId, approveExtState, confirmState,
   setShowCreate, setEditingTask, setQuickViewTaskId,
   setCompleteTaskId, setTransferTaskId, setRejectTaskId, setRejectReviewId,
-  setCancelTaskId, setRestoreTaskId, setSupplementTaskId, setRejectPlanTaskId, setExtensionTaskId, setApproveExtState,
+  setCancelTaskId, setRestoreTaskId, setSupplementTaskId, setRejectPlanTaskId, setExtensionTaskId, setApproveExtState, setConfirmState,
 }: TaskListModalsProps) {
   const t                = useTranslations();
   const complete         = useCompleteTask();
@@ -77,6 +84,9 @@ export function TaskListModals({
   const requestExtension = useRequestExtension();
   const approveExtension = useApproveExtension();
   const rejectExtension  = useRejectExtension();
+  const acknowledge      = useAcknowledgeTask();
+  const approvePlan      = useApprovePlan();
+  const approveReview    = useApproveReview();
 
   const transferTask               = tasks.find((t) => t.id === transferTaskId);
   const transferCurrentAssigneeIds = transferTask?.assignees.map((a) => a.user.id) ?? [];
@@ -87,6 +97,10 @@ export function TaskListModals({
     const x = id ? tasks.find((t) => t.id === id) : undefined;
     return x ? { code: x.taskCode, title: x.title } : null;
   };
+  const confirmTask     = confirmState ? tasks.find((x) => x.id === confirmState.taskId) : undefined;
+  const confirmTitle    = confirmTask?.title ?? '';
+  const closeConfirm    = () => setConfirmState(null);
+  const confirmProgress = confirmTask ? acceptProgress(confirmTask.assignees) : null;
   const rejectReviewCompletedAssignees = (rejectReviewTask?.assignees ?? [])
     .filter((a) => a.status === 'COMPLETED')
     .map((a) => ({ assigneeId: a.id, displayName: a.user.displayName }));
@@ -102,6 +116,27 @@ export function TaskListModals({
         ids={tasks.map((t) => t.id)}
         onNavigate={setQuickViewTaskId}
         onClose={() => setQuickViewTaskId(null)}
+      />
+
+      {/* V2 A2-3: Nhận việc / Duyệt / Nghiệm thu từ menu ⋯ mở hộp xác nhận A2-2 (V1 thẻ gọi API ngay). API không đổi. */}
+      <ConfirmActionModal open={confirmState?.kind === 'acknowledge'} onClose={closeConfirm} task={card(confirmState?.taskId ?? null)}
+        title={t('app.dlg.accept.t')}
+        description={confirmTask ? t('tdx.dlg.accept.d', { t: confirmTitle }) : undefined}
+        note={confirmProgress ? t('app.dlg.accept.multi', confirmProgress) : undefined} noteIcon={Users}
+        confirmLabel={t('act.accept')} isLoading={acknowledge.isPending}
+        onConfirm={() => acknowledge.mutate(confirmState!.taskId, { onSuccess: closeConfirm })}
+      />
+      <ConfirmActionModal open={confirmState?.kind === 'approve-plan'} onClose={closeConfirm} task={card(confirmState?.taskId ?? null)}
+        title={t('app.dlg.approve.t')}
+        description={t('app.dlg.approve.d', { t: confirmTitle, s: t('st.WAITING_ACKNOWLEDGE') })}
+        confirmLabel={t('act.approve')} isLoading={approvePlan.isPending}
+        onConfirm={() => approvePlan.mutate(confirmState!.taskId, { onSuccess: closeConfirm })}
+      />
+      <ConfirmActionModal open={confirmState?.kind === 'approve-review'} onClose={closeConfirm} task={card(confirmState?.taskId ?? null)}
+        title={t('app.dlg.review.t')}
+        description={t('app.dlg.review.d', { t: confirmTitle, s: t('st.COMPLETED') })}
+        confirmLabel={t('act.review')} isLoading={approveReview.isPending}
+        onConfirm={() => approveReview.mutate(confirmState!.taskId, { onSuccess: closeConfirm })}
       />
 
       <CompleteTaskModal

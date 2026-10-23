@@ -282,6 +282,25 @@
   }
 }
 
+/* ===================== Danh sách công việc V2 (A2-3) =====================
+ * Bảng `.v2-tasks` (TaskList/TaskListGrid.tsx) theo preview tasks-list: khoảng cột 16, lề 18/10;
+ * ★ chưa bật chỉ hiện khi rê/focus dòng (≤680 ẩn hẳn — bật/tắt qua menu ⋯); ≤680 dòng 3 tầng gọn.
+ */
+@layer components {
+  .v2-tasks .v2-thead,
+  .v2-tasks .v2-tr { column-gap: 16px; padding: 0 10px 0 18px; }
+  .v2-tasks .tl-star-off { opacity: 0; }
+  .v2-tasks .v2-tr:hover .tl-star-off,
+  .v2-tasks .v2-tr:focus-within .tl-star-off { opacity: 1; }
+  @media (max-width: 1023px) {
+    .v2-tasks .v2-thead,
+    .v2-tasks .v2-tr { column-gap: 14px; padding: 0 8px 0 16px; }
+  }
+  @media (max-width: 680px) {
+    .v2-tasks .v2-tr { padding: 10px 8px 12px 16px; row-gap: 4px; column-gap: 12px; }
+  }
+}
+
 /* ===================== Khung app V2 (A1-4) =====================
  * Vùng nội dung (preview `.content`): padding 20 · 24 ngang (--content-px) · ≤1023: 16.
  * Đáy 24 (preview để 88 vì có thanh điều khiển xem trước — app thật không có).

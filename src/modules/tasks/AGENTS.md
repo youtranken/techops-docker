@@ -46,11 +46,10 @@ tasks/
     useComments.ts                # Bình luận
     useAssignableUsers.ts         # Danh sách user có thể gán
     useTaskPermissions.ts         # Kiểm tra quyền với task
-    useTaskListModals.ts          # State quản lý modals trong list
+    useTaskListModals.ts          # State quản lý modals trong list (+ confirmState: Nhận việc/Duyệt/Nghiệm thu)
 
   components/
-    TaskList/                     # Danh sách task
-    TaskCard/                     # Card task (trong list)
+    TaskList/                     # Danh sách task V2 (A2-3) — bảng + bộ lọc + menu ⋯
     TaskDetail/                   # Chi tiết task V2 — DÙNG CHUNG cho trang /tasks/[id] (TaskDetailPage) và ngăn xem nhanh (TaskDetailDrawer)
     TaskModals/                   # Các modal (tạo, sửa, xóa, v.v.)
     ActionModals/                 # Modals cho các action workflow
@@ -128,3 +127,10 @@ Xem `config/taskActionMatrix.ts` — đây là nguồn sự thật duy nhất ch
 - Luật kiểm tra = V1, gom ở `actions/components/modals/action-dialog-rules.ts` (`reasonError`, `reportError`, `attachmentError`, `extensionDateError`, `transferErrors`, `reworkErrors`) + câu "điều gì xảy ra tiếp theo" (`reportNextStep`, `nextReportVersion`, `acceptProgress`) theo service V1. Đổi luật ở đây = đổi nghiệp vụ → Phase B.
 - `TaskActionModals` nhận thêm `task={{code,title,workflowMode}}` để hiện thẻ tóm tắt + ghi chú; payload mutation không đổi (test `modals/__tests__/action-modals.test.tsx`).
 - Lý do Từ chối kế hoạch: chi tiết KHÔNG bắt buộc, danh sách (`TaskListModals`) bắt buộc — giữ nguyên lệch của V1.
+
+## Danh sách công việc V2 (A2-3)
+
+- `components/TaskList/`: `TaskListClient` (trang `/tasks`, gồm các mục con `?view=important` / `?view=unseen`), `TaskListGrid` (bảng `DataTable` `.v2-tasks`: Mã · Công việc · Ưu tiên · Người làm · Trạng thái · Hạn · ⋯; ≤680 dòng 3 tầng), `TaskListFilters` (bảng lọc + `FilterChips`), `DateFilter`, `TaskListModals`, `TaskViewSwitch` (chỗ cho nút Danh sách | Bảng của A2-4), `useTaskListState` (URL ↔ trạng thái ↔ payload API; A2-4 dùng lại).
+- Logic thuần + test: `list-logic.ts` — `readListState`/`toApiFilters` (payload GIỐNG V1, đối chiếu `__tests__/v1-list.fixture.ts`), setter URL (`filterUpdate`, `pageUpdate`, `limitUpdate`, `sortUpdate`), tab (`tabsFor`, `activeTab`, `tabUpdate` → tham số V1 `view`/`status`), chip (`filterChips`, `chipRemoveUpdate`, `clearFiltersUpdate`), `headerSort` (cột Hạn/Trạng thái dùng sortField V1), `quickMenuKeys` (menu ⋯ = đúng tập hành động menu thẻ V1 theo `useTaskPermissions`, xếp theo preview), `latestPendingExtension`, `displayCode`.
+- Menu ⋯: [Xem nhanh · Mở trang đầy đủ · Sao chép mã] · [hành động V1] · [Sửa · ★ (Boss/Admin)] · [Hủy]. Không có Giao lại (V1 thẻ không có — làm ở chi tiết). Nhận việc / Duyệt / Nghiệm thu mở hộp xác nhận A2-2 (`confirmState`), API không đổi.
+- Thư mục `TaskCard/` (thẻ lưới V1) và `hooks/useTaskCardActions.ts` đã xoá ở A2-3.
