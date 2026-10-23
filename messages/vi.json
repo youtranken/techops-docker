@@ -234,6 +234,105 @@
     "search": "Tìm kiếm",
     "success": "Thành công"
   },
+  "db": {
+    "act": {
+      "empty": {
+        "boss": "Không có việc nào chờ duyệt hoặc nghiệm thu",
+        "emp": "Không có việc nào cần bạn nhận hoặc báo cáo"
+      },
+      "ext": "Duyệt gia hạn",
+      "extBadge": "{n} gia hạn",
+      "extBadgeT": "Số đơn gia hạn đang chờ duyệt (V1)",
+      "extList": "Đơn gia hạn chờ duyệt",
+      "extTo": "đến {d}",
+      "sub": {
+        "boss": "Duyệt kế hoạch, nghiệm thu, gia hạn",
+        "emp": "Nhận việc, báo cáo kết quả"
+      },
+      "t": "Cần bạn xử lý"
+    },
+    "all": "Xem tất cả",
+    "cm": {
+      "empty": "Chưa có bình luận nào",
+      "sub": "Bình luận mới nhất của mỗi việc",
+      "t": "Bình luận gần đây"
+    },
+    "dist": {
+      "empty": "Chưa có việc nào trong tháng này",
+      "sub": "Việc tạo trong tháng {m}",
+      "total": "việc tạo trong tháng {m}"
+    },
+    "due": {
+      "empty": "Không có việc nào đến hạn trong 7 ngày tới",
+      "sub": "Trong 7 ngày tới",
+      "t": "Sắp đến hạn"
+    },
+    "err": {
+      "d": "Kết nối tới máy chủ bị gián đoạn. Kiểm tra mạng rồi thử lại.",
+      "t": "Không tải được tổng quan"
+    },
+    "hi": {
+      "am": "Chào buổi sáng, {n}",
+      "eve": "Chào buổi tối, {n}",
+      "pm": "Chào buổi chiều, {n}"
+    },
+    "k": {
+      "apSub": "Kế hoạch chờ bạn duyệt",
+      "done": "Hoàn thành",
+      "label": "Chỉ số chính",
+      "myAck": "Chờ bạn nhận",
+      "myAckSub": "Việc mới giao cho bạn",
+      "myProg": "Bạn đang làm",
+      "myProgSub": "Việc bạn đã nhận",
+      "overSub": "Chưa xong, đã qua hạn",
+      "overdue": "Quá hạn",
+      "rate": "Tỉ lệ {n}%",
+      "rvSub": "Báo cáo chờ bạn nghiệm thu",
+      "sla": "Đúng hạn (SLA)",
+      "slaSub": "Việc xong trước hạn",
+      "total": "Tổng công việc",
+      "totalSub": "Không tính việc đã hủy"
+    },
+    "loading": "Đang tải tổng quan…",
+    "mon": "1|2|3|4|5|6|7|8|9|10|11|12",
+    "pb": {
+      "_": "Phase B",
+      "ext": "V1 chỉ trả số đơn gia hạn đang chờ; danh sách từng đơn cần dữ liệu mới → Phase B",
+      "rec": "V1 trả 5 việc mới cập nhật; dòng “sự kiện cuối” cần đọc thêm nhật ký → Phase B",
+      "s": "B",
+      "tip": "Phase B: API tổng quan V1 chưa trả dữ liệu này"
+    },
+    "perf": {
+      "created": "Tạo mới",
+      "d30": "30 ngày",
+      "d7": "7 ngày",
+      "date": "Ngày",
+      "done": "Hoàn thành",
+      "empty": "Chưa có số liệu trong {n} ngày qua",
+      "range": "Khoảng thời gian",
+      "sub": "Việc tạo mới và hoàn thành mỗi ngày",
+      "t": "Hiệu suất"
+    },
+    "prop": {
+      "_": "Đề xuất",
+      "tip": "Chưa có ở V1, đề xuất cho V2"
+    },
+    "rec": {
+      "empty": "Chưa có công việc nào",
+      "sub": "Thay đổi mới nhất của mỗi việc",
+      "t": "Cập nhật gần đây"
+    },
+    "sub": {
+      "boss": "{d} · Có {n} việc đang chờ bạn duyệt hoặc nghiệm thu.",
+      "emp": "{d} · Bạn có {n} việc cần nhận hoặc báo cáo.",
+      "empty": "{d} · Chưa có công việc nào. Số liệu sẽ hiện khi phòng bắt đầu giao việc.",
+      "none": "{d} · Không có việc nào đang chờ bạn."
+    },
+    "wd": "Chủ nhật|Thứ Hai|Thứ Ba|Thứ Tư|Thứ Năm|Thứ Sáu|Thứ Bảy",
+    "wf": {
+      "t": "Quy trình"
+    }
+  },
   "dnd": {
     "accepted": "{x}/{n} người đã nhận",
     "drop": {

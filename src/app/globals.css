@@ -341,3 +341,24 @@
     border-left: 1px solid var(--line-2);
   }
 }
+
+/* ---- A3-1 Tổng quan (preview dashboard.html): hàng chỉ số + lưới khối theo vùng ---- */
+@layer components {
+  .v2-db-kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .v2-db-grid {
+    display: grid; gap: 16px; align-items: start;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas: "act due cm" "perf perf st" "rec rec pr";
+  }
+  .v2-db-act { grid-area: act; } .v2-db-due { grid-area: due; } .v2-db-cm { grid-area: cm; }
+  .v2-db-perf { grid-area: perf; align-self: stretch; } .v2-db-st { grid-area: st; align-self: stretch; }
+  .v2-db-rec { grid-area: rec; } .v2-db-pr { grid-area: pr; }
+  @media (max-width: 1199px) {
+    .v2-db-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .v2-db-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "act due" "perf perf" "st pr" "rec cm"; }
+  }
+  @media (max-width: 680px) {
+    .v2-db-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .v2-db-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "act" "due" "perf" "st" "pr" "rec" "cm"; gap: 12px; }
+  }
+}

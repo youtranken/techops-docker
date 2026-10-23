@@ -234,6 +234,105 @@
     "search": "Search",
     "success": "Success"
   },
+  "db": {
+    "act": {
+      "empty": {
+        "boss": "Nothing waiting for approval or review",
+        "emp": "Nothing for you to accept or report on"
+      },
+      "ext": "Review extension",
+      "extBadge": "{n} extensions",
+      "extBadgeT": "Pending extension requests (V1)",
+      "extList": "Extension requests to review",
+      "extTo": "to {d}",
+      "sub": {
+        "boss": "Plan approvals, reviews, extensions",
+        "emp": "Accept tasks, report results"
+      },
+      "t": "Needs your action"
+    },
+    "all": "View all",
+    "cm": {
+      "empty": "No comments yet",
+      "sub": "Latest comment on each task",
+      "t": "Recent comments"
+    },
+    "dist": {
+      "empty": "No tasks created this month",
+      "sub": "Tasks created in {m}",
+      "total": "tasks created in {m}"
+    },
+    "due": {
+      "empty": "Nothing due in the next 7 days",
+      "sub": "Next 7 days",
+      "t": "Due soon"
+    },
+    "err": {
+      "d": "The connection to the server dropped. Check your network and try again.",
+      "t": "Couldn’t load the overview"
+    },
+    "hi": {
+      "am": "Good morning, {n}",
+      "eve": "Good evening, {n}",
+      "pm": "Good afternoon, {n}"
+    },
+    "k": {
+      "apSub": "Plans awaiting your approval",
+      "done": "Completed",
+      "label": "Key figures",
+      "myAck": "To accept",
+      "myAckSub": "Newly assigned to you",
+      "myProg": "You’re working on",
+      "myProgSub": "Tasks you accepted",
+      "overSub": "Open and past due",
+      "overdue": "Overdue",
+      "rate": "{n}% of total",
+      "rvSub": "Reports awaiting your review",
+      "sla": "On time (SLA)",
+      "slaSub": "Done by the due date",
+      "total": "Total tasks",
+      "totalSub": "Excludes cancelled"
+    },
+    "loading": "Loading overview…",
+    "mon": "January|February|March|April|May|June|July|August|September|October|November|December",
+    "pb": {
+      "_": "Phase B",
+      "ext": "V1 returns only the number of pending extensions; listing each request needs new data → Phase B",
+      "rec": "V1 returns the 5 most recently updated tasks; the “latest event” line needs log data → Phase B",
+      "s": "B",
+      "tip": "Phase B: the V1 overview API doesn’t return this"
+    },
+    "perf": {
+      "created": "Created",
+      "d30": "30 days",
+      "d7": "7 days",
+      "date": "Date",
+      "done": "Completed",
+      "empty": "No activity in the last {n} days",
+      "range": "Date range",
+      "sub": "Tasks created and completed per day",
+      "t": "Throughput"
+    },
+    "prop": {
+      "_": "Proposed",
+      "tip": "Not in V1, proposed for V2"
+    },
+    "rec": {
+      "empty": "No tasks yet",
+      "sub": "Latest change on each task",
+      "t": "Recently updated"
+    },
+    "sub": {
+      "boss": "{d} · {n} tasks are waiting for your approval or review.",
+      "emp": "{d} · You have {n} tasks to accept or report on.",
+      "empty": "{d} · No tasks yet. Numbers show up once the team starts assigning work.",
+      "none": "{d} · Nothing is waiting on you."
+    },
+    "wd": "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday",
+    "wf": {
+      "t": "Workflow"
+    }
+  },
   "dnd": {
     "accepted": "{x}/{n} accepted",
     "drop": {

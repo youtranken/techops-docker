@@ -38,6 +38,7 @@ export const INCLUDE = {
     'dnd', // A2-4a bảng Kanban (kéo thả, mẹo, thông báo cho trình đọc màn hình)
     'tf', // A2-4b biểu mẫu Tạo / Sửa công việc (ngăn trượt + trang đầy đủ)
     'dr', // A2-4b nháp lưu trên trình duyệt (Phase B)
+    'db', // A3-1 Tổng quan
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
@@ -51,6 +52,7 @@ export const INCLUDE = {
     'td.pv.', // thanh điều khiển preview
     'td.cm.lock', // khoá bình luận khi xong/hủy — Phase B
     'tf.pv.', // thanh điều khiển preview biểu mẫu
+    'db.pv.', // thanh điều khiển preview Tổng quan
   ],
 };
 
