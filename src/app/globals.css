@@ -2,92 +2,214 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * TechOps DS v2 — token màu/khoảng cách/bo góc/bóng (nguồn: docs/previews/ds-v2/app.css).
+ * Tầng 1 (:root / .dark): token V2 thô, giữ tên như preview. Riêng --primary của preview
+ *   (màu chữ/điểm nhấn) đổi tên thành --primary-text vì --primary đã là biến shadcn.
+ * Tầng 2: biến shadcn (--background, --primary…) trỏ sang token V2 để component cũ tự đổi màu.
+ * Tầng 3 (@theme inline): đưa ra lớp Tailwind (bg-surface, text-ink-2, bg-primary-fill, text-c-done…).
+ */
+
 @theme inline {
-  --color-background:          hsl(var(--background));
-  --color-foreground:          hsl(var(--foreground));
-  --color-card:                hsl(var(--card));
-  --color-card-foreground:     hsl(var(--card-foreground));
-  --color-popover:             hsl(var(--popover));
-  --color-popover-foreground:  hsl(var(--popover-foreground));
-  --color-primary:             hsl(var(--primary));
-  --color-primary-foreground:  hsl(var(--primary-foreground));
-  --color-secondary:           hsl(var(--secondary));
-  --color-secondary-foreground:hsl(var(--secondary-foreground));
-  --color-muted:               hsl(var(--muted));
-  --color-muted-foreground:    hsl(var(--muted-foreground));
-  --color-accent:              hsl(var(--accent));
-  --color-accent-foreground:   hsl(var(--accent-foreground));
-  --color-destructive:         hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border:              hsl(var(--border));
-  --color-input:               hsl(var(--input));
-  --color-ring:                hsl(var(--ring));
-  --radius:                    var(--radius);
+  /* ---- shadcn (component cũ) ---- */
+  --color-background:          var(--background);
+  --color-foreground:          var(--foreground);
+  --color-card:                var(--card);
+  --color-card-foreground:     var(--card-foreground);
+  --color-popover:             var(--popover);
+  --color-popover-foreground:  var(--popover-foreground);
+  --color-primary:             var(--primary);
+  --color-primary-foreground:  var(--primary-foreground);
+  --color-secondary:           var(--secondary);
+  --color-secondary-foreground:var(--secondary-foreground);
+  --color-muted:               var(--muted);
+  --color-muted-foreground:    var(--muted-foreground);
+  --color-accent:              var(--accent);
+  --color-accent-foreground:   var(--accent-foreground);
+  --color-destructive:         var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border:              var(--border);
+  --color-input:               var(--input);
+  --color-ring:                var(--ring);
+  --color-chart-1:             var(--chart-1);
+  --color-chart-2:             var(--chart-2);
+  --color-chart-3:             var(--chart-3);
+  --color-chart-4:             var(--chart-4);
+  --color-chart-5:             var(--chart-5);
+
+  /* ---- V2: nền theo lớp ---- */
+  --color-canvas:              var(--canvas);
+  --color-surface:             var(--surface);
+  --color-surface-2:           var(--surface-2);
+  --color-lane:                var(--lane);
+  --color-pop:                 var(--pop);
+  --color-pop-2:               var(--pop-2);
+  --color-pop-line:            var(--pop-line);
+  --color-seg-on:              var(--seg-on);
+  /* chữ + viền */
+  --color-ink:                 var(--ink);
+  --color-ink-2:               var(--ink-2);
+  --color-ink-3:               var(--ink-3);
+  --color-line:                var(--line);
+  --color-line-2:              var(--line-2);
+  /* màu chính: text = chữ/điểm nhấn; fill = nền nút */
+  --color-primary-text:        var(--primary-text);
+  --color-primary-soft:        var(--primary-soft);
+  --color-primary-hover:       var(--primary-hover);
+  --color-primary-ink:         var(--primary-ink);
+  --color-primary-fill:        var(--primary-fill);
+  --color-primary-fill-hover:  var(--primary-fill-hover);
+  --color-primary-fill-ink:    var(--primary-fill-ink);
+  /* nguy hiểm + cảnh báo */
+  --color-danger:              var(--danger);
+  --color-danger-ink:          var(--danger-ink);
+  --color-danger-hover:        var(--danger-hover);
+  --color-danger-fill:         var(--danger-fill);
+  --color-danger-fill-hover:   var(--danger-fill-hover);
+  --color-amber:               var(--amber);
+  /* trạng thái công việc (chấm màu + chữ) */
+  --color-c-draft:             var(--c-draft);
+  --color-c-approval:          var(--c-approval);
+  --color-c-pickup:            var(--c-pickup);
+  --color-c-progress:          var(--c-progress);
+  --color-c-review:            var(--c-review);
+  --color-c-done:              var(--c-done);
+  /* tông hạn chót (.due-*) */
+  --color-due-overdue:         var(--due-overdue);
+  --color-due-soon:            var(--due-soon);
+  --color-due-near:            var(--due-near);
+  --color-due-calm:            var(--due-calm);
+  --color-due-done:            var(--due-done);
+  --color-scrim:               var(--scrim);
+  --color-scrim-dlg:           var(--scrim-dlg);
+
+  /* ---- bo góc: rounded-sm 6 · rounded-md 8 (ô nhập/nút) · rounded-card 12 · rounded-pill ---- */
+  --radius-sm:   var(--r-sm);
+  --radius-md:   var(--r-ctl);
+  --radius-ctl:  var(--r-ctl);
+  --radius-card: var(--r-card);
+  --radius-pill: var(--r-pill);
+
+  /* ---- bóng: shadow-v2-1 / -2 / -pop / -drawer (dark: gần như bỏ, dùng viền) ---- */
+  --shadow-v2-1:      var(--shadow-1);
+  --shadow-v2-2:      var(--shadow-2);
+  --shadow-v2-pop:    var(--shadow-pop);
+  --shadow-v2-drawer: var(--shadow-drawer);
+
+  /* ---- font (biến --ff-* do next/font gắn ở <html>, xem src/app/layout.tsx) ---- */
+  --font-sans: var(--ff-body), "Noto Sans", "Segoe UI", system-ui, sans-serif;
+  --font-body: var(--ff-body), "Noto Sans", "Segoe UI", system-ui, sans-serif;
+  --font-head: var(--ff-head), "Lexend", "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--ff-mono), "JetBrains Mono", ui-monospace, Consolas, monospace;
+
+  /* ---- khoảng cách V2 (nhịp 4/8/12/16/20/24): p-sp-3, gap-sp-4… ---- */
+  --spacing-sp-1: 4px;
+  --spacing-sp-2: 8px;
+  --spacing-sp-3: 12px;
+  --spacing-sp-4: 16px;
+  --spacing-sp-5: 20px;
+  --spacing-sp-6: 24px;
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    /* ===== Tầng 1: token V2 (sáng) ===== */
+    --canvas:#F3F5F9; --surface:#FFFFFF; --surface-2:#EEF1F6; --lane:#EAEDF3; --line:#E2E6EE; --line-2:#D3D9E4;
+    --ink:#0F1729; --ink-2:#4E5A70; --ink-3:#8892A6;
+    --primary-text:#1D4ED8; --primary-ink:#FFFFFF; --primary-soft:#E8EEFD; --primary-hover:#1A43BC;
+    --primary-fill:#1D4ED8; --primary-fill-hover:#1A43BC; --primary-fill-ink:#FFFFFF;
+    --c-draft:#8892A6; --c-approval:#6D5BD0; --c-pickup:#0E8FB0; --c-progress:#1D4ED8; --c-review:#C2780A; --c-done:#1F8F5A;
+    --danger:#D0443A; --danger-ink:#FFFFFF; --danger-hover:#B5382F; --amber:#E0A100;
+    --danger-fill:#D0443A; --danger-fill-hover:#B5382F;
+    --pop:#FFFFFF; --pop-2:#EEF1F6; --pop-line:#E2E6EE; --seg-on:#FFFFFF;
+    --shadow-1:0 1px 2px rgba(15,23,41,.06),0 1px 1px rgba(15,23,41,.03);
+    --shadow-2:0 2px 6px rgba(15,23,41,.06),0 8px 24px rgba(15,23,41,.08);
+    --shadow-pop:0 12px 32px rgba(15,23,41,.16),0 2px 6px rgba(15,23,41,.08);
+    --shadow-drawer:-12px 0 40px rgba(15,23,41,.14),-1px 0 0 var(--line);
+    --scrim:rgba(15,23,41,.32); --scrim-dlg:rgba(15,23,41,.38);
+    --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --gap-blk:16px;
+    --r-sm:6px; --r-ctl:8px; --r-card:12px; --r-pill:999px;
+    --fs-xs:12px; --fs-sm:13px; --fs-md:14px; --fs-lg:17px; --fs-xl:22px; --fs-2xl:24px;
+    /* tông hạn chót */
+    --due-overdue:var(--danger); --due-soon:var(--c-review); --due-near:var(--ink-2); --due-calm:var(--ink-3); --due-done:var(--c-done);
+
+    /* ===== Tầng 2: biến shadcn → token V2 ===== */
+    --background: var(--surface);          /* nền control/hộp (bg-background) */
+    --foreground: var(--ink);
+    --card: var(--surface);
+    --card-foreground: var(--ink);
+    --popover: var(--pop);
+    --popover-foreground: var(--ink);
+    --primary: var(--primary-fill);         /* bg-primary = nút chính */
+    --primary-foreground: var(--primary-fill-ink);
+    --secondary: var(--surface-2);
+    --secondary-foreground: var(--ink);
+    --muted: var(--surface-2);
+    --muted-foreground: var(--ink-2);
+    --accent: var(--surface-2);
+    --accent-foreground: var(--ink);
+    --destructive: var(--danger-fill);
+    --destructive-foreground: var(--danger-ink);
+    --border: var(--line);
+    --input: var(--line-2);
+    --ring: var(--primary-text);
+    --radius: var(--r-ctl);
+    /* biểu đồ: lấy từ màu trạng thái để đồng bộ */
+    --chart-1: var(--c-progress);
+    --chart-2: var(--c-done);
+    --chart-3: var(--c-review);
+    --chart-4: var(--c-approval);
+    --chart-5: var(--c-pickup);
+    color-scheme: light;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* ===== Tầng 1: token V2 (tối) — xám lạnh ít bão hoà, không đen tuyền ===== */
+    --canvas:#0F1216; --surface:#161A20; --surface-2:#1D2229; --lane:#13161B; --line:#2A3039; --line-2:#3A414C;
+    --ink:#E6E9EF; --ink-2:#A9B1BE; --ink-3:#818A99;
+    --primary-text:#86A8F2; --primary-ink:#0F1216; --primary-soft:#1E2A42; --primary-hover:#9DB8F5;
+    --primary-fill:#3D6AD6; --primary-fill-hover:#4A77DF; --primary-fill-ink:#FFFFFF;
+    --c-draft:#8D96A6; --c-approval:#A99AF0; --c-pickup:#4CB6D0; --c-progress:#86A8F2; --c-review:#E2A64C; --c-done:#52BA8B;
+    --danger:#EF7A70; --danger-ink:#FFFFFF; --danger-hover:#F28E86; --amber:#E5B73D;
+    --danger-fill:#C9463C; --danger-fill-hover:#D4554B;
+    --pop:#232932; --pop-2:#2B323C; --pop-line:#363E49; --seg-on:#323A45;
+    /* bóng gần như bỏ: lớp nổi phân biệt bằng nền sáng hơn + viền */
+    --shadow-1:none;
+    --shadow-2:0 2px 8px rgba(0,0,0,.24);
+    --shadow-pop:0 10px 28px rgba(0,0,0,.34);
+    --shadow-drawer:-1px 0 0 var(--line-2);
+    --scrim:rgba(5,7,10,.62); --scrim-dlg:rgba(5,7,10,.66);
+    color-scheme: dark;
   }
 }
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    border-color: var(--border);
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-body);
+  }
+  h1, h2, h3 {
+    font-family: var(--font-head);
+  }
+}
+
+@layer utilities {
+  /* Dark: chữ màu chính dùng tông sáng (--primary-text) thay vì nền nút (--primary-fill) cho đủ tương phản. */
+  .dark .text-primary,
+  .dark .hover\:text-primary:hover {
+    color: var(--primary-text);
+  }
+  /* Lớp nổi (menu, select, hộp thoại, ngăn trượt) ở dark: nền sáng hơn + viền thay cho bóng. */
+  .dark .v2-pop {
+    --surface: var(--pop);
+    --surface-2: var(--pop-2);
+    --line: var(--pop-line);
   }
 }
