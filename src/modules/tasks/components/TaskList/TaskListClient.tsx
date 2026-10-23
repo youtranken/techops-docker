@@ -1,265 +1,263 @@
 'use client';
 
-import { useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+/**
+ * Trang Danh sách công việc V2 (A2-3) — preview `tasks-list.html` (A2 "quiet list").
+ * Áp dụng cho /tasks và các mục con ở sidebar (/tasks?view=important · ?view=unseen — chỉ Boss/Admin).
+ *
+ * Nghiệp vụ giữ V1: tham số URL / payload API / phân trang phía server / sắp xếp (list-logic.ts, có test đối chiếu V1),
+ * quyền hành động (useTaskPermissions), ★ (Boss/Admin dùng chung), "chưa xem", "Đánh dấu đã xem tất cả".
+ * Mới (thuần client): tab ánh xạ vào tham số V1, bảng lọc + chip, sắp xếp bằng tiêu đề cột, menu ⋯.
+ */
+import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ListTodo, Plus, ArrowUpDown, Star, CheckCheck } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { isTrackingRole, useMarkAllSeen } from '../../hooks/useTaskTracking';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Search, SlidersHorizontal, CheckCheck, Info, ArrowUpDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Pagination } from '@/shared/ui/Pagination';
+import { cn } from '@/lib/utils';
+import { useErrorMessage } from '@/lib/useErrorMessage';
+import { useMarkAllSeen, useTaskCounters, useToggleImportant } from '../../hooks/useTaskTracking';
 import { useTaskList } from '../../hooks/useTaskList';
 import { usePriorities } from '@/modules/settings/hooks/usePriorities';
 import { useTaskTypes } from '@/modules/settings/hooks/useTaskTypes';
 import { useTaskListModals } from '../../hooks/useTaskListModals';
-import { TaskListFilters } from './TaskListFilters';
-import { TaskListGrid } from './TaskListGrid';
-import { TaskListPagination } from './TaskListPagination';
+import { copyTaskCode } from '../TaskDetail/DetailActions';
+import { TaskListFilters, FilterChips } from './TaskListFilters';
+import { TaskListGrid, type TaskRowAction } from './TaskListGrid';
 import { TaskListModals } from './TaskListModals';
-import type { TaskListItem, TaskSortField, TaskSortOrder } from '../../services/task-query.service';
-import type { TaskStatus } from '@prisma/client';
-import { useErrorMessage } from '@/lib/useErrorMessage';
+import { TaskViewSwitch } from './TaskViewSwitch';
+import { useTaskListState } from './useTaskListState';
+import {
+  tabsFor, activeTab, tabUpdate, filterUpdate, filterCount, clearFiltersUpdate, pageUpdate, limitUpdate, sortUpdate,
+  normalizedSortKey, displayCode, SMART_SORT, type ListTab,
+} from './list-logic';
 
-const VALID_TASK_STATUSES: TaskStatus[] = [
-  'PENDING_APPROVAL', 'IN_PROGRESS', 'PENDING_REVIEW', 'WAITING_ACKNOWLEDGE', 'COMPLETED', 'CANCELLED',
-];
-const VALID_SOURCES = ['helpdesk', 'techops'] as const;
-
-const SORT_OPTIONS: { value: string; label: string }[] = [
-  { value: 'createdAt:desc', label: 'Mới nhất' },
-  { value: 'createdAt:asc',  label: 'Cũ nhất' },
-  { value: 'scheduleEnd:asc',  label: 'Deadline gần nhất' },
-  { value: 'scheduleEnd:desc', label: 'Deadline xa nhất' },
-  { value: 'title:asc',  label: 'Tên A → Z' },
-  { value: 'title:desc', label: 'Tên Z → A' },
-  { value: 'status:asc', label: 'Trạng thái' },
-];
-
-// V2 — Boss/Admin: sort mặc định = chưa xem → ★ → mức ưu tiên (server xử lý khi không gửi sortField)
-const SMART_SORT = 'smart';
-const SMART_SORT_OPTION = { value: SMART_SORT, label: 'Mặc định (chưa xem → ★ → ưu tiên)' };
-
-// V2 — các mục con dưới Tasks ở sidebar (chỉ Boss/Admin)
-type TaskView = '' | 'important' | 'unseen';
-const VIEW_HEADER: Record<TaskView, { title: string; Icon: typeof ListTodo }> = {
-  '':        { title: 'Công việc',             Icon: ListTodo },
-  important: { title: 'Task quan trọng',       Icon: Star },
-  unseen:    { title: 'Hoàn thành – chưa xem', Icon: CheckCheck },
+const SORT_OPTIONS = [
+  'createdAt:desc', 'createdAt:asc', 'scheduleEnd:asc', 'scheduleEnd:desc', 'title:asc', 'title:desc', 'status:asc',
+] as const;
+const TAB_LABEL: Record<ListTab, string> = {
+  open: 'view.open', starred: 'view.starred', unseen: 'view.unseen', done: 'view.done', cancelled: 'view.cancelled',
 };
 
+/** Ô tìm kiếm: gõ cập nhật URL sau 300 ms (V1 cập nhật mỗi phím); URL đổi từ ngoài → ô theo. */
+function SearchBox({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const t = useTranslations();
+  const [text, setText] = React.useState(value);
+  const last = React.useRef(value);
+  React.useEffect(() => { if (value !== last.current) { last.current = value; setText(value); } }, [value]);
+  React.useEffect(() => {
+    if (text === last.current) return;
+    const h = setTimeout(() => { last.current = text; onChange(text); }, 300);
+    return () => clearTimeout(h);
+  }, [text, onChange]);
+  return (
+    <label className="relative flex h-9 min-w-0 flex-1 items-center min-[1400px]:w-[220px] min-[1400px]:flex-none max-[680px]:h-11">
+      <Search aria-hidden className="pointer-events-none absolute left-2.5 size-4 text-ink-3" />
+      <span className="sr-only">{t('filter.search')}</span>
+      <input
+        type="search"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder={t('filter.search')}
+        className="h-full w-full rounded-ctl border border-line-2 bg-surface pl-8 pr-2.5 text-sm text-ink placeholder:text-ink-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+    </label>
+  );
+}
+
 export function TaskListClient() {
+  const t = useTranslations();
   const errMsg = useErrorMessage();
+  const router = useRouter();
   const { data: session } = useSession();
   const currentUserId = session?.user?.id ?? '';
-  const role          = session?.user?.role?.name ?? '';
+  const role = session?.user?.role?.name ?? '';
 
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Helper đọc/ghi URL params
-  const getParam = useCallback((key: string, def = '') => searchParams.get(key) ?? def, [searchParams]);
-  const updateParams = useCallback((updates: Record<string, string | undefined>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    Object.entries(updates).forEach(([k, v]) => {
-      if (v === undefined || v === '') params.delete(k);
-      else params.set(k, v);
-    });
-    router.replace(`?${params.toString()}`, { scroll: false });
-  }, [router, searchParams]);
-
-  // ── Filters — sync với URL ─────────────────────────────────────────────────
-  const search     = getParam('search');
-  const status     = getParam('status');
-  const priorityId = getParam('priorityId');
-  const typeId     = getParam('typeId');
-  const source     = getParam('source');
-  const datePreset = getParam('datePreset');
-  const dateFrom   = getParam('dateFrom');
-  const dateTo     = getParam('dateTo');
-  const page       = Number(getParam('page', '1'))  || 1;
-  const limit      = Number(getParam('limit', '20')) || 20;
-  const tracking   = isTrackingRole(role);
-  const rawView    = getParam('view');
-  const view: TaskView = tracking && (rawView === 'important' || rawView === 'unseen') ? rawView : '';
-  const sortKey    = getParam('sort', tracking ? SMART_SORT : 'createdAt:desc');
-  const isSmartSort = tracking && sortKey === SMART_SORT;
-  const sortOptions = tracking ? [SMART_SORT_OPTION, ...SORT_OPTIONS] : SORT_OPTIONS;
-
-  const VALID_SORT_FIELDS: TaskSortField[] = ['createdAt', 'scheduleEnd', 'title', 'status'];
-  const VALID_SORT_ORDERS: TaskSortOrder[] = ['asc', 'desc'];
-  const [rawSortField, rawSortOrder] = sortKey.split(':');
-  const sortField = (VALID_SORT_FIELDS.includes(rawSortField as TaskSortField) ? rawSortField : 'createdAt') as TaskSortField;
-  const sortOrder = (VALID_SORT_ORDERS.includes(rawSortOrder as TaskSortOrder) ? rawSortOrder : 'desc') as TaskSortOrder;
-  const normalizedSortKey = isSmartSort ? SMART_SORT : `${sortField}:${sortOrder}`;
-
-  function setSearch(v: string)     { updateParams({ search: v || undefined, page: undefined }); }
-  function setStatus(v: string)     { updateParams({ status: v || undefined, page: undefined }); }
-  function setPriorityId(v: string) { updateParams({ priorityId: v || undefined, page: undefined }); }
-  function setTypeId(v: string)     { updateParams({ typeId: v || undefined, page: undefined }); }
-  function setSource(v: string)     { updateParams({ source: v || undefined, page: undefined }); }
-  function setDatePreset(v: string) { updateParams({ datePreset: v || undefined, dateFrom: undefined, dateTo: undefined, page: undefined }); }
-  function setDateFrom(v: string)   { updateParams({ dateFrom: v || undefined, datePreset: undefined, page: undefined }); }
-  function setDateTo(v: string)     { updateParams({ dateTo: v || undefined, datePreset: undefined, page: undefined }); }
-  function setPage(p: number)       { updateParams({ page: p > 1 ? String(p) : undefined }); }
-  function setSort(v: string)       { updateParams({ sort: v !== (tracking ? SMART_SORT : 'createdAt:desc') ? v : undefined, page: undefined }); }
-
-  function resolveDates() {
-    if (dateFrom || dateTo) return { dateFrom: dateFrom || undefined, dateTo: dateTo || undefined };
-    const now = new Date(); const pad = (d: Date) => d.toISOString().slice(0, 10);
-    if (datePreset === 'today')   return { dateFrom: pad(now), dateTo: pad(now) };
-    if (datePreset === '7d')      return { dateFrom: pad(now), dateTo: pad(new Date(now.getTime() + 7  * 86400000)) };
-    if (datePreset === '30d')     return { dateFrom: pad(now), dateTo: pad(new Date(now.getTime() + 30 * 86400000)) };
-    if (datePreset === 'overdue') return { dateTo: pad(new Date(now.getTime() - 86400000)) };
-    return {};
-  }
-
-  // ── Modal / Sheet state ───────────────────────────────────────────────────
+  const { state, update, apiFilters, tracking } = useTaskListState(role);
   const modals = useTaskListModals();
+  const [fOpen, setFOpen] = React.useState(false);
+  const fBtn = React.useRef<HTMLButtonElement>(null);
 
-  // ── Data ──────────────────────────────────────────────────────────────────
-  const { data, isLoading, isError } = useTaskList({
-    search:     search     || undefined,
-    status:     (VALID_TASK_STATUSES.includes(status as TaskStatus) ? status as TaskStatus : undefined),
-    priorityId: priorityId || undefined,
-    typeId:     typeId     || undefined,
-    source:     (VALID_SOURCES.includes(source as typeof VALID_SOURCES[number]) ? source as typeof VALID_SOURCES[number] : undefined),
-    ...resolveDates(),
-    sortField: isSmartSort ? undefined : sortField,
-    sortOrder: isSmartSort ? undefined : sortOrder,
-    // Mặc định (không chọn gì) = ẩn task Hoàn thành + Đã hủy; 'all' = hiện tất cả
-    // (Boss/Admin: vẫn hiện task Hoàn thành mình chưa xem — xử lý ở server)
-    hideCompleted: !status && view !== 'unseen',
-    important:  view === 'important' || undefined,
-    unseenOnly: view === 'unseen' || undefined,
-    page,
-    limit,
-  });
+  const { data, isLoading, isError, refetch } = useTaskList(apiFilters);
   const { data: priorities = [] } = usePriorities();
-  const { data: taskTypes  = [] } = useTaskTypes();
-
+  const { data: taskTypes = [] } = useTaskTypes();
+  const { data: counters } = useTaskCounters(tracking);
   const markAllSeen = useMarkAllSeen();
-  const { title: viewTitle, Icon: ViewIcon } = VIEW_HEADER[view];
+  const toggleStar = useToggleImportant();
 
-  const tasks      = data?.data       ?? [];
+  const tasks = data?.data ?? [];
   const pagination = data?.pagination;
+  const tab = activeTab(state);
+  const nFilters = filterCount(state);
+  const filtered = nFilters > 0 || !!state.search;
+  const sortKey = normalizedSortKey(state);
+  const sortOptions = tracking ? [SMART_SORT, ...SORT_OPTIONS] : [...SORT_OPTIONS];
 
-  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearch(e.target.value);
+  // Trang vượt quá số trang (vd sau khi lọc) → về trang cuối có dữ liệu (thuần client)
+  React.useEffect(() => {
+    if (pagination && pagination.totalPages > 0 && state.page > pagination.totalPages) update(pageUpdate(pagination.totalPages));
+  }, [pagination, state.page, update]);
+
+  const closeFilters = React.useCallback(() => { setFOpen(false); fBtn.current?.focus(); }, []);
+  const onSearch = React.useCallback((v: string) => update(filterUpdate('search', v)), [update]);
+
+  function onAction({ key, task, extId }: TaskRowAction) {
+    switch (key) {
+      case 'view': modals.setQuickViewTaskId(task.id); break;
+      case 'open': router.push(`/tasks/${task.id}`); break;
+      case 'copy': copyTaskCode(displayCode(task), t); break;
+      case 'star':
+        toggleStar.mutate(
+          { id: task.id, isImportant: !task.isImportant },
+          {
+            onSuccess: () => toast.success(t(task.isImportant ? 'qa.starOff' : 'qa.starOn', { id: displayCode(task) })),
+            onError: (e) => toast.error(errMsg(e)),
+          },
+        );
+        break;
+      case 'acknowledge': case 'approve-plan': case 'approve-review':
+        modals.setConfirmState({ kind: key, taskId: task.id }); break;
+      case 'reject-plan': modals.setRejectPlanTaskId(task.id); break;
+      case 'reject-task': modals.setRejectTaskId(task.id); break;
+      case 'complete': modals.setCompleteTaskId(task.id); break;
+      case 'supplement': modals.setSupplementTaskId(task.id); break;
+      case 'reject-review': modals.setRejectReviewId(task.id); break;
+      case 'extension': modals.setExtensionTaskId(task.id); break;
+      case 'approve-extension': if (extId) modals.setApproveExtState({ taskId: task.id, extId }); break;
+      case 'transfer': modals.setTransferTaskId(task.id); break;
+      case 'restore': modals.setRestoreTaskId(task.id); break;
+      case 'edit': modals.setEditingTask(task.id); break;
+      case 'cancel': modals.setCancelTaskId(task.id); break;
+    }
   }
+
+  const tabCount = (k: ListTab) =>
+    k === 'starred' ? counters?.important : k === 'unseen' ? counters?.unseen : k === tab ? pagination?.total : undefined;
 
   return (
-    <div className="space-y-5">
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <ViewIcon className={`h-6 w-6 ${view === 'important' ? 'text-amber-500 fill-amber-400' : view === 'unseen' ? 'text-emerald-500' : 'text-muted-foreground'}`} />
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">{viewTitle}</h1>
-            <p className="text-sm text-muted-foreground">
-              {pagination ? (
-                <span>
-                  Tổng cộng{' '}
-                  <Badge variant="secondary" className="font-mono">{pagination.total}</Badge>{' '}
-                  công việc
-                </span>
-              ) : 'Đang tải...'}
-            </p>
-          </div>
+    <div>
+      {/* ── Đầu trang ───────────────────────────────────────────────────── */}
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+        <div className="min-w-0">
+          <h1 className="font-head text-[22px] font-semibold leading-tight text-ink">{t('page.title')}</h1>
+          <p className="m-0 mt-1 text-[13px] text-ink-3" data-testid="list-total">
+            {pagination ? t('tlx.total', { n: pagination.total }) : ' '}
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          {view === 'unseen' && tasks.length > 0 && (
+          {tracking && state.view === 'unseen' && tasks.length > 0 && (
             <Button
+              type="button"
               variant="outline"
-              className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+              size="md"
+              aria-label={t('tl.seenAll._')}
               disabled={markAllSeen.isPending}
               onClick={() => markAllSeen.mutate(undefined, {
-                onSuccess: (r: { count?: number }) => toast.success(`Đã đánh dấu đã xem ${r.count ?? 0} công việc`),
+                onSuccess: (r: { count?: number }) => toast.success(t('tl.seenAll.done', { n: r.count ?? 0 })),
                 onError: (e) => toast.error(errMsg(e)),
               })}
+              className="max-[680px]:h-11"
             >
-              <CheckCheck className="h-4 w-4" />Đánh dấu đã xem tất cả
+              <CheckCheck aria-hidden />
+              <span className="max-[680px]:sr-only">{t('tl.seenAll._')}</span>
             </Button>
           )}
-          {/* Sort dropdown */}
-          <Select value={normalizedSortKey} onValueChange={setSort}>
-            <SelectTrigger className="h-9 w-48 text-sm gap-1.5">
-              <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {sortOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button onClick={() => modals.setShowCreate(true)} className="gap-2">
-            <Plus className="h-4 w-4" />Tạo công việc
+          <Button type="button" size="md" onClick={() => modals.setShowCreate(true)} className="max-[680px]:h-11">
+            <Plus aria-hidden />{t('page.new')}
           </Button>
         </div>
       </div>
 
-      {/* ── Filters ─────────────────────────────────────────────────────────── */}
-      <TaskListFilters
-        search={search}
-        status={status}
-        statusLocked={view === 'unseen' ? 'Hoàn thành' : undefined}
-        priorityId={priorityId}
-        typeId={typeId}
-        source={source}
-        datePreset={datePreset}
-        dateFrom={dateFrom}
-        dateTo={dateTo}
-        priorities={priorities}
-        taskTypes={taskTypes}
-        onSearchChange={handleSearchChange}
-        onStatusChange={(v) => setStatus(v === 'active' ? '' : v)}
-        onPriorityChange={(v) => setPriorityId(v === 'all' ? '' : v)}
-        onTypeChange={(v) => setTypeId(v === 'all' ? '' : v)}
-        onSourceChange={(v) => setSource(v === 'all' ? '' : v)}
-        onDatePresetChange={(v) => setDatePreset(v === 'all' ? '' : v)}
-        onDateFromChange={(v) => setDateFrom(v)}
-        onDateToChange={(v) => setDateTo(v)}
-      />
+      {/* ── Tab + công cụ ───────────────────────────────────────────────── */}
+      <div className="mb-4 flex items-end gap-4 border-b border-line max-[1399px]:block max-[1399px]:border-b-0">
+        <Tabs value={tab} onValueChange={(v) => update(tabUpdate(v as ListTab))} className="min-w-0 flex-1">
+          <TabsList
+            aria-label={t('tlx.views')}
+            className="border-b-0 max-[1399px]:border-b max-[680px]:-mx-4 max-[680px]:px-4"
+          >
+            {tabsFor(tracking).map((k) => (
+              <TabsTrigger key={k} value={k} count={tabCount(k)} className="max-[680px]:h-11">
+                {t(TAB_LABEL[k])}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+        <div className="flex flex-none items-center gap-2 pb-2 max-[1399px]:pt-3 max-[1399px]:pb-0">
+          <SearchBox value={state.search} onChange={onSearch} />
+          <Button
+            ref={fBtn}
+            type="button"
+            variant="outline"
+            size="md"
+            aria-expanded={fOpen}
+            aria-controls="tl-fpanel"
+            onClick={() => setFOpen((o) => !o)}
+            className={cn('flex-none max-[680px]:h-11 max-[680px]:px-3', nFilters > 0 && 'border-primary-text text-primary-text')}
+          >
+            <SlidersHorizontal aria-hidden />
+            <span>{nFilters ? t('tl.f.n', { n: nFilters }) : t('filter.btn')}</span>
+          </Button>
+          <label className="relative flex flex-none items-center">
+            <span className="sr-only">{t('tlx.sort._')}</span>
+            <ArrowUpDown aria-hidden className="pointer-events-none absolute left-2.5 size-3.5 text-ink-3" />
+            <select
+              value={sortKey}
+              onChange={(e) => update(sortUpdate(e.target.value, tracking))}
+              title={t('tlx.sort._')}
+              className="h-9 max-w-[260px] rounded-ctl border border-line-2 bg-surface pl-8 pr-7 text-[13px] text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-[680px]:h-11 max-[680px]:w-11 max-[680px]:max-w-11 max-[680px]:px-0 max-[680px]:text-transparent"
+            >
+              {sortOptions.map((o) => (
+                <option key={o} value={o} className="text-ink">{t(`tlx.sort.${o.replace(':', '_')}`)}</option>
+              ))}
+            </select>
+          </label>
+          <TaskViewSwitch value="list" onChange={() => {}} />
+        </div>
+      </div>
 
-      {/* ── Task Grid ───────────────────────────────────────────────────────── */}
+      {fOpen && (
+        <TaskListFilters state={state} priorities={priorities} taskTypes={taskTypes} onUpdate={update} onClose={closeFilters} />
+      )}
+      <FilterChips state={state} priorities={priorities} taskTypes={taskTypes} onUpdate={update} />
+
+      {tab === 'cancelled' && role !== 'ADMIN' && (
+        <p className="mb-3 flex items-center gap-2 text-[13px] text-ink-2">
+          <Info aria-hidden className="size-4 flex-none text-ink-3" />
+          <span>{t('tl.cx.note')}</span>
+        </p>
+      )}
+
+      {/* ── Bảng ────────────────────────────────────────────────────────── */}
       <TaskListGrid
         tasks={tasks}
+        state={state}
         isLoading={isLoading}
         isError={isError}
+        onRetry={() => void refetch()}
         currentUserId={currentUserId}
         role={role}
+        selectedId={modals.quickViewTaskId}
+        filtered={filtered}
+        onClearFilters={nFilters ? () => update(clearFiltersUpdate(state)) : undefined}
         onCreateClick={() => modals.setShowCreate(true)}
-        onOpenQuickView={modals.setQuickViewTaskId}
-        onEdit={modals.setEditingTask}
-        onOpenComplete={modals.setCompleteTaskId}
-        onOpenTransfer={modals.setTransferTaskId}
-        onOpenRejectTask={modals.setRejectTaskId}
-        onOpenRejectReview={modals.setRejectReviewId}
-        onOpenCancel={modals.setCancelTaskId}
-        onOpenRestore={modals.setRestoreTaskId}
-        onOpenSupplement={modals.setSupplementTaskId}
-        onOpenRejectPlan={modals.setRejectPlanTaskId}
-        onOpenExtension={modals.setExtensionTaskId}
-        onOpenApproveExtension={(taskId, extId) => modals.setApproveExtState({ taskId, extId })}
+        onAction={onAction}
+        onSort={(v) => update(sortUpdate(v, tracking))}
       />
 
-      {/* ── Pagination ──────────────────────────────────────────────────────── */}
-      {pagination && pagination.totalPages >= 1 && (
-        <TaskListPagination
-          pagination={{ ...pagination, limit }}
-          onPageChange={(p) => setPage(p)}
-          onLimitChange={(l) => { updateParams({ limit: l !== 20 ? String(l) : undefined, page: undefined }); }}
+      {pagination && (
+        <Pagination
+          page={state.page}
+          pageSize={state.limit}
+          total={pagination.total}
+          onPageChange={(p) => update(pageUpdate(p))}
+          onPageSizeChange={(l) => update(limitUpdate(l))}
         />
       )}
 
-      {/* ── Modals ──────────────────────────────────────────────────────────── */}
-      <TaskListModals
-        tasks={tasks}
-        currentUserId={currentUserId}
-        role={role}
-        {...modals}
-      />
+      <TaskListModals tasks={tasks} currentUserId={currentUserId} role={role} {...modals} />
     </div>
   );
 }

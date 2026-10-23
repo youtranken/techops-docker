@@ -764,6 +764,45 @@
     }
   },
   "tl": {
+    "colId": "Mã",
+    "colMore": "Thao tác",
+    "colTask": "Công việc",
+    "cx": {
+      "note": "Chỉ Admin khôi phục được việc đã hủy."
+    },
+    "f": {
+      "apply": "Áp dụng",
+      "chipRm": "Bỏ điều kiện {x}",
+      "clear": "Xóa bộ lọc",
+      "from": "Từ ngày",
+      "n": "Lọc · {n}",
+      "none": "Không có việc nào khớp bộ lọc",
+      "noneD": "Thử bỏ bớt điều kiện hoặc xóa bộ lọc.",
+      "prAll": "Tất cả ưu tiên",
+      "priority": "Ưu tiên",
+      "rangeErr": "Ngày kết thúc phải sau ngày bắt đầu.",
+      "source": "Nguồn",
+      "src": {
+        "helpdesk": "Helpdesk",
+        "techops": "TechOps"
+      },
+      "srcAll": "Tất cả nguồn",
+      "stAll": "Tất cả trong tab",
+      "status": "Trạng thái",
+      "t": {
+        "30d": "30 ngày tới",
+        "7d": "7 ngày tới",
+        "custom": "Từ ngày – đến ngày",
+        "overdue": "Quá hạn",
+        "today": "Hôm nay"
+      },
+      "tAll": "Mọi thời gian",
+      "time": "Hạn hoàn thành",
+      "title": "Bộ lọc",
+      "to": "Đến ngày",
+      "tyAll": "Tất cả loại",
+      "type": "Loại công việc"
+    },
     "pg": {
       "nav": "Phân trang",
       "next": "Trang sau",
@@ -771,7 +810,40 @@
       "page": "Trang {n}",
       "prev": "Trang trước",
       "size": "Mỗi trang"
-    }
+    },
+    "seenAll": {
+      "_": "Đánh dấu đã xem tất cả",
+      "done": "Đã đánh dấu đã xem {n} công việc."
+    },
+    "sortBy": "Sắp xếp theo {c}",
+    "waiting": "{n} việc đang chờ bạn"
+  },
+  "tlx": {
+    "extPending": "Đơn gia hạn đang chờ duyệt (đến {d})",
+    "f": {
+      "stActive": "Chưa hoàn thành",
+      "stAll": "Tất cả trạng thái"
+    },
+    "loadErr": "Không thể tải danh sách công việc.",
+    "mention": "có nhắc đến bạn",
+    "qa": {
+      "approveExt": "Duyệt gia hạn ({d})",
+      "declineTask": "Từ chối nhận"
+    },
+    "sort": {
+      "_": "Sắp xếp",
+      "createdAt_asc": "Cũ nhất",
+      "createdAt_desc": "Mới nhất",
+      "scheduleEnd_asc": "Hạn gần nhất",
+      "scheduleEnd_desc": "Hạn xa nhất",
+      "smart": "Mặc định (chưa xem → ★ → ưu tiên)",
+      "status_asc": "Trạng thái",
+      "title_asc": "Tên A → Z",
+      "title_desc": "Tên Z → A"
+    },
+    "total": "{n} công việc",
+    "viewMode": "Chế độ xem",
+    "views": "Nhóm công việc"
   },
   "top": {
     "appearance": "Giao diện",

@@ -34,11 +34,11 @@ export const INCLUDE = {
     'er', // trang/toast lỗi chung
     'idle', 'lang', 'card', 'lane', 'flow', 'n',
     'td', // A2-1 chi tiết công việc (trang + ngăn xem nhanh)
+    'tl', // A2-3 danh sách công việc (bảng lọc, chip, phân trang, tab)
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
     'td.as.', // trạng thái người làm (StatusDot kind="assignee")
-    'tl.pg.', // phân trang (Pagination)
     'dnd.reported', // A2-1: "x/n đã báo cáo" ở khối Kết quả của người làm
     'tf.att.', // A2-2: luật tệp đính kèm trong hộp Báo cáo / Bổ sung
     'tf.paste.', // A2-2: hộp xem trước ảnh vừa dán

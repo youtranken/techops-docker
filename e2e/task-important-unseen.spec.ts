@@ -76,7 +76,8 @@ test.describe.serial('V2 — ★ Quan trọng & Hoàn thành chưa xem', () => {
     // Sidebar + trang Quan trọng
     await page.getByRole('link', { name: /Quan trọng/ }).click();
     await expect(page).toHaveURL(/view=important/);
-    await expect(page.getByRole('heading', { name: 'Task quan trọng', exact: true })).toBeVisible();
+    // V2 A2-3: mục con hiện là tab "Quan trọng" của trang Công việc
+    await expect(page.getByRole('tab', { name: /^Quan trọng/ })).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByText(TITLE)).toBeVisible();
     expect((await counters(page)).important).toBeGreaterThanOrEqual(1);
   });
@@ -112,14 +113,18 @@ test.describe.serial('V2 — ★ Quan trọng & Hoàn thành chưa xem', () => {
 
     // Danh sách mặc định: vẫn hiện, ở đầu, có badge
     await page.goto('/tasks');
-    const firstCard = page.locator('.grid > div').first();
-    await expect(firstCard).toContainText(TITLE);
-    await expect(firstCard).toContainText('Mới hoàn thành');
+    // V2 A2-3: dòng đầu bảng, có chấm "chưa xem"
+    const firstRow = page.locator('.v2-tasks .v2-tr').first();
+    await expect(firstRow).toContainText(TITLE);
+    await expect(firstRow.locator('[data-unseen]')).toBeVisible();
+    await expect(firstRow).toContainText('Chưa xem');
 
     // Mục "Hoàn thành – chưa xem": trạng thái khoá ở Hoàn thành
     await page.getByRole('link', { name: /Mới xong/ }).click();
-    await expect(page.getByRole('heading', { name: 'Hoàn thành – chưa xem', exact: true })).toBeVisible();
-    await expect(page.getByRole('combobox').filter({ hasText: 'Hoàn thành' })).toBeDisabled();
+    await expect(page.getByRole('tab', { name: /^Mới xong/ })).toHaveAttribute('aria-selected', 'true');
+    await page.getByRole('button', { name: /^Lọc/ }).click();
+    await expect(page.getByLabel('Trạng thái', { exact: true })).toBeDisabled();
+    await expect(page.getByLabel('Trạng thái', { exact: true })).toHaveValue('COMPLETED');
     await expect(page.getByText(TITLE)).toBeVisible();
 
     // Mở trang chi tiết
@@ -143,7 +148,8 @@ test.describe.serial('V2 — ★ Quan trọng & Hoàn thành chưa xem', () => {
     // Đã xem → counter giảm, biến khỏi mục chưa xem
     await expect.poll(async () => (await counters(page)).unseen).toBe(before.unseen - 1);
     await page.goto('/tasks?view=unseen');
-    await expect(page.getByRole('heading', { name: 'Hoàn thành – chưa xem', exact: true })).toBeVisible();
+    await expect(page.getByRole('tab', { name: /^Mới xong/ })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('.v2-tasks [data-skeleton-row]')).toHaveCount(0);
     await expect(page.getByText(TITLE)).toHaveCount(0);
 
     // Bỏ ★ trên trang chi tiết
@@ -177,8 +183,11 @@ test.describe.serial('V2 — ★ Quan trọng & Hoàn thành chưa xem', () => {
     await login(page, E2E_USERS.boss.username);
     await page.goto('/tasks?view=unseen');
     await expect(page.getByText(TITLE_2)).toBeVisible();
+    // Ổn định (từng chập chờn): chờ đúng response POST seen-all rồi poll số đếm, không đọc ngay 1 lần
+    const seenAll = page.waitForResponse((r) => r.url().endsWith('/api/tasks/seen-all') && r.request().method() === 'POST');
     await page.getByRole('button', { name: 'Đánh dấu đã xem tất cả' }).click();
+    expect((await seenAll).status()).toBe(200);
     await expect(page.getByText(TITLE_2)).toHaveCount(0);
-    expect((await counters(page)).unseen).toBe(0);
+    await expect.poll(async () => (await counters(page)).unseen).toBe(0);
   });
 });
