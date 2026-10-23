@@ -34,11 +34,12 @@ settings/
     useSmtp.ts                     # TanStack Query — smtp config (Admin only)
 
   components/
-    SettingsClient.tsx             # Layout: grouped sidebar nav + content panel
     PrioritiesSection.tsx          # Inline edit table for priorities
     TaskTypesSection.tsx           # Card grid + Lucide icon picker
     TagsSection.tsx                # Tag CRUD with color picker
-    AvatarSection.tsx              # Avatar upload + color presets + display name
+    profile/                       # A3-2 (V2): trang Hồ sơ của tôi — ProfilePage (khối Tài khoản/Ảnh/Cơ bản/Liên hệ/Múi giờ+ngôn ngữ/Mật khẩu,
+                                   #   StickySaveBar), ChangePasswordDialog, PasswordInput. Thay AvatarSection/Profile*/ChangePasswordSection (đã xoá).
+    SettingsHeader.tsx             # Đầu khu Cài đặt (V1) — ẩn ở /settings/profile
     NotificationSection.tsx        # Email toggle + role filter + type checklist
     NotificationTypeList.tsx       # Sub-component: checklist with select-all
     SmtpSection.tsx                # SMTP form orchestrator
@@ -57,6 +58,16 @@ settings/
 | Profile/Avatar | Tất cả user (mỗi người xem profile của mình) |
 | Thông báo | Tất cả user (mỗi người xem prefs của mình) |
 | SMTP | Admin only — ẩn hoàn toàn với role khác |
+
+## Hồ sơ (A3-2, V2 Phase A)
+
+- Luật thuần ở `lib/profile-form.ts` (test `lib/__tests__/profile-form.test.ts`) và `lib/password-rules.ts` (test đối chiếu `validatePassword` server).
+- zod của PATCH `/api/settings/profile` nằm ở `validators/profile.schema.ts`, route và client dùng chung (không đổi luật).
+- Lưu: 1 StickySaveBar cho mọi ô; gửi đúng 2 body V1 — cơ bản `{displayName, position, department, timezone, bio}` rồi liên hệ `{email, phone}` (chỉ phần có đổi).
+- Ảnh/màu lưu ngay như V1. Ảnh: chỉ gọi `POST /api/upload/avatar` (route tự ghi `avatarUrl`); bỏ lệnh PATCH `avatarUrl` thừa của V1 (luôn bị server từ chối vì URL tương đối → V1 báo lỗi dù ảnh đã lưu).
+- Ngôn ngữ: thuần client (cookie `NEXT_LOCALE`), áp dụng ngay. Đổi mật khẩu: chính sách từ `/api/auth/password-policy`, lỗi server `WRONG_PASSWORD`/`SAME_PASSWORD`/`PASSWORD_POLICY_VIOLATION` hiện dưới ô.
+- Phase B: xác nhận email khi đổi, "Bỏ ảnh", ngày đổi mật khẩu gần nhất (API profile chưa trả), bắt bỏ khoảng trắng tên / kiểm định dạng số điện thoại.
+- `/settings/security` (cấu hình bảo mật hệ thống, Admin) và `/settings/notifications` (prefs email) thuộc lát Cài đặt.
 
 ## Quan trọng
 

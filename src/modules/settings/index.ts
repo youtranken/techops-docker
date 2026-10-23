@@ -11,5 +11,3 @@ export { useNotificationPrefs, useUpdateNotificationPrefs, NOTIFICATION_TYPES } 
 export { useSmtpConfig, useUpdateSmtpConfig, useTestSmtp } from './hooks/useSmtp';
 export { useSecurityConfig } from './hooks/useSecurityConfig';
 
-// Components (for use in page.tsx)
-export { SettingsClient } from './components/SettingsClient';

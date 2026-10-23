@@ -239,6 +239,8 @@ export function buildCrumbs(pathname: string, view?: string | null): Crumb[] {
       return [{ label: 'nav.tasks', href: '/tasks' }];
     case 'helpdesk':
       return [{ label: 'nav.helpdesk' }];
+    case 'notifications':
+      return [{ label: 'nt.title' }];
     case 'analytics':
       if (b === 'task-list') return [{ label: 'nav.reports', href: '/analytics' }, { label: 'nav.sub.taskList' }];
       if (b === 'research') return [{ label: 'nav.reports', href: '/analytics' }, { label: 'nav.sub.research' }];

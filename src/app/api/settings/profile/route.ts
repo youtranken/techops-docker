@@ -1,19 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-utils';
 import { profileService } from '@/modules/settings/services/profile.service';
-import { z } from 'zod';
-
-const updateSchema = z.object({
-  displayName: z.string().min(1).max(100).optional(),
-  email: z.string().email().or(z.literal('')).optional(),
-  avatarColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
-  avatarUrl: z.string().nullable().optional(),
-  phone: z.string().max(20).optional(),
-  department: z.string().max(100).optional(),
-  position: z.string().max(100).optional(),
-  bio: z.string().max(500).optional(),
-  timezone: z.string().optional(),
-});
+import { profileUpdateSchema as updateSchema } from '@/modules/settings/validators/profile.schema';
 
 export async function GET() {
   const user = await requireAuth();

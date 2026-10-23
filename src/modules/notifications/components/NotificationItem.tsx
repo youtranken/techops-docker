@@ -4,40 +4,9 @@
 import { formatDistanceToNow } from 'date-fns';
 import { vi, enUS } from 'date-fns/locale';
 import { useLocale } from 'next-intl';
-import {
-  ClipboardList, CheckCircle, XCircle, ArrowLeftRight, CalendarClock, Search, PenLine, PartyPopper,
-  MessageSquare, AlarmClock, Siren, FileText, Bell,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NotificationWithTask } from '../services/notification.service';
-
-type Tone = 'primary' | 'done' | 'danger' | 'review' | 'approval' | 'pickup' | 'muted';
-const TONE: Record<Tone, string> = {
-  primary: 'text-c-progress bg-[color-mix(in_srgb,var(--c-progress)_12%,var(--surface))]',
-  done: 'text-c-done bg-[color-mix(in_srgb,var(--c-done)_12%,var(--surface))]',
-  danger: 'text-danger bg-[color-mix(in_srgb,var(--danger)_12%,var(--surface))]',
-  review: 'text-c-review bg-[color-mix(in_srgb,var(--c-review)_12%,var(--surface))]',
-  approval: 'text-c-approval bg-[color-mix(in_srgb,var(--c-approval)_12%,var(--surface))]',
-  pickup: 'text-c-pickup bg-[color-mix(in_srgb,var(--c-pickup)_12%,var(--surface))]',
-  muted: 'text-ink-3 bg-surface-2',
-};
-type IconCmp = React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
-const TYPE_META: Record<string, [IconCmp, Tone]> = {
-  TASK_ASSIGNED: [ClipboardList, 'primary'],
-  TASK_APPROVED: [CheckCircle, 'done'],
-  TASK_REJECTED: [XCircle, 'danger'],
-  TRANSFER_RECEIVED: [ArrowLeftRight, 'approval'],
-  EXTENSION_REQUESTED: [CalendarClock, 'review'],
-  EXTENSION_APPROVED: [CheckCircle, 'done'],
-  EXTENSION_REJECTED: [XCircle, 'danger'],
-  REVIEW_REQUIRED: [Search, 'review'],
-  REVISION_REQUIRED: [PenLine, 'review'],
-  TASK_COMPLETED: [PartyPopper, 'done'],
-  COMMENT_ADDED: [MessageSquare, 'pickup'],
-  DEADLINE_REMINDER: [AlarmClock, 'danger'],
-  ALL_FAILED: [Siren, 'danger'],
-  PLAN_APPROVAL_REQUESTED: [FileText, 'approval'],
-};
+import { NotificationIcon } from './notification-icon';
 
 interface NotificationItemProps {
   notification: NotificationWithTask;
@@ -47,7 +16,6 @@ interface NotificationItemProps {
 
 export function NotificationItem({ notification, unread, onClick }: NotificationItemProps) {
   const locale = useLocale();
-  const [Icon, tone] = TYPE_META[notification.type] ?? [Bell, 'muted' as Tone];
   const taskCode = notification.task?.taskCode;
   const created = new Date(notification.createdAt);
 
@@ -58,9 +26,7 @@ export function NotificationItem({ notification, unread, onClick }: Notification
       data-unread={unread || undefined}
       className="relative flex w-full gap-2.5 border-0 bg-transparent px-3.5 py-2.5 text-left transition-colors hover:bg-surface-2 focus-visible:bg-surface-2 focus-visible:outline-none"
     >
-      <span aria-hidden className={cn('grid size-8 shrink-0 place-items-center rounded-full', TONE[tone])}>
-        <Icon className="size-4" />
-      </span>
+      <NotificationIcon type={notification.type} />
       <span className={cn('min-w-0 flex-1', unread && 'pr-4')}>
         <span className={cn('block text-[13px] leading-snug', unread ? 'font-semibold text-ink' : 'font-medium text-ink-2')}>
           {notification.title}

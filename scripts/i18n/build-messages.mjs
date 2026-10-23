@@ -38,6 +38,8 @@ export const INCLUDE = {
     'dnd', // A2-4a bảng Kanban (kéo thả, mẹo, thông báo cho trình đọc màn hình)
     'tf', // A2-4b biểu mẫu Tạo / Sửa công việc (ngăn trượt + trang đầy đủ)
     'dr', // A2-4b nháp lưu trên trình duyệt (Phase B)
+    'nt', // A3-2 trang Thông báo
+    'pf', // A3-2 Hồ sơ của tôi
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
@@ -45,12 +47,19 @@ export const INCLUDE = {
     'dnd.reported', // A2-1: "x/n đã báo cáo" ở khối Kết quả của người làm
     'tf.att.', // A2-2: luật tệp đính kèm trong hộp Báo cáo / Bổ sung
     'tf.paste.', // A2-2: hộp xem trước ảnh vừa dán
+    // A3-2: hộp Đổi mật khẩu trong Hồ sơ (phần còn lại của nhóm au làm ở A3-8 Đăng nhập / Mật khẩu)
+    'au.pol.', 'au.cur', 'au.new', 'au.show', 'au.hide', 'au.saving',
+    'au.err.cur', 'au.err.match', 'au.err.policy', 'au.err.same',
   ],
   /** Bỏ các khoá theo tiền tố: điều khiển của trang preview, tính năng Phase B */
   exclude: [
     'td.pv.', // thanh điều khiển preview
     'td.cm.lock', // khoá bình luận khi xong/hủy — Phase B
     'tf.pv.', // thanh điều khiển preview biểu mẫu
+    'nt.scn', 'pf.scn', // A3-2: thanh điều khiển preview
+    'nt.pb', 'nt.type', 'nt.clear', 'nt.empty.type', // A3-2: lọc theo loại thông báo — Phase B (API V1 không có tham số loại)
+    'pf.pb', 'pf.email.ok', 'pf.email.pending', 'pf.email.resend', 'pf.email.sent', 'pf.email.note', // A3-2: xác nhận email — Phase B
+    'pf.av.rm', 'pf.saved.avRm', 'pf.pw.last', // A3-2: bỏ ảnh / ngày đổi mật khẩu — V1 không có
   ],
 };
 
