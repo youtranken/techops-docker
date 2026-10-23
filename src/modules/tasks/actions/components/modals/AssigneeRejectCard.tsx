@@ -1,9 +1,11 @@
 'use client';
 
+/** Một dòng người làm trong hộp Yêu cầu làm lại (preview `.rw-row` + `.rw-why`): chọn → hiện báo cáo mới nhất + ô lý do. */
+import { useTranslations, useLocale } from 'next-intl';
 import { FileText, ExternalLink } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Field, textareaClass } from '@/shared/ui/Field';
+import { UserAvatar } from '@/shared/ui/UserAvatar';
+import { fileSizeLabel } from './action-dialog-rules';
 import type { AssigneeOption } from './RejectReviewModal';
 
 interface Props {
@@ -11,65 +13,68 @@ interface Props {
   checked: boolean;
   hideCheckbox?: boolean;
   reason: string;
-  showError: boolean;
+  error?: string;
   onToggle: () => void;
   onReasonChange: (v: string) => void;
 }
 
-function formatSize(bytes: number) {
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)}KB`;
-  return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
-}
-
-export function AssigneeRejectCard({ assignee, checked, hideCheckbox, reason, showError, onToggle, onReasonChange }: Props) {
+export function AssigneeRejectCard({ assignee, checked, hideCheckbox, reason, error, onToggle, onReasonChange }: Props) {
+  const t = useTranslations();
+  const locale = useLocale();
   const report = assignee.latestReport;
+  const fid = `dlg-rw-${assignee.assigneeId}`;
 
   return (
-    <div className={`rounded-lg border transition-colors ${checked ? 'border-red-200 bg-red-50/30 dark:border-red-800/40 dark:bg-red-950/10' : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800/30'}`}>
+    <div className="border-t border-line py-1.5 last:border-b" data-rw={assignee.assigneeId}>
       {!hideCheckbox && (
-        <label className="flex items-center gap-3 px-3 py-2.5 cursor-pointer">
-          <Checkbox
+        <label className="flex min-h-10 cursor-pointer items-center gap-2.5 text-sm text-ink max-[680px]:min-h-11">
+          <input
+            type="checkbox"
+            name="dlg-rw"
             checked={checked}
-            onCheckedChange={onToggle}
-            className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
+            onChange={onToggle}
+            className="size-4 flex-none accent-[var(--primary)]"
           />
-          <span className="text-sm font-medium text-slate-800 dark:text-slate-200">{assignee.displayName}</span>
+          <UserAvatar displayName={assignee.displayName} size="xs" />
+          <span className="min-w-0 flex-1 truncate">{assignee.displayName}</span>
         </label>
       )}
-
       {checked && (
-        <div className={`px-3 pb-3 space-y-2 ${!hideCheckbox ? 'border-t border-slate-100 dark:border-slate-700' : 'pt-3'}`}>
+        <div className="pb-2 pl-[26px] pt-0.5 max-[680px]:pl-0">
           {report && (
-            <div className="rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs overflow-hidden">
-              <p className="px-3 py-2 text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 whitespace-pre-wrap">{report.content}</p>
+            <div className="mb-2.5 overflow-hidden rounded-ctl border border-line text-xs">
+              <p className="m-0 px-3 pt-2 text-[11px] font-medium uppercase tracking-wide text-ink-3">{t('tdx.dlg.rework.latest')}</p>
+              <p className="m-0 line-clamp-3 whitespace-pre-wrap px-3 pb-2 pt-1 leading-relaxed text-ink-2">{report.content}</p>
               {report.attachments.length > 0 && (
-                <div className="border-t border-slate-100 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-700">
+                <ul className="m-0 list-none divide-y divide-line border-t border-line p-0">
                   {report.attachments.map((f, i) => (
-                    <a key={i} href={`/api/files?path=${encodeURIComponent(f.filePath)}`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/60 group transition-colors"
-                    >
-                      <FileText className="w-3 h-3 text-red-400 shrink-0" />
-                      <span className="flex-1 truncate text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">{f.fileName}</span>
-                      <span className="text-slate-400 dark:text-slate-500 shrink-0">{formatSize(f.fileSize)}</span>
-                      <ExternalLink className="w-2.5 h-2.5 text-slate-300 group-hover:text-indigo-400 shrink-0" />
-                    </a>
+                    <li key={i}>
+                      <a
+                        href={`/api/files?path=${encodeURIComponent(f.filePath)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-1.5 text-ink-2 hover:bg-surface-2 hover:text-primary-text"
+                      >
+                        <FileText aria-hidden className="size-3.5 flex-none text-ink-3" />
+                        <span className="min-w-0 flex-1 truncate">{f.fileName}</span>
+                        <span className="flex-none font-mono text-ink-3">{fileSizeLabel(f.fileSize, locale)}</span>
+                        <ExternalLink aria-hidden className="size-3 flex-none text-ink-3" />
+                      </a>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
             </div>
           )}
-          <div className="space-y-1">
-            <Label className="text-xs">Lý do <span className="text-destructive">*</span></Label>
-            <Textarea
-              placeholder={`Lý do yêu cầu ${assignee.displayName} làm lại...`}
+          <Field id={fid} label={t('app.dlg.rework.reason', { a: assignee.displayName })} required error={error}>
+            <textarea
+              rows={2}
+              className={`${textareaClass} min-h-[68px]`}
+              placeholder={t('app.dlg.rework.ph')}
               value={reason}
               onChange={(e) => onReasonChange(e.target.value)}
-              rows={2}
-              className={showError ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
-            {showError && <p className="text-xs text-red-500">Vui lòng nhập lý do</p>}
-          </div>
+          </Field>
         </div>
       )}
     </div>

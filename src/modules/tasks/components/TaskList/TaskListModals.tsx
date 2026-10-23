@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+import { Users } from 'lucide-react';
 import { CreateTaskSheet } from '../CreateTask/CreateTaskSheet';
 import { EditTaskModal } from '../TaskModals/EditTaskModal';
 import { CompleteTaskModal } from '../../actions/components/modals/CompleteTaskModal';
@@ -63,6 +65,7 @@ export function TaskListModals({
   setCompleteTaskId, setTransferTaskId, setRejectTaskId, setRejectReviewId,
   setCancelTaskId, setRestoreTaskId, setSupplementTaskId, setRejectPlanTaskId, setExtensionTaskId, setApproveExtState,
 }: TaskListModalsProps) {
+  const t                = useTranslations();
   const complete         = useCompleteTask();
   const transfer         = useTransferTask();
   const rejectTask       = useRejectTask();
@@ -79,6 +82,11 @@ export function TaskListModals({
   const transferCurrentAssigneeIds = transferTask?.assignees.map((a) => a.user.id) ?? [];
   const extensionTask              = tasks.find((t) => t.id === extensionTaskId);
   const rejectReviewTask           = tasks.find((t) => t.id === rejectReviewId);
+  /** Thẻ tóm tắt việc trong hộp thoại (mã + tiêu đề) */
+  const card = (id: string | null) => {
+    const x = id ? tasks.find((t) => t.id === id) : undefined;
+    return x ? { code: x.taskCode, title: x.title } : null;
+  };
   const rejectReviewCompletedAssignees = (rejectReviewTask?.assignees ?? [])
     .filter((a) => a.status === 'COMPLETED')
     .map((a) => ({ assigneeId: a.id, displayName: a.user.displayName }));
@@ -98,6 +106,7 @@ export function TaskListModals({
 
       <CompleteTaskModal
         taskId={completeTaskId ?? undefined}
+        task={card(completeTaskId)}
         open={!!completeTaskId}
         onClose={() => setCompleteTaskId(null)}
         isLoading={complete.isPending}
@@ -111,6 +120,7 @@ export function TaskListModals({
 
       <TransferModal
         open={!!transferTaskId}
+        task={card(transferTaskId)}
         onClose={() => setTransferTaskId(null)}
         currentUserId={currentUserId}
         currentAssigneeIds={transferCurrentAssigneeIds}
@@ -126,11 +136,12 @@ export function TaskListModals({
       <ReasonModal
         open={!!rejectTaskId}
         onClose={() => setRejectTaskId(null)}
-        title="Từ chối nhận công việc"
-        placeholder="Lý do từ chối..."
-        confirmLabel="Từ chối"
+        task={card(rejectTaskId)}
+        title={t('app.dlg.decline.t')}
+        placeholder={t('app.dlg.decline.ph')}
+        note={t('tdx.dlg.decline.note')}
+        confirmLabel={t('act.decline')}
         required
-        isDestructive
         isLoading={rejectTask.isPending}
         onConfirm={(reason) =>
           rejectTask.mutate(
@@ -143,6 +154,7 @@ export function TaskListModals({
       <RejectReviewModal
         open={!!rejectReviewId}
         onClose={() => setRejectReviewId(null)}
+        task={card(rejectReviewId)}
         completedAssignees={rejectReviewCompletedAssignees}
         isLoading={rejectReview.isPending}
         onConfirm={(entries) =>
@@ -153,10 +165,13 @@ export function TaskListModals({
       <ReasonModal
         open={!!cancelTaskId}
         onClose={() => setCancelTaskId(null)}
-        title="Hủy công việc"
-        placeholder="Lý do hủy..."
-        confirmLabel="Hủy công việc"
-        isDestructive
+        task={card(cancelTaskId)}
+        title={t('app.dlg.cancel.t')}
+        description={t('tdx.dlg.cancel.d')}
+        label={t('app.dlg.cancel.label')}
+        placeholder={t('app.dlg.cancel.ph')}
+        confirmLabel={t('act.cancel')}
+        danger
         required
         isLoading={cancelTask.isPending}
         onConfirm={(reason) =>
@@ -170,17 +185,19 @@ export function TaskListModals({
       <ConfirmActionModal
         open={!!restoreTaskId}
         onClose={() => setRestoreTaskId(null)}
-        variant="success"
-        title="Khôi phục công việc"
-        icon="check"
-        description="Công việc sẽ trở về trạng thái trước khi bị hủy. Tất cả người thực hiện sẽ được giao lại từ đầu (chờ tiếp nhận)."
-        confirmLabel="Khôi phục"
+        task={card(restoreTaskId)}
+        title={t('app.dlg.restore.t')}
+        description={t('tdx.dlg.restore.d')}
+        note={t('app.dlg.restore.ppl')}
+        noteIcon={Users}
+        confirmLabel={t('act.restore')}
         isLoading={restoreTask.isPending}
         onConfirm={() => restoreTask.mutate(restoreTaskId!, { onSuccess: () => setRestoreTaskId(null) })}
       />
 
       <SupplementReportModal
         taskId={supplementTaskId ?? undefined}
+        task={card(supplementTaskId)}
         open={!!supplementTaskId}
         onClose={() => setSupplementTaskId(null)}
         isLoading={supplementReport.isPending}
@@ -195,10 +212,11 @@ export function TaskListModals({
       <ReasonModal
         open={!!rejectPlanTaskId}
         onClose={() => setRejectPlanTaskId(null)}
-        title="Từ chối công việc"
-        placeholder="Lý do từ chối..."
-        confirmLabel="Từ chối"
-        isDestructive
+        task={card(rejectPlanTaskId)}
+        title={t('app.dlg.reject.t')}
+        description={t('tdx.dlg.reject.d')}
+        confirmLabel={t('app.dlg.reject.ok')}
+        danger
         required
         isLoading={rejectPlan.isPending}
         onConfirm={(reason) =>
@@ -212,6 +230,7 @@ export function TaskListModals({
       {extensionTask && (
         <RequestExtensionModal
           open={!!extensionTaskId}
+          task={card(extensionTaskId)}
           onClose={() => setExtensionTaskId(null)}
           currentDeadline={extensionTask.scheduleEnd}
           isLoading={requestExtension.isPending}
@@ -226,6 +245,7 @@ export function TaskListModals({
 
       <ApproveExtensionModal
         open={!!approveExtState}
+        task={card(approveExtState?.taskId ?? null)}
         onClose={() => setApproveExtState(null)}
         extension={approveExtState ? (() => {
           const task = tasks.find((t) => t.id === approveExtState.taskId);

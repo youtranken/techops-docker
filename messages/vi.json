@@ -685,6 +685,53 @@
       "sendHint": "Ctrl+Enter để gửi"
     },
     "dept": "Phòng ban",
+    "dlg": {
+      "accept": {
+        "d": "Bạn xác nhận nhận “{t}”; phần việc của bạn chuyển sang Đang làm."
+      },
+      "cancel": {
+        "d": "Việc chuyển sang Đã hủy, người được giao nhận thông báo kèm lý do. Đơn gia hạn đang chờ tự bị từ chối. Admin có thể khôi phục sau."
+      },
+      "closeX": "Đóng hộp thoại",
+      "decline": {
+        "note": "Nếu việc này được chuyển giao cho bạn, phần việc quay lại người đã chuyển. Nếu mọi người được giao đều từ chối, người tạo được báo."
+      },
+      "ext": {
+        "dateErr": "Chọn ngày từ {d} trở đi (sau hạn hiện tại).",
+        "dateReq": "Chọn ngày gia hạn mới.",
+        "rules": "Ngày mới phải sau hạn hiện tại và sau hôm nay. Mỗi việc tối đa 5 đơn, 2 đơn chờ cùng lúc. Vice Manager hoặc Admin sẽ duyệt."
+      },
+      "extRev": {
+        "note": "Duyệt: hạn mới được áp dụng, người xin và người được giao nhận thông báo. Từ chối: chỉ người xin nhận thông báo.",
+        "ok": "Duyệt gia hạn",
+        "t": "Xem xét đơn gia hạn"
+      },
+      "paste": {
+        "size": "Ảnh {s}, vượt giới hạn {m} MB."
+      },
+      "reason": {
+        "ph": "Nhập lý do…"
+      },
+      "reject": {
+        "d": "Việc chuyển sang Đã hủy; người tạo và người được giao nhận thông báo kèm lý do (nếu có). Việc bị từ chối kế hoạch không khôi phục được."
+      },
+      "restore": {
+        "d": "Việc quay về trạng thái trước khi bị hủy. Người tạo và người được giao nhận thông báo."
+      },
+      "rework": {
+        "all": "Tất cả ({n} người)",
+        "latest": "Báo cáo mới nhất"
+      },
+      "supp": {
+        "d": "Tạo phiên bản mới của báo cáo; các bản trước vẫn được giữ."
+      },
+      "tpl": {
+        "hint": "Gồm mẫu chung và mẫu cho loại việc này. Chọn mẫu sẽ thay nội dung đang nhập."
+      },
+      "tr": {
+        "empty": "Không còn ai để chuyển giao."
+      }
+    },
     "doneAt": "Hoàn thành lúc",
     "ext": {
       "date": "Xin gia hạn đến {d}",
@@ -696,6 +743,25 @@
     "processing": "Đang xử lý…",
     "start": "Ngày bắt đầu",
     "view": "Xem"
+  },
+  "tf": {
+    "att": {
+      "count": "{x}/{n} tệp",
+      "full": "Đã đủ {n} tệp. Bỏ bớt một tệp để thêm tệp khác.",
+      "keep": "Giữ lại {f}",
+      "max": "Tối đa {n} tệp: bạn chọn {k} tệp nhưng chỉ còn chỗ cho {r}.",
+      "paste": "Mẹo: chụp màn hình rồi nhấn Ctrl+V để đính kèm ảnh.",
+      "removed": "Sẽ xoá khi lưu",
+      "rules": "PDF, JPG, PNG, Word, Excel, PowerPoint · tối đa {n} tệp, {m} MB mỗi tệp",
+      "size": "“{f}” nặng {s}, vượt giới hạn {m} MB mỗi tệp.",
+      "type": "“{f}” không đúng định dạng. Chỉ nhận PDF, JPG, PNG, Word, Excel, PowerPoint.",
+      "undo": "Hoàn tác"
+    },
+    "paste": {
+      "alt": "Ảnh vừa dán",
+      "ok": "Thêm vào tệp đính kèm",
+      "t": "Đính kèm ảnh vừa dán"
+    }
   },
   "tl": {
     "pg": {

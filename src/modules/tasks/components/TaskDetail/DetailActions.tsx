@@ -2,7 +2,7 @@
 
 /**
  * Nút hành động của chi tiết công việc V2. Chỉ hiển thị theo cờ quyền V1 (`detailActions`) và mở đúng hộp thoại V1
- * (`TaskActionModals` dùng chung state với `useTaskActionPanel`). Restyle hộp thoại là lát A2-2.
+ * (`TaskActionModals` dùng chung state với `useTaskActionPanel`; hộp thoại V2 theo khung `ActionDialog` — A2-2).
  */
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
@@ -151,6 +151,7 @@ export function DetailModals({ model }: { model: TaskDetailModel }) {
         currentUserId={model.viewerId}
         scheduleEnd={task.scheduleEnd ?? undefined}
         taskAssignees={task.assignees}
+        task={{ code: task.taskCode, title: task.title, workflowMode: task.workflowMode }}
       />
       <EditTaskModal taskId={model.editOpen ? task.id : null} onClose={() => model.setEditOpen(false)} />
     </>

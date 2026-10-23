@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { CalendarCheck } from 'lucide-react';
-import {
-  Dialog, DialogContent, DialogTitle, DialogFooter,
-} from '@/components/ui/dialog';
+/**
+ * Xem xét đơn gia hạn (V2) — vẫn MỘT hộp như V1 với hai lựa chọn [Từ chối][Duyệt gia hạn], phản hồi không bắt buộc.
+ * Như V1: bấm Duyệt/Từ chối gọi `onApprove/onReject(extId, note)` rồi đóng ngay.
+ */
+import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
+import { ActionDialog, DialogNote } from '@/shared/ui/ActionDialog';
+import { Field, textareaClass } from '@/shared/ui/Field';
+import { useFormat } from '@/i18n/useFormat';
 
 interface ExtensionInfo {
   id: string;
@@ -24,71 +25,52 @@ interface ApproveExtensionModalProps {
   onApprove: (extId: string, note?: string) => void;
   onReject: (extId: string, note?: string) => void;
   isLoading?: boolean;
+  task?: { code?: string | null; title: string } | null;
 }
 
 export function ApproveExtensionModal({
-  open, onClose, extension, onApprove, onReject, isLoading = false,
+  open, onClose, extension, onApprove, onReject, isLoading = false, task,
 }: ApproveExtensionModalProps) {
-  const [note, setNote] = useState('');
+  const t = useTranslations();
+  const f = useFormat();
+  const [note, setNote] = React.useState('');
 
-  function handleClose() {
-    setNote('');
-    onClose();
-  }
+  React.useEffect(() => { if (open) setNote(''); }, [open]);
 
   if (!extension) return null;
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100">
-        <div className="bg-amber-50 dark:bg-amber-950/30 pt-5 pb-3 px-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center mx-auto mb-2 ring-4 ring-amber-200/60 dark:ring-amber-800/30">
-            <CalendarCheck className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-          </div>
-          <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-slate-100">Xem xét yêu cầu gia hạn</DialogTitle>
+    <ActionDialog
+      open={open}
+      onClose={onClose}
+      title={t('tdx.dlg.extRev.t')}
+      size="md"
+      task={task}
+      okLabel={t('tdx.dlg.extRev.ok')}
+      onOk={() => { onApprove(extension.id, note); onClose(); }}
+      pending={isLoading}
+      extraActions={(
+        <Button type="button" variant="neg" size="md" disabled={isLoading} onClick={() => { onReject(extension.id, note); onClose(); }}>
+          {t('act.decline')}
+        </Button>
+      )}
+      data-testid="dlg-ext-review"
+    >
+      <div className="mb-4 rounded-ctl border border-line p-3">
+        <div className="flex flex-wrap items-center gap-2 text-[13px]">
+          <b className="font-semibold text-ink">{extension.requesterName}</b>
+          <span className="ml-auto inline-flex items-center gap-1.5 text-xs text-ink-2">
+            <span aria-hidden className="size-2 rounded-full" style={{ background: 'var(--c-review)' }} />
+            {t('td.ext.st.PENDING')}
+          </span>
         </div>
-        <div className="px-6 py-4 space-y-4">
-          <div className="space-y-2 rounded-md border p-3 bg-gray-100/30 dark:bg-slate-700/40">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{extension.requesterName}</span>
-              <Badge variant="outline" className="text-xs">Đang chờ</Badge>
-            </div>
-            <p className="text-xs text-gray-500">
-              Ngày đề xuất: <span className="font-medium text-gray-900 dark:text-slate-100">
-                {new Date(extension.requestedDate).toLocaleDateString('vi-VN')}
-              </span>
-            </p>
-            <p className="text-sm">{extension.reason}</p>
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="note">Ghi chú phản hồi</Label>
-            <Textarea
-              id="note"
-              placeholder="Ghi chú cho người xin gia hạn (không bắt buộc)..."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={2}
-            />
-          </div>
-        </div>
-        <DialogFooter className="flex-col gap-2 px-6 pb-6 pt-0">
-          <Button
-            onClick={() => { onApprove(extension.id, note); handleClose(); }}
-            disabled={isLoading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white border-0"
-          >
-            Duyệt gia hạn
-          </Button>
-          <Button
-            onClick={() => { onReject(extension.id, note); handleClose(); }}
-            disabled={isLoading}
-            className="w-full bg-red-600 hover:bg-red-700 text-white border-0"
-          >
-            Từ chối
-          </Button>
-          <Button variant="outline" onClick={handleClose} disabled={isLoading} className="w-full">Đóng</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <p className="m-0 mt-1 text-[13px] font-medium text-ink">{t('tdx.ext.date', { d: f.date(extension.requestedDate) })}</p>
+        <p className="m-0 mt-0.5 text-sm text-ink-2 [overflow-wrap:anywhere]">{extension.reason}</p>
+      </div>
+      <Field id="dlg-ext-note" label={t('app.dlg.reply._')}>
+        <textarea rows={2} className={`${textareaClass} min-h-[68px]`} placeholder={t('app.dlg.reply.ph')} value={note} onChange={(e) => setNote(e.target.value)} />
+      </Field>
+      <DialogNote>{t('tdx.dlg.extRev.note')}</DialogNote>
+    </ActionDialog>
   );
 }

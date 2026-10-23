@@ -1,22 +1,15 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+/** Báo cáo hoàn thành (V2): chọn Mẫu hoàn thành (API V1 `completion-templates`) + nội dung + tệp/dán ảnh. Payload như V1. */
+import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Dialog, DialogContent, DialogTitle, DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Paperclip, X, FileText, CheckCircle2, ImagePlus } from 'lucide-react';
-import { usePasteImage } from '@/modules/tasks/components/CreateTask/usePasteImage';
-import { PasteImageModal } from '@/modules/tasks/components/CreateTask/PasteImageModal';
-import {
-  ACCEPTED_EXTENSIONS, ACCEPTED_LABEL, MAX_FILE_COUNT as MAX_FILES, MAX_SIZE_MB, validateNewAttachments,
-} from '@/modules/tasks/components/CreateTask/attachment-rules';
-
-interface FileEntry { fileName: string; filePath: string; fileSize: number; _file?: File }
+import { useTranslations } from 'next-intl';
+import { DialogNote } from '@/shared/ui/ActionDialog';
+import { Field, inputClass } from '@/shared/ui/Field';
+import { cn } from '@/lib/utils';
+import { ReportFormDialog } from './ReportFormDialog';
+import type { FileEntry } from './AttachmentField';
+import type { Msg } from './action-dialog-rules';
 
 interface TemplateItem { id: string; title: string; content: string; category: string | null }
 
@@ -26,42 +19,17 @@ interface CompleteTaskModalProps {
   onClose: () => void;
   onConfirm: (reportContent: string, files: FileEntry[]) => void;
   isLoading?: boolean;
+  task?: { code?: string | null; title: string } | null;
+  version?: string | null;
+  next?: Msg | null;
 }
 
+export function CompleteTaskModal({ taskId, open, onClose, onConfirm, isLoading = false, task, version, next }: CompleteTaskModalProps) {
+  const t = useTranslations();
+  const [picked, setPicked] = React.useState('');
+  React.useEffect(() => { if (open) setPicked(''); }, [open]);
 
-export function CompleteTaskModal({ taskId, open, onClose, onConfirm, isLoading = false }: CompleteTaskModalProps) {
-  const [report, setReport] = useState('');
-  const [files, setFiles] = useState<FileEntry[]>([]);
-  const [fileError, setFileError] = useState('');
-  const [pastedImage, setPastedImage] = useState<File | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Listen Win+Shift+S → Ctrl+V workflow (chỉ khi modal đang mở)
-  usePasteImage(open, (img) => {
-    if (files.length >= MAX_FILES) {
-      setFileError(`Tối đa ${MAX_FILES} file`);
-      return;
-    }
-    setFileError('');
-    setPastedImage(img);
-  });
-
-  function handlePasteConfirm(file: File) {
-    if (files.length >= MAX_FILES) {
-      setFileError(`Tối đa ${MAX_FILES} file`);
-      setPastedImage(null);
-      return;
-    }
-    setFiles((prev) => [...prev, {
-      fileName: file.name,
-      filePath: `reports/${Date.now()}_${file.name}`,
-      fileSize: file.size,
-      _file: file,
-    }]);
-    setPastedImage(null);
-  }
-
-  const { data: templates = [] } = useQuery<TemplateItem[]>({
+  const { data: templates = [], isFetched } = useQuery<TemplateItem[]>({
     queryKey: ['report-templates-task', taskId],
     queryFn: async () => {
       if (!taskId) return [];
@@ -74,135 +42,40 @@ export function CompleteTaskModal({ taskId, open, onClose, onConfirm, isLoading 
     staleTime: 5 * 60_000,
   });
 
-  useEffect(() => {
-    if (open) { setReport(''); setFiles([]); setFileError(''); }
-  }, [open]);
-
-  function handleClose() {
-    setReport('');
-    setFiles([]);
-    setFileError('');
-    onClose();
-  }
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const selected = Array.from(e.target.files ?? []);
-    if (inputRef.current) inputRef.current.value = '';
-    const error = validateNewAttachments(selected, files.length);
-    setFileError(error ?? '');
-    if (error) return;
-
-    const newEntries: FileEntry[] = selected.map((f) => ({
-      fileName: f.name,
-      filePath: `reports/${Date.now()}_${f.name}`,
-      fileSize: f.size,
-      _file: f,
-    }));
-    setFiles((prev) => [...prev, ...newEntries]);
-  }
-
-  function removeFile(idx: number) {
-    setFiles((prev) => prev.filter((_, i) => i !== idx));
-    setFileError('');
-  }
-
-  function handleConfirm() {
-    if (report.length < 10) return;
-    // Pass files WITH _file so hook can upload them
-    onConfirm(report, files);
-  }
-
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="sm:max-w-[520px] p-0 overflow-hidden bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 flex flex-col max-h-[90vh]">
-        <div className="bg-green-50 dark:bg-green-950/30 pt-5 pb-3 px-6 text-center shrink-0">
-          <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center mx-auto mb-2 ring-4 ring-green-200/60 dark:ring-green-800/30">
-            <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
-          </div>
-          <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-slate-100">Báo cáo hoàn thành</DialogTitle>
-        </div>
-        <div className="px-6 py-4 space-y-4 overflow-y-auto flex-1">
-          <div className="space-y-1">
-            <Label>Mẫu hoàn thành</Label>
-            {templates.length > 0 ? (
-              <Select onValueChange={(id) => {
-                const t = templates.find((t) => t.id === id);
-                if (t) setReport(t.content);
-              }}>
-                <SelectTrigger className="text-sm">
-                  <SelectValue placeholder="Chọn mẫu để điền tự động..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {templates.map((t) => (
-                    <SelectItem key={t.id} value={t.id}>
-                      {t.category ? `[${t.category}] ` : ''}{t.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <p className="text-xs text-muted-foreground italic px-2 py-2 border rounded bg-slate-50 dark:bg-slate-800/40">
-                Chưa có mẫu nào — Admin/Boss tạo mẫu tại <span className="font-medium">Settings → Mẫu hoàn thành</span>
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <Label htmlFor="report">Nội dung báo cáo <span className="text-destructive">*</span></Label>
-            <Textarea
-              id="report"
-              placeholder="Mô tả kết quả công việc đã thực hiện (ít nhất 10 ký tự)..."
-              value={report}
-              onChange={(e) => setReport(e.target.value)}
-              rows={5}
-            />
-            {report.length > 0 && report.length < 10 && (
-              <p className="text-xs text-destructive">Cần ít nhất 10 ký tự ({report.length}/10)</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label>File đính kèm ({ACCEPTED_LABEL}, tối đa {MAX_FILES} file, {MAX_SIZE_MB}MB/file)</Label>
-            <div className="space-y-1.5">
-              {files.map((f, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm border rounded px-2 py-1">
-                  <FileText className="h-4 w-4 text-red-500 shrink-0" />
-                  <span className="flex-1 truncate">{f.fileName}</span>
-                  <span className="text-xs text-gray-500">{(f.fileSize / 1024).toFixed(0)}KB</span>
-                  <button type="button" onClick={() => removeFile(i)} className="text-gray-500 hover:text-destructive">
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
+    <ReportFormDialog
+      kind="complete"
+      open={open}
+      onClose={onClose}
+      onConfirm={onConfirm}
+      isLoading={isLoading}
+      task={task}
+      version={version}
+      next={next}
+      templateSlot={(setContent) => (
+        !isFetched ? null : templates.length > 0 ? (
+          <Field id="dlg-tpl" label={t('app.dlg.tpl._')} hint={t('tdx.dlg.tpl.hint')}>
+            <select
+              className={cn(inputClass, 'pr-8')}
+              value={picked}
+              onChange={(e) => {
+                setPicked(e.target.value);
+                const x = templates.find((p) => p.id === e.target.value);
+                if (x) setContent(x.content);
+              }}
+            >
+              <option value="">{t('app.dlg.tpl.ph')}</option>
+              {templates.map((p) => (
+                <option key={p.id} value={p.id}>{p.category ? `[${p.category}] ` : ''}{p.title}</option>
               ))}
-            </div>
-            {files.length < MAX_FILES && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <input ref={inputRef} type="file" accept={ACCEPTED_EXTENSIONS.join(',')} multiple className="hidden" onChange={handleFileChange} />
-                <Button type="button" variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
-                  <Paperclip className="h-4 w-4 mr-2" /> Đính kèm file
-                </Button>
-                <span className="flex items-center gap-1 text-[11px] text-slate-400">
-                  <ImagePlus className="w-3.5 h-3.5" />
-                  Tip: <kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">Win</kbd>+<kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">Shift</kbd>+<kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">S</kbd> rồi <kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">Ctrl</kbd>+<kbd className="px-1 bg-slate-100 dark:bg-slate-700 rounded">V</kbd>
-                </span>
-              </div>
-            )}
-            {fileError && <p className="text-xs text-destructive">{fileError}</p>}
+            </select>
+          </Field>
+        ) : (
+          <div className="mb-4">
+            <DialogNote className="first:mt-0 mt-0">{t('app.dlg.tpl.none')}</DialogNote>
           </div>
-        </div>
-        <DialogFooter className="flex-col gap-2 px-6 pb-6 pt-2 shrink-0">
-          <Button onClick={handleConfirm} disabled={isLoading || report.length < 10} className="w-full bg-green-600 hover:bg-green-700 text-white border-0">
-            {isLoading ? 'Đang gửi...' : 'Gửi báo cáo'}
-          </Button>
-          <Button variant="outline" onClick={handleClose} disabled={isLoading} className="w-full">Hủy</Button>
-        </DialogFooter>
-
-        <PasteImageModal
-          file={pastedImage}
-          onConfirm={handlePasteConfirm}
-          onCancel={() => setPastedImage(null)}
-        />
-      </DialogContent>
-    </Dialog>
+        )
+      )}
+    />
   );
 }

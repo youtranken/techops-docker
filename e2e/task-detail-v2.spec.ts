@@ -58,10 +58,10 @@ test.describe.serial('V2 — chi tiết công việc', () => {
     await expect(page.getByTestId('turn')).toHaveText(/Đến lượt bạn duyệt/, { timeout: 60_000 });
     await expect(actions(page).getByRole('button')).toHaveText(['Từ chối', 'Duyệt']);
     await actions(page).getByRole('button', { name: 'Duyệt' }).click();
-    await expect(page.getByRole('dialog', { name: 'Duyệt công việc' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Duyệt công việc này?' })).toBeVisible();
     await page.keyboard.press('Escape');
     await actions(page).getByRole('button', { name: 'Từ chối' }).click();
-    await expect(page.getByRole('dialog', { name: 'Từ chối công việc' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Từ chối kế hoạch?' })).toBeVisible();
     await page.keyboard.press('Escape');
 
     // Chờ nghiệm thu → Yêu cầu làm lại + Nghiệm thu; xem báo cáo
@@ -71,7 +71,7 @@ test.describe.serial('V2 — chi tiết công việc', () => {
     await expect(page.getByRole('dialog', { name: 'Yêu cầu làm lại' })).toBeVisible();
     await page.keyboard.press('Escape');
     await actions(page).getByRole('button', { name: 'Nghiệm thu' }).click();
-    await expect(page.getByRole('dialog', { name: 'Duyệt KQ hoàn thành' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Nghiệm thu công việc này?' })).toBeVisible();
     await page.keyboard.press('Escape');
     await page.getByTestId('results').getByRole('button', { name: 'Xem báo cáo' }).click();
     await expect(page.getByRole('dialog')).toContainText('Đã kiểm tra lại.');
@@ -95,10 +95,10 @@ test.describe.serial('V2 — chi tiết công việc', () => {
     await page.goto(`/tasks/${ids.waiting}`);
     await expect(actions(page).getByRole('button')).toHaveText(['Từ chối', 'Nhận việc'], { timeout: 60_000 });
     await actions(page).getByRole('button', { name: 'Nhận việc' }).click();
-    await expect(page.getByRole('dialog', { name: 'Tiếp nhận công việc' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Nhận công việc này?' })).toBeVisible();
     await page.keyboard.press('Escape');
     await actions(page).getByRole('button', { name: 'Từ chối' }).click();
-    await expect(page.getByRole('dialog', { name: 'Từ chối nhận công việc' })).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'Từ chối nhận việc?' })).toBeVisible();
     await page.keyboard.press('Escape');
   });
 

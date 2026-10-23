@@ -1,17 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { ArrowLeftRight } from 'lucide-react';
-import {
-  Dialog, DialogContent, DialogTitle, DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
+/**
+ * Chuyển giao phần việc (V2). Danh sách người nhận = `assignable-users` V1 trừ mình và mọi người đã có trong việc;
+ * ghi chú bắt buộc (luật UI V1). Gửi `onConfirm(newAssigneeId, notes.trim())` như V1.
+ */
+import * as React from 'react';
+import { useTranslations } from 'next-intl';
+import { ActionDialog } from '@/shared/ui/ActionDialog';
+import { Field, textareaClass } from '@/shared/ui/Field';
+import { UserAvatar } from '@/shared/ui/UserAvatar';
 import { useAssignableUsers } from '../../../hooks/useAssignableUsers';
+import { transferErrors } from './action-dialog-rules';
 
 interface TransferModalProps {
   open: boolean;
@@ -20,76 +19,67 @@ interface TransferModalProps {
   currentUserId: string;
   currentAssigneeIds: string[];
   isLoading?: boolean;
+  task?: { code?: string | null; title: string } | null;
 }
 
 export function TransferModal({
-  open, onClose, onConfirm, currentUserId, currentAssigneeIds, isLoading = false,
+  open, onClose, onConfirm, currentUserId, currentAssigneeIds, isLoading = false, task,
 }: TransferModalProps) {
-  const [newAssigneeId, setNewAssigneeId] = useState('');
-  const [notes, setNotes] = useState('');
-  const [attempted, setAttempted] = useState(false);
+  const t = useTranslations();
+  const [to, setTo] = React.useState('');
+  const [notes, setNotes] = React.useState('');
+  const [tried, setTried] = React.useState(false);
   const { data } = useAssignableUsers();
-  const users = (data?.data ?? []).filter(
-    (u) => u.id !== currentUserId && !currentAssigneeIds.includes(u.id),
-  );
+  const users = (data?.data ?? []).filter((u) => u.id !== currentUserId && !currentAssigneeIds.includes(u.id));
 
-  function handleClose() {
-    setNewAssigneeId('');
-    setNotes('');
-    setAttempted(false);
-    onClose();
+  React.useEffect(() => { if (open) { setTo(''); setNotes(''); setTried(false); } }, [open]);
+
+  const errs = tried ? transferErrors(to, notes) : { to: null, notes: null };
+
+  function submit() {
+    setTried(true);
+    const e = transferErrors(to, notes);
+    if (e.to) { document.querySelector<HTMLInputElement>('input[name="dlg-tr-to"]')?.focus(); return; }
+    if (e.notes) { document.getElementById('dlg-tr-note')?.focus(); return; }
+    onConfirm(to, notes.trim());
   }
-
-  function handleConfirm() {
-    if (!newAssigneeId || !notes.trim()) { setAttempted(true); return; }
-    onConfirm(newAssigneeId, notes.trim());
-  }
-
-  const notesError = attempted && !notes.trim();
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100">
-        <div className="bg-indigo-50 dark:bg-indigo-950/30 pt-5 pb-3 px-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mx-auto mb-2 ring-4 ring-indigo-200/60 dark:ring-indigo-800/30">
-            <ArrowLeftRight className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-          </div>
-          <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-slate-100">Chuyển giao công việc</DialogTitle>
+    <ActionDialog
+      open={open}
+      onClose={onClose}
+      title={t('app.dlg.tr.t')}
+      task={task}
+      okLabel={t('app.dlg.tr.ok')}
+      onOk={submit}
+      pending={isLoading}
+    >
+      <p>{t('app.dlg.tr.d')}</p>
+      <Field id="dlg-tr-to" asGroup label={t('app.dlg.tr.to')} required hint={t('app.dlg.tr.hint')} error={errs.to ? t(errs.to.key) : undefined}>
+        <div role="radiogroup" aria-labelledby="dlg-tr-to-lbl" className="max-h-56 overflow-y-auto rounded-ctl border border-line">
+          {users.length === 0 && <p className="m-0 px-3 py-2.5 text-[13px] text-ink-3">{t('tdx.dlg.tr.empty')}</p>}
+          {users.map((u) => (
+            <label key={u.id} className="flex min-h-10 cursor-pointer items-center gap-2.5 border-b border-line px-3 py-1.5 text-sm text-ink last:border-b-0 hover:bg-surface-2 max-[680px]:min-h-11">
+              <input
+                type="radio"
+                name="dlg-tr-to"
+                value={u.id}
+                checked={to === u.id}
+                onChange={() => setTo(u.id)}
+                className="size-4 flex-none accent-[var(--primary)]"
+              />
+              <UserAvatar displayName={u.displayName} size="xs" />
+              <span className="min-w-0 flex-1 truncate">
+                {u.displayName}
+                {u.role?.name === 'BOSS' && <small className="text-xs text-ink-3"> · {t('role.boss')}</small>}
+              </span>
+            </label>
+          ))}
         </div>
-        <div className="px-6 py-4 space-y-4">
-          <div className="space-y-1">
-            <Label>Người nhận <span className="text-destructive">*</span></Label>
-            <Select value={newAssigneeId} onValueChange={setNewAssigneeId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn người nhận..." />
-              </SelectTrigger>
-              <SelectContent>
-                {users.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>{u.displayName}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="notes">Ghi chú chuyển giao <span className="text-destructive">*</span></Label>
-            <Textarea
-              id="notes"
-              placeholder="Lý do chuyển giao..."
-              value={notes}
-              onChange={(e) => { setNotes(e.target.value); if (attempted) setAttempted(false); }}
-              rows={3}
-              className={notesError ? 'border-red-500 focus-visible:ring-red-500' : ''}
-            />
-            {notesError && <p className="text-xs text-red-500">Vui lòng nhập ghi chú chuyển giao</p>}
-          </div>
-        </div>
-        <DialogFooter className="flex-col gap-2 px-6 pb-6 pt-0">
-          <Button onClick={handleConfirm} disabled={isLoading || !newAssigneeId} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0">
-            {isLoading ? 'Đang xử lý...' : 'Chuyển giao'}
-          </Button>
-          <Button variant="outline" onClick={handleClose} disabled={isLoading} className="w-full">Hủy</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </Field>
+      <Field id="dlg-tr-note" label={t('app.dlg.tr.note')} required error={errs.notes ? t(errs.notes.key) : undefined}>
+        <textarea rows={3} className={textareaClass} placeholder={t('app.dlg.tr.ph')} value={notes} onChange={(e) => setNotes(e.target.value)} />
+      </Field>
+    </ActionDialog>
   );
 }
