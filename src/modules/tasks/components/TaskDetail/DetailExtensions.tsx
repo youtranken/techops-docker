@@ -75,6 +75,7 @@ export function ExtensionsPanel({ model }: { model: TaskDetailModel }) {
       <ApproveExtensionModal
         open={!!review}
         onClose={() => setReview(null)}
+        task={{ code: task.taskCode, title: task.title }}
         extension={review ? { id: review.id, reason: review.reason, requestedDate: review.requestedDate, requesterName: review.requester?.displayName ?? '' } : null}
         isLoading={approve.isPending || reject.isPending}
         onApprove={(extId, note) => approve.mutate({ taskId: task.id, extId, responseNote: note })}

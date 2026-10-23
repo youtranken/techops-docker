@@ -4,6 +4,8 @@ import { E2E_PASSWORD } from './db';
 export async function login(page: Page, username: string) {
   await page.context().clearCookies();
   await page.goto('/login');
+  // next dev: chờ hydrate xong, tránh form gửi kiểu GET thuần (lộ mật khẩu lên URL, không đăng nhập)
+  await page.waitForLoadState('networkidle');
   await page.locator('#username').fill(username);
   await page.locator('#password').fill(E2E_PASSWORD);
   await page.locator('button[type="submit"]').click();

@@ -121,3 +121,10 @@ Xem `config/taskActionMatrix.ts` — đây là nguồn sự thật duy nhất ch
 - Logic hiển thị thuần + test: `detail-logic.ts` — `buildJourney` (Hành trình), `taskHolder` ("Đang ở chỗ ai · bao lâu"), `detailActions`/`viewerTurn` (nút + "Đến lượt bạn…", CHỈ đọc cờ của `useTaskPermissions`), `drawerNav`, `assigneeNote`.
 - Hành trình: Phê duyệt 5 bước (Chờ duyệt → Chờ nhận việc → Đang làm → Chờ nghiệm thu → Đã xong); Trực tiếp 3 bước (Chờ nhận việc → Đang làm → Đã xong) theo service V1. Ngày mỗi bước lấy từ `TaskAuditLog`.
 - Nút bấm mở đúng hộp thoại V1 qua `TaskActionModals` (tách từ `TaskActionPanel`, chung state `useTaskActionPanel`).
+
+## Hộp thoại hành động V2 (A2-2)
+
+- Khung chung `@/shared/ui/ActionDialog` (+ `DialogNote`, `TaskSummary`) và `@/shared/ui/Field`. Mọi hộp trong `actions/components/modals/` dùng khung này, chữ qua `useTranslations` (`app.dlg.*`, `act.*`, `tf.att.*`, `tdx.dlg.*`).
+- Luật kiểm tra = V1, gom ở `actions/components/modals/action-dialog-rules.ts` (`reasonError`, `reportError`, `attachmentError`, `extensionDateError`, `transferErrors`, `reworkErrors`) + câu "điều gì xảy ra tiếp theo" (`reportNextStep`, `nextReportVersion`, `acceptProgress`) theo service V1. Đổi luật ở đây = đổi nghiệp vụ → Phase B.
+- `TaskActionModals` nhận thêm `task={{code,title,workflowMode}}` để hiện thẻ tóm tắt + ghi chú; payload mutation không đổi (test `modals/__tests__/action-modals.test.tsx`).
+- Lý do Từ chối kế hoạch: chi tiết KHÔNG bắt buộc, danh sách (`TaskListModals`) bắt buộc — giữ nguyên lệch của V1.

@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { Clock } from 'lucide-react';
-import {
-  Dialog, DialogContent, DialogTitle, DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
+/**
+ * Xin gia hạn (V2). V1: ngày mới ≥ hạn + 1 ngày (ô ngày `min`), lý do không rỗng;
+ * gửi `onConfirm(reason.trim(), new Date(ngày).toISOString())`. Các luật còn lại do extension.service kiểm.
+ */
+import * as React from 'react';
+import { useTranslations } from 'next-intl';
+import { ActionDialog, DialogNote } from '@/shared/ui/ActionDialog';
+import { Field, inputClass, textareaClass } from '@/shared/ui/Field';
+import { useFormat } from '@/i18n/useFormat';
+import { cn } from '@/lib/utils';
+import { extensionDateError, extensionMinDate, reasonError } from './action-dialog-rules';
 
 interface RequestExtensionModalProps {
   open: boolean;
@@ -16,78 +18,60 @@ interface RequestExtensionModalProps {
   onConfirm: (reason: string, requestedDate: string) => void;
   currentDeadline: Date | string;
   isLoading?: boolean;
+  task?: { code?: string | null; title: string } | null;
 }
 
 export function RequestExtensionModal({
-  open, onClose, onConfirm, currentDeadline, isLoading = false,
+  open, onClose, onConfirm, currentDeadline, isLoading = false, task,
 }: RequestExtensionModalProps) {
-  const [reason, setReason] = useState('');
-  const [requestedDate, setRequestedDate] = useState('');
+  const t = useTranslations();
+  const f = useFormat();
+  const [reason, setReason] = React.useState('');
+  const [date, setDate] = React.useState('');
+  const [tried, setTried] = React.useState(false);
+  const min = extensionMinDate(currentDeadline);
 
-  const minDate = new Date(currentDeadline);
-  minDate.setDate(minDate.getDate() + 1);
-  const minDateStr = minDate.toISOString().slice(0, 10);
+  React.useEffect(() => { if (open) { setReason(''); setDate(''); setTried(false); } }, [open]);
 
-  function handleClose() {
-    setReason('');
-    setRequestedDate('');
-    onClose();
-  }
+  const dErr = tried ? extensionDateError(date, currentDeadline) : null;
+  const rErr = tried ? reasonError(reason, true) : null;
 
-  function handleConfirm() {
-    if (!reason.trim() || !requestedDate) return;
-    onConfirm(reason.trim(), new Date(requestedDate).toISOString());
-    handleClose();
+  function submit() {
+    setTried(true);
+    if (extensionDateError(date, currentDeadline)) { document.getElementById('dlg-ext-date')?.focus(); return; }
+    if (reasonError(reason, true)) { document.getElementById('dlg-ext-reason')?.focus(); return; }
+    onConfirm(reason.trim(), new Date(date).toISOString());
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100">
-        <div className="bg-amber-50 dark:bg-amber-950/30 pt-5 pb-3 px-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center mx-auto mb-2 ring-4 ring-amber-200/60 dark:ring-amber-800/30">
-            <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-          </div>
-          <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-slate-100">Xin gia hạn Hoàn thành</DialogTitle>
+    <ActionDialog
+      open={open}
+      onClose={onClose}
+      title={t('app.dlg.ext.t')}
+      task={task}
+      okLabel={t('app.dlg.ext.send')}
+      onOk={submit}
+      pending={isLoading}
+    >
+      <div className="mb-4 grid grid-cols-2 gap-3 max-[680px]:grid-cols-1">
+        <div>
+          <div className="mb-1.5 text-[13px] font-medium text-ink">{t('app.dlg.ext.cur')}</div>
+          <div className={cn(inputClass, 'flex items-center bg-surface-2 font-mono text-ink-2')} data-testid="ext-cur">{f.date(currentDeadline)}</div>
         </div>
-        <div className="px-6 py-4 space-y-4">
-          <div className="space-y-1">
-            <Label>Hoàn thành hiện tại</Label>
-            <p className="text-sm text-gray-500">
-              {new Date(currentDeadline).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-            </p>
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="newDate">Ngày gia hạn mới <span className="text-destructive">*</span></Label>
-            <Input
-              id="newDate"
-              type="date"
-              min={minDateStr}
-              value={requestedDate}
-              onChange={(e) => setRequestedDate(e.target.value)}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="reason">Lý do <span className="text-destructive">*</span></Label>
-            <Textarea
-              id="reason"
-              placeholder="Giải thích lý do cần gia hạn..."
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              rows={3}
-            />
-          </div>
-        </div>
-        <DialogFooter className="flex-col gap-2 px-6 pb-6 pt-0">
-          <Button
-            onClick={handleConfirm}
-            disabled={isLoading || !reason.trim() || !requestedDate}
-            className="w-full bg-amber-600 hover:bg-amber-700 text-white border-0"
-          >
-            {isLoading ? 'Đang gửi...' : 'Gửi yêu cầu'}
-          </Button>
-          <Button variant="outline" onClick={handleClose} disabled={isLoading} className="w-full">Hủy</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <Field
+          id="dlg-ext-date"
+          className="mb-0"
+          label={t('app.dlg.ext.new')}
+          required
+          error={dErr ? t(dErr.key, dErr.key === 'tdx.dlg.ext.dateErr' ? { d: f.date(min) } : dErr.values) : undefined}
+        >
+          <input type="date" min={min} className={cn(inputClass, 'font-mono')} value={date} onChange={(e) => setDate(e.target.value)} />
+        </Field>
+      </div>
+      <Field id="dlg-ext-reason" label={t('app.dlg.reason')} required error={rErr ? t(rErr.key) : undefined}>
+        <textarea rows={3} className={textareaClass} placeholder={t('app.dlg.ext.ph')} value={reason} onChange={(e) => setReason(e.target.value)} />
+      </Field>
+      <DialogNote>{t('tdx.dlg.ext.rules')}</DialogNote>
+    </ActionDialog>
   );
 }

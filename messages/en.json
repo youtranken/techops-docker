@@ -685,6 +685,53 @@
       "sendHint": "Ctrl+Enter to send"
     },
     "dept": "Department",
+    "dlg": {
+      "accept": {
+        "d": "You’re taking on “{t}”. Your part moves to In progress."
+      },
+      "cancel": {
+        "d": "The task moves to Cancelled and the assignees get the reason. Pending extension requests are declined automatically. An Admin can restore it later."
+      },
+      "closeX": "Close dialog",
+      "decline": {
+        "note": "If this was handed over to you, it goes back to whoever handed it over. If everyone assigned declines, the creator is told."
+      },
+      "ext": {
+        "dateErr": "Pick {d} or later (after the current due date).",
+        "dateReq": "Pick a new due date.",
+        "rules": "The new date must be after the current due date and after today. Up to 5 requests per task, 2 pending at a time. A Vice Manager or Admin will decide."
+      },
+      "extRev": {
+        "note": "Approve: the new due date applies and the requester and assignees are notified. Decline: only the requester is notified.",
+        "ok": "Approve extension",
+        "t": "Review extension request"
+      },
+      "paste": {
+        "size": "This image is {s}, over the {m} MB limit."
+      },
+      "reason": {
+        "ph": "Enter a reason…"
+      },
+      "reject": {
+        "d": "The task moves to Cancelled. The creator and assignees are notified, with your reason if you give one. A rejected plan can’t be restored."
+      },
+      "restore": {
+        "d": "The task goes back to its status before it was cancelled. The creator and assignees are notified."
+      },
+      "rework": {
+        "all": "All ({n})",
+        "latest": "Latest report"
+      },
+      "supp": {
+        "d": "This adds a new version of your report; earlier versions are kept."
+      },
+      "tpl": {
+        "hint": "General templates plus those for this task type. Picking one replaces what you typed."
+      },
+      "tr": {
+        "empty": "There’s no one else to hand it over to."
+      }
+    },
     "doneAt": "Completed",
     "ext": {
       "date": "Asks to extend to {d}",
@@ -696,6 +743,25 @@
     "processing": "Working…",
     "start": "Start date",
     "view": "View"
+  },
+  "tf": {
+    "att": {
+      "count": "{x}/{n} files",
+      "full": "You’ve reached {n} files. Remove one to add another.",
+      "keep": "Keep {f}",
+      "max": "Up to {n} files: you picked {k}, but there’s only room for {r}.",
+      "paste": "Tip: take a screenshot and press Ctrl+V to attach it.",
+      "removed": "Removed on save",
+      "rules": "PDF, JPG, PNG, Word, Excel, PowerPoint · up to {n} files, {m} MB each",
+      "size": "“{f}” is {s}, over the {m} MB per-file limit.",
+      "type": "“{f}” isn’t supported. Use PDF, JPG, PNG, Word, Excel or PowerPoint.",
+      "undo": "Undo"
+    },
+    "paste": {
+      "alt": "Pasted image",
+      "ok": "Add to attachments",
+      "t": "Attach pasted image"
+    }
   },
   "tl": {
     "pg": {

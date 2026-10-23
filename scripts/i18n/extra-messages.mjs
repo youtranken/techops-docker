@@ -161,6 +161,27 @@ const vi = {
   'tdx.doneAt': 'Hoàn thành lúc',
   'tdx.view': 'Xem',
   'tdx.processing': 'Đang xử lý…',
+
+  // ── A2-2 hộp thoại hành động: câu theo đúng hành vi service V1 (preview ghi khác/thiếu) ──
+  'tdx.dlg.reason.ph': 'Nhập lý do…',
+  'tdx.dlg.closeX': 'Đóng hộp thoại',
+  'tdx.dlg.accept.d': 'Bạn xác nhận nhận “{t}”; phần việc của bạn chuyển sang Đang làm.',
+  'tdx.dlg.decline.note': 'Nếu việc này được chuyển giao cho bạn, phần việc quay lại người đã chuyển. Nếu mọi người được giao đều từ chối, người tạo được báo.',
+  'tdx.dlg.reject.d': 'Việc chuyển sang Đã hủy; người tạo và người được giao nhận thông báo kèm lý do (nếu có). Việc bị từ chối kế hoạch không khôi phục được.',
+  'tdx.dlg.cancel.d': 'Việc chuyển sang Đã hủy, người được giao nhận thông báo kèm lý do. Đơn gia hạn đang chờ tự bị từ chối. Admin có thể khôi phục sau.',
+  'tdx.dlg.restore.d': 'Việc quay về trạng thái trước khi bị hủy. Người tạo và người được giao nhận thông báo.',
+  'tdx.dlg.tpl.hint': 'Gồm mẫu chung và mẫu cho loại việc này. Chọn mẫu sẽ thay nội dung đang nhập.',
+  'tdx.dlg.supp.d': 'Tạo phiên bản mới của báo cáo; các bản trước vẫn được giữ.',
+  'tdx.dlg.ext.dateReq': 'Chọn ngày gia hạn mới.',
+  'tdx.dlg.ext.dateErr': 'Chọn ngày từ {d} trở đi (sau hạn hiện tại).',
+  'tdx.dlg.ext.rules': 'Ngày mới phải sau hạn hiện tại và sau hôm nay. Mỗi việc tối đa 5 đơn, 2 đơn chờ cùng lúc. Vice Manager hoặc Admin sẽ duyệt.',
+  'tdx.dlg.extRev.t': 'Xem xét đơn gia hạn',
+  'tdx.dlg.extRev.ok': 'Duyệt gia hạn',
+  'tdx.dlg.extRev.note': 'Duyệt: hạn mới được áp dụng, người xin và người được giao nhận thông báo. Từ chối: chỉ người xin nhận thông báo.',
+  'tdx.dlg.tr.empty': 'Không còn ai để chuyển giao.',
+  'tdx.dlg.rework.all': 'Tất cả ({n} người)',
+  'tdx.dlg.rework.latest': 'Báo cáo mới nhất',
+  'tdx.dlg.paste.size': 'Ảnh {s}, vượt giới hạn {m} MB.',
 };
 
 const en = {
@@ -314,6 +335,27 @@ const en = {
   'tdx.doneAt': 'Completed',
   'tdx.view': 'View',
   'tdx.processing': 'Working…',
+
+  // ── A2-2 action dialogs ──
+  'tdx.dlg.reason.ph': 'Enter a reason…',
+  'tdx.dlg.closeX': 'Close dialog',
+  'tdx.dlg.accept.d': 'You’re taking on “{t}”. Your part moves to In progress.',
+  'tdx.dlg.decline.note': 'If this was handed over to you, it goes back to whoever handed it over. If everyone assigned declines, the creator is told.',
+  'tdx.dlg.reject.d': 'The task moves to Cancelled. The creator and assignees are notified, with your reason if you give one. A rejected plan can’t be restored.',
+  'tdx.dlg.cancel.d': 'The task moves to Cancelled and the assignees get the reason. Pending extension requests are declined automatically. An Admin can restore it later.',
+  'tdx.dlg.restore.d': 'The task goes back to its status before it was cancelled. The creator and assignees are notified.',
+  'tdx.dlg.tpl.hint': 'General templates plus those for this task type. Picking one replaces what you typed.',
+  'tdx.dlg.supp.d': 'This adds a new version of your report; earlier versions are kept.',
+  'tdx.dlg.ext.dateReq': 'Pick a new due date.',
+  'tdx.dlg.ext.dateErr': 'Pick {d} or later (after the current due date).',
+  'tdx.dlg.ext.rules': 'The new date must be after the current due date and after today. Up to 5 requests per task, 2 pending at a time. A Vice Manager or Admin will decide.',
+  'tdx.dlg.extRev.t': 'Review extension request',
+  'tdx.dlg.extRev.ok': 'Approve extension',
+  'tdx.dlg.extRev.note': 'Approve: the new due date applies and the requester and assignees are notified. Decline: only the requester is notified.',
+  'tdx.dlg.tr.empty': 'There’s no one else to hand it over to.',
+  'tdx.dlg.rework.all': 'All ({n})',
+  'tdx.dlg.rework.latest': 'Latest report',
+  'tdx.dlg.paste.size': 'This image is {s}, over the {m} MB limit.',
 };
 
 export const EXTRA = { vi, en };
