@@ -202,6 +202,15 @@ const vi = {
   'tlx.qa.approveExt': 'Duyệt gia hạn ({d})',
   'tlx.mention': 'có nhắc đến bạn',
   'tlx.extPending': 'Đơn gia hạn đang chờ duyệt (đến {d})',
+  // ── A2-4a bảng Kanban (tbx.*: chữ của V1/bảng thật không có trong copy.js) ──
+  'tbx.board': 'Bảng công việc theo trạng thái',
+  'tbx.actTo': '{a} — chuyển sang {s}',
+  'tbx.instr': 'Thẻ kéo được bằng chuột sang cột kế tiếp. Không dùng chuột: bấm nút hành động trên thẻ hoặc menu Thao tác nhanh.',
+  'tbx.more': 'Xem thêm ({n})',
+  'tbx.allInList': 'Xem tất cả {n} việc ở Danh sách',
+  'tbx.outFilter': 'Không thuộc bộ lọc trạng thái',
+  'tbx.doneHidden': 'Việc đã xong không hiện ở tab Đang mở.',
+  'tbx.seeDone': 'Xem việc đã xong',
 };
 
 const en = {
@@ -396,6 +405,15 @@ const en = {
   'tlx.qa.approveExt': 'Approve extension ({d})',
   'tlx.mention': 'mentions you',
   'tlx.extPending': 'Extension request pending (to {d})',
+  // ── A2-4a Kanban board ──
+  'tbx.board': 'Task board by status',
+  'tbx.actTo': '{a} — move to {s}',
+  'tbx.instr': 'Drag this card with a mouse to the next column. Without a mouse, use the action button on the card or the Quick actions menu.',
+  'tbx.more': 'Show more ({n})',
+  'tbx.allInList': 'See all {n} tasks in List',
+  'tbx.outFilter': 'Not in the status filter',
+  'tbx.doneHidden': 'Done tasks don’t show in the Open tab.',
+  'tbx.seeDone': 'See done tasks',
 };
 
 export const EXTRA = { vi, en };

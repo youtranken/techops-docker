@@ -33,7 +33,7 @@ import {
 } from './list-logic';
 
 type Icon = React.ComponentType<{ className?: string }>;
-const QA: Record<Exclude<QuickActionKey, 'star' | 'approve-extension'>, { label: string; icon: Icon }> = {
+export const QA: Record<Exclude<QuickActionKey, 'star' | 'approve-extension'>, { label: string; icon: Icon }> = {
   view: { label: 'qa.view', icon: Eye },
   open: { label: 'td.openFull', icon: ExternalLink },
   copy: { label: 'qa.copy', icon: Copy },
@@ -77,7 +77,7 @@ export interface TaskListGridProps {
 }
 
 // ───────────────────────────── Ô ─────────────────────────────
-function StarToggle({ task }: { task: TaskListItem }) {
+export function StarToggle({ task }: { task: TaskListItem }) {
   const t = useTranslations();
   const errMsg = useErrorMessage();
   const toggle = useToggleImportant();
@@ -159,7 +159,7 @@ function TitleCell({ task, canStar }: { task: TaskListItem; canStar: boolean }) 
   );
 }
 
-function People({ task }: { task: TaskListItem }) {
+export function People({ task }: { task: TaskListItem }) {
   const t = useTranslations();
   const a = task.assignees;
   if (!a.length) return <span className="text-[13px] text-ink-3">{t('card.unassigned')}</span>;
@@ -186,7 +186,7 @@ function People({ task }: { task: TaskListItem }) {
   );
 }
 
-function RowMenu({ task, currentUserId, role, onAction }: { task: TaskListItem; currentUserId: string; role: string; onAction: TaskListGridProps['onAction'] }) {
+export function RowMenu({ task, currentUserId, role, onAction }: { task: TaskListItem; currentUserId: string; role: string; onAction: TaskListGridProps['onAction'] }) {
   const t = useTranslations();
   const f = useFormat();
   const p = useTaskPermissions(task, currentUserId, role);

@@ -9,7 +9,8 @@
  * Mới (thuần client): tab ánh xạ vào tham số V1, bảng lọc + chip, sắp xếp bằng tiêu đề cột, menu ⋯.
  */
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useIsFetching } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
@@ -29,7 +30,10 @@ import { TaskListFilters, FilterChips } from './TaskListFilters';
 import { TaskListGrid, type TaskRowAction } from './TaskListGrid';
 import { TaskListModals } from './TaskListModals';
 import { TaskViewSwitch } from './TaskViewSwitch';
+import { TaskBoard, type PendingDrop } from './TaskBoard';
+import { useBoardData } from './useBoardData';
 import { useTaskListState } from './useTaskListState';
+import { resolveViewMode, modeUpdate, VIEW_COOKIE, type TaskViewMode, type BoardCol } from './board-logic';
 import {
   tabsFor, activeTab, tabUpdate, filterUpdate, filterCount, clearFiltersUpdate, pageUpdate, limitUpdate, sortUpdate,
   normalizedSortKey, displayCode, SMART_SORT, type ListTab,
@@ -68,7 +72,12 @@ function SearchBox({ value, onChange }: { value: string; onChange: (v: string) =
   );
 }
 
-export function TaskListClient() {
+/** Nhớ chế độ xem (cookie đọc ở server → lần sau mở /tasks không nháy). Lỗi cookie thì bỏ qua. */
+function rememberMode(m: TaskViewMode) {
+  try { document.cookie = `${VIEW_COOKIE}=${m}; path=/; max-age=31536000; samesite=lax`; } catch { /* bỏ qua */ }
+}
+
+export function TaskListClient({ rememberedMode }: { rememberedMode?: string }) {
   const t = useTranslations();
   const errMsg = useErrorMessage();
   const router = useRouter();
@@ -77,19 +86,28 @@ export function TaskListClient() {
   const role = session?.user?.role?.name ?? '';
 
   const { state, update, apiFilters, tracking } = useTaskListState(role);
+  const searchParams = useSearchParams();
+  const mode = resolveViewMode(searchParams.get('mode'), rememberedMode);
+  const board = mode === 'board';
   const modals = useTaskListModals();
   const [fOpen, setFOpen] = React.useState(false);
   const fBtn = React.useRef<HTMLButtonElement>(null);
 
-  const { data, isLoading, isError, refetch } = useTaskList(apiFilters);
+  const { data, isLoading, isError, refetch } = useTaskList(apiFilters, { enabled: !board });
+  const bd = useBoardData(apiFilters, tracking, board);
+  const fetching = useIsFetching({ queryKey: ['tasks'] });
+  const [pending, setPending] = React.useState<PendingDrop | null>(null);
   const { data: priorities = [] } = usePriorities();
   const { data: taskTypes = [] } = useTaskTypes();
   const { data: counters } = useTaskCounters(tracking);
   const markAllSeen = useMarkAllSeen();
   const toggleStar = useToggleImportant();
 
-  const tasks = data?.data ?? [];
-  const pagination = data?.pagination;
+  const listTasks = data?.data ?? [];
+  const pagination = board ? undefined : data?.pagination;
+  /** Việc đang hiển thị (cho hộp thoại + ‹ › của ngăn chi tiết) */
+  const tasks = board ? bd.tasks : listTasks;
+  const total = board ? (bd.loading ? undefined : bd.total) : pagination?.total;
   const tab = activeTab(state);
   const nFilters = filterCount(state);
   const filtered = nFilters > 0 || !!state.search;
@@ -100,6 +118,16 @@ export function TaskListClient() {
   React.useEffect(() => {
     if (pagination && pagination.totalPages > 0 && state.page > pagination.totalPages) update(pageUpdate(pagination.totalPages));
   }, [pagination, state.page, update]);
+
+  // Thẻ vừa thả: giữ ở cột đích trong lúc hộp thoại mở; đóng hộp → đợi bảng tải lại (nếu đã làm) rồi bỏ → thẻ về đúng chỗ thật.
+  const pendingDialogOpen = !!pending && (modals.confirmState?.taskId === pending.taskId || modals.completeTaskId === pending.taskId);
+  React.useEffect(() => {
+    if (!pending || pendingDialogOpen || fetching > 0) return;
+    const h = setTimeout(() => setPending(null), 120);
+    return () => clearTimeout(h);
+  }, [pending, pendingDialogOpen, fetching]);
+
+  const onViewMode = (m: TaskViewMode) => { rememberMode(m); setPending(null); update(modeUpdate(m)); };
 
   const closeFilters = React.useCallback(() => { setFOpen(false); fBtn.current?.focus(); }, []);
   const onSearch = React.useCallback((v: string) => update(filterUpdate('search', v)), [update]);
@@ -135,7 +163,7 @@ export function TaskListClient() {
   }
 
   const tabCount = (k: ListTab) =>
-    k === 'starred' ? counters?.important : k === 'unseen' ? counters?.unseen : k === tab ? pagination?.total : undefined;
+    k === 'starred' ? counters?.important : k === 'unseen' ? counters?.unseen : k === tab ? total : undefined;
 
   return (
     <div>
@@ -144,7 +172,7 @@ export function TaskListClient() {
         <div className="min-w-0">
           <h1 className="font-head text-[22px] font-semibold leading-tight text-ink">{t('page.title')}</h1>
           <p className="m-0 mt-1 text-[13px] text-ink-3" data-testid="list-total">
-            {pagination ? t('tlx.total', { n: pagination.total }) : ' '}
+            {total !== undefined ? t('tlx.total', { n: total }) : ' '}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -207,14 +235,14 @@ export function TaskListClient() {
               value={sortKey}
               onChange={(e) => update(sortUpdate(e.target.value, tracking))}
               title={t('tlx.sort._')}
-              className="h-9 max-w-[260px] rounded-ctl border border-line-2 bg-surface pl-8 pr-7 text-[13px] text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-[680px]:h-11 max-[680px]:w-11 max-[680px]:max-w-11 max-[680px]:px-0 max-[680px]:text-transparent"
+              className="h-9 max-w-[200px] min-[1600px]:max-w-[260px] rounded-ctl border border-line-2 bg-surface pl-8 pr-7 text-[13px] text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-[680px]:h-11 max-[680px]:w-11 max-[680px]:max-w-11 max-[680px]:px-0 max-[680px]:text-transparent"
             >
               {sortOptions.map((o) => (
                 <option key={o} value={o} className="text-ink">{t(`tlx.sort.${o.replace(':', '_')}`)}</option>
               ))}
             </select>
           </label>
-          <TaskViewSwitch value="list" onChange={() => {}} />
+          <TaskViewSwitch value={mode} onChange={onViewMode} />
         </div>
       </div>
 
@@ -230,7 +258,25 @@ export function TaskListClient() {
         </p>
       )}
 
-      {/* ── Bảng ────────────────────────────────────────────────────────── */}
+      {/* ── Bảng Kanban (A2-4a) | Danh sách ─────────────────────────────── */}
+      {board ? (
+        <TaskBoard
+          columns={bd.columns}
+          error={bd.error}
+          onRetry={bd.refetch}
+          currentUserId={currentUserId}
+          role={role}
+          selectedId={modals.quickViewTaskId}
+          pending={pending}
+          filteredEmpty={filtered && !bd.loading && bd.total === 0 ? { onClear: nFilters ? () => update(clearFiltersUpdate(state)) : undefined } : null}
+          onAction={onAction}
+          onDrop={(d, task) => { setPending(d); onAction({ key: d.action, task }); }}
+          onShowMore={bd.showMore}
+          onOpenColumn={(col: BoardCol) => update({ ...modeUpdate('list'), status: col, view: undefined })}
+          onShowDone={() => update(tabUpdate('done'))}
+          onCreate={() => modals.setShowCreate(true)}
+        />
+      ) : (
       <TaskListGrid
         tasks={tasks}
         state={state}
@@ -246,6 +292,7 @@ export function TaskListClient() {
         onAction={onAction}
         onSort={(v) => update(sortUpdate(v, tracking))}
       />
+      )}
 
       {pagination && (
         <Pagination

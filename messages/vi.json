@@ -235,7 +235,26 @@
     "success": "Thành công"
   },
   "dnd": {
-    "reported": "{x}/{n} đã báo cáo"
+    "accepted": "{x}/{n} người đã nhận",
+    "drop": {
+      "accept": "Thả để Nhận việc",
+      "approve": "Thả để Duyệt",
+      "report": "Thả để Báo cáo xong",
+      "review": "Thả để Nghiệm thu"
+    },
+    "grip": "Kéo sang cột kế tiếp để thao tác nhanh",
+    "hint": "Mẹo: kéo thẻ sang cột kế tiếp để thao tác nhanh. Chỉ những bước bạn được phép mới nhận thẻ.",
+    "hintClose": "Ẩn mẹo",
+    "reported": "{x}/{n} đã báo cáo",
+    "sr": {
+      "cancel": "Đã huỷ. Thẻ {id} ở lại cột {s}.",
+      "instr": "Thẻ kéo được. Nhấn Space để nhấc thẻ, mũi tên trái/phải để chọn cột, Enter để thả, Esc để huỷ.",
+      "invalid": "Không thả được ở đây. Thẻ {id} về chỗ cũ.",
+      "lift": "Đã nhấc thẻ {id}. Cột nhận được: {s}. Nhấn mũi tên phải hoặc trái để chọn, Enter để thả, Esc để huỷ.",
+      "origin": "Đang ở vị trí ban đầu, cột {s}.",
+      "over": "Đang ở cột {s}. Nhấn Enter để {a}.",
+      "start": "Đang kéo thẻ {id}. Chỉ cột {s} nhận thẻ."
+    }
   },
   "due": {
     "doneOnTime": "Xong đúng hạn",
@@ -490,6 +509,16 @@
     "status": "Trạng thái",
     "title": "Công việc",
     "type": "Loại công việc"
+  },
+  "tbx": {
+    "actTo": "{a} — chuyển sang {s}",
+    "allInList": "Xem tất cả {n} việc ở Danh sách",
+    "board": "Bảng công việc theo trạng thái",
+    "doneHidden": "Việc đã xong không hiện ở tab Đang mở.",
+    "instr": "Thẻ kéo được bằng chuột sang cột kế tiếp. Không dùng chuột: bấm nút hành động trên thẻ hoặc menu Thao tác nhanh.",
+    "more": "Xem thêm ({n})",
+    "outFilter": "Không thuộc bộ lọc trạng thái",
+    "seeDone": "Xem việc đã xong"
   },
   "td": {
     "actions": "Hành động",

@@ -35,6 +35,7 @@ export const INCLUDE = {
     'idle', 'lang', 'card', 'lane', 'flow', 'n',
     'td', // A2-1 chi tiết công việc (trang + ngăn xem nhanh)
     'tl', // A2-3 danh sách công việc (bảng lọc, chip, phân trang, tab)
+    'dnd', // A2-4a bảng Kanban (kéo thả, mẹo, thông báo cho trình đọc màn hình)
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
