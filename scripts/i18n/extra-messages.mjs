@@ -360,6 +360,8 @@ const vi = {
   'rpx.p.sub': 'Phần việc giao cho nhân viên, theo việc tạo trong kỳ, không gồm việc đã hủy',
   'rpx.p.ontimeT': 'Như V1: số phần việc xong đúng hạn / tổng phần việc được giao',
   'rpx.rs.dates': 'Ngày tạo việc (để trống = tất cả)',
+  'rpx.c.received': 'Ngày nhận', // user chốt 24/10: cột là ngày nhận việc (receivedAt V1), không phải ngày tạo
+  'rpx.l.received': 'Nhận {d}',
 };
 
 const en = {
@@ -712,6 +714,8 @@ const en = {
   'rpx.p.sub': 'Staff assignments on tasks created in this period, excluding cancelled tasks',
   'rpx.p.ontimeT': 'As in V1: assignments done on time ÷ all assignments',
   'rpx.rs.dates': 'Task created date (leave empty for all)',
+  'rpx.c.received': 'Received',
+  'rpx.l.received': 'Received {d}',
 };
 
 export const EXTRA = { vi, en };

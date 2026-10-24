@@ -2167,8 +2167,14 @@
     "to": "Đến ngày"
   },
   "rpx": {
+    "c": {
+      "received": "Ngày nhận"
+    },
     "dd": {
       "max": "Hiển thị tối đa 100 việc"
+    },
+    "l": {
+      "received": "Nhận {d}"
     },
     "lbl": {
       "month": "Tháng {n}/{y}"

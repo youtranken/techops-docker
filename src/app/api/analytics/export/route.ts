@@ -3,7 +3,7 @@ import { requireMenuPermission } from '@/lib/auth-utils';
 import { analyticsService } from '@/modules/analytics/services/analytics.service';
 import ExcelJS from 'exceljs';
 import dayjs from 'dayjs';
-import { parseDate } from '@/lib/date';
+import { parseDayStart, parseDayEnd } from '@/lib/date';
 
 // ─── Period label helper ───────────────────────────────────────────────────
 
@@ -75,8 +75,8 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: { code: 'INVALID_FORMAT', message: 'Use xlsx' } }, { status: 400 });
   }
 
-  const dateFrom = parseDate(searchParams.get('dateFrom'));
-  const dateTo   = parseDate(searchParams.get('dateTo'));
+  const dateFrom = parseDayStart(searchParams.get('dateFrom'));
+  const dateTo   = parseDayEnd(searchParams.get('dateTo'));
   const preset   = searchParams.get('preset') ?? undefined;
   const filters  = { dateFrom, dateTo };
 

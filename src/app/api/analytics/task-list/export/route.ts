@@ -3,7 +3,7 @@ import { requireMenuPermission } from '@/lib/auth-utils';
 import { analyticsService } from '@/modules/analytics/services/analytics.service';
 import ExcelJS from 'exceljs';
 import dayjs from 'dayjs';
-import { parseDate } from '@/lib/date';
+import { parseDayStart, parseDayEnd } from '@/lib/date';
 
 const STATUS_LABELS: Record<string, string> = {
   PENDING:           'Chờ tiếp nhận',
@@ -78,8 +78,8 @@ export async function GET(req: Request) {
   if (user instanceof NextResponse) return user;
 
   const { searchParams } = new URL(req.url);
-  const dateFrom  = parseDate(searchParams.get('dateFrom'));
-  const dateTo    = parseDate(searchParams.get('dateTo'));
+  const dateFrom  = parseDayStart(searchParams.get('dateFrom'));
+  const dateTo    = parseDayEnd(searchParams.get('dateTo'));
   const userId    = searchParams.get('userId') ?? undefined;
   const rawPeriod = searchParams.get('period') ?? 'du-lieu';
   const period    = rawPeriod.replace(/[^a-zA-Z0-9\-_]/g, '').slice(0, 60) || 'du-lieu';

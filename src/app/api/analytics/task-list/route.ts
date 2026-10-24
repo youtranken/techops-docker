@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { requireMenuPermission } from '@/lib/auth-utils';
 import { analyticsService } from '@/modules/analytics/services/analytics.service';
-import { parseDate } from '@/lib/date';
+import { parseDayStart, parseDayEnd } from '@/lib/date';
 
 export async function GET(req: Request) {
   const user = await requireMenuPermission('analytics');
   if (user instanceof NextResponse) return user;
 
   const { searchParams } = new URL(req.url);
-  const dateFrom   = parseDate(searchParams.get('dateFrom'));
-  const dateTo     = parseDate(searchParams.get('dateTo'));
+  const dateFrom   = parseDayStart(searchParams.get('dateFrom'));
+  const dateTo     = parseDayEnd(searchParams.get('dateTo'));
   const userId     = searchParams.get('userId') ?? undefined;
   const search     = searchParams.get('search')?.trim() ?? undefined;
   const sortBy     = (searchParams.get('sortBy') ?? 'createdAt') as 'createdAt' | 'scheduleEnd' | 'status' | 'title';

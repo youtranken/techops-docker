@@ -3,7 +3,7 @@
 /**
  * Bảng Danh sách công việc (preview `.rt`): mỗi dòng = một người được giao trong một việc (V1 `TaskListRow`).
  * Cột sắp xếp được gửi lên API như V1 (`sortBy`/`sortOrder`, bấm lại cùng cột thì đảo chiều — `nextSort`).
- * Cột Người làm ẩn khi đang lọc một người (V1). "Ngày tạo" = ngày nhận việc hoặc ngày tạo (V1 `receivedAt`).
+ * Cột Người làm ẩn khi đang lọc một người (V1). "Ngày nhận" = ngày nhận việc hoặc ngày tạo (V1 `receivedAt`; user chốt đổi nhãn 24/10).
  */
 import { useTranslations } from 'next-intl';
 import { ChevronDown, ChevronRight, Inbox } from 'lucide-react';
@@ -52,7 +52,7 @@ export function TlTable({ s, rows, loading, error, onRetry, noneInPeriod, onSort
           <span className="truncate font-medium leading-5 text-ink max-[680px]:line-clamp-2 max-[680px]:whitespace-normal" title={r.taskTitle}>{r.taskTitle}</span>
           <span className="truncate text-xs text-ink-3">
             {r.taskCode && <span className="font-mono">{r.taskCode} · </span>}{r.taskType}
-            <span className="hidden max-[1100px]:inline"> · {t('rp.l.created', { d: f.date(r.receivedAt) })}</span>
+            <span className="hidden max-[1100px]:inline"> · {t('rpx.l.received', { d: f.date(r.receivedAt) })}</span>
           </span>
         </span>
       ),
@@ -65,7 +65,7 @@ export function TlTable({ s, rows, loading, error, onRetry, noneInPeriod, onSort
         </span>
       ),
     }]),
-    { key: 'cr', ...head('createdAt', t('rp.c.created')), width: '96px', hideBelow: 'lg', mobile: 'hide', cell: (r) => <span className="font-mono text-xs text-ink-2">{f.date(r.receivedAt)}</span> },
+    { key: 'cr', ...head('createdAt', t('rpx.c.received')), width: '96px', hideBelow: 'lg', mobile: 'hide', cell: (r) => <span className="font-mono text-xs text-ink-2">{f.date(r.receivedAt)}</span> },
     {
       key: 'due', ...head('scheduleEnd', t('filter.due')), width: '96px', mobileOrder: 2,
       cell: (r) => <span className={cn('whitespace-nowrap font-mono text-xs', r.isOverdue ? 'font-medium text-danger' : 'text-ink-2')}>{ml(t('filter.due'))}{f.date(r.scheduleEnd)}</span>,

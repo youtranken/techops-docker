@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-utils';
 import { analyticsService } from '@/modules/analytics/services/analytics.service';
-import { parseDate } from '@/lib/date';
+import { parseDayStart, parseDayEnd } from '@/lib/date';
 
 export async function GET(req: Request) {
   const user = await requireAuth();
@@ -14,8 +14,8 @@ export async function GET(req: Request) {
   const forUserId = user.role.name === 'EMPLOYEE' ? user.id : undefined;
 
   const result = await analyticsService.getUserPerformance({
-    dateFrom: parseDate(searchParams.get('dateFrom')),
-    dateTo: parseDate(searchParams.get('dateTo')),
+    dateFrom: parseDayStart(searchParams.get('dateFrom')),
+    dateTo: parseDayEnd(searchParams.get('dateTo')),
     forUserId,
   });
 

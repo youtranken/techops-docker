@@ -89,7 +89,7 @@ class ResearchService {
     for (const [, { user, statuses }] of userMap) {
       const inProgressCount = statuses.filter((s) => s === 'IN_PROGRESS').length;
       const pendingCount = statuses.filter((s) =>
-        ['WAITING_ACK', 'PENDING_APPROVAL', 'PENDING_REVIEW'].includes(s),
+        ['WAITING_ACKNOWLEDGE', 'PENDING_APPROVAL', 'PENDING_REVIEW'].includes(s),
       ).length;
 
       result.push({

@@ -44,8 +44,9 @@ async function as(page: Page, who: 'boss' | 'emp') {
 const vi = (n: number) => n.toLocaleString('vi-VN');
 const count = (sql: string) => Number(psql(sql));
 const noHScroll = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
-/** createdAt của Prisma là UTC; V1 parseDate('YYYY-MM-DD') = 00:00 giờ máy chủ (cùng máy với test). */
-const utc = (d: string) => new Date(`${d}T00:00:00`).toISOString().replace('T', ' ').replace('Z', '');
+/** createdAt của Prisma là UTC. Từ 24/10 (user duyệt): dateFrom = 00:00 VN, dateTo = 23:59:59.999 VN (gồm trọn ngày cuối kỳ). */
+const utc = (d: string) => new Date(`${d}T00:00:00.000+07:00`).toISOString().replace('T', ' ').replace('Z', '');
+const utcEnd = (d: string) => new Date(`${d}T23:59:59.999+07:00`).toISOString().replace('T', ' ').replace('Z', '');
 
 interface Kpi { totalTasksCreated: number; totalCompleted: number; totalOverdue: number; tasksByStatus: Record<string, number> }
 
@@ -79,8 +80,8 @@ test.describe.serial('V2 — Báo cáo', () => {
     await page.goto('/analytics');
     const k = (await (await cur).json()) as Kpi;
     await expect(page.getByTestId('rp-kpis')).toBeVisible({ timeout: 60_000 });
-    // DB (cùng điều kiện V1: createdAt ≥ dateFrom 00:00, ≤ dateTo 00:00)
-    const where = `"createdAt" >= '${utc(MONTH.dateFrom)}' AND "createdAt" <= '${utc(MONTH.dateTo)}'`;
+    // DB (createdAt ≥ dateFrom 00:00 VN, ≤ dateTo 23:59:59.999 VN)
+    const where = `"createdAt" >= '${utc(MONTH.dateFrom)}' AND "createdAt" <= '${utcEnd(MONTH.dateTo)}'`;
     expect(k.totalTasksCreated).toBe(count(`SELECT count(*) FROM "Task" WHERE ${where}`));
     expect(k.totalCompleted).toBe(count(`SELECT count(*) FROM "Task" WHERE ${where} AND status='COMPLETED'`));
     expect(k.totalTasksCreated).toBeGreaterThanOrEqual(1);
@@ -145,7 +146,7 @@ test.describe.serial('V2 — Báo cáo', () => {
     await row.click();
     await expect(page).toHaveURL(new RegExp(`/analytics/task-list\\?userId=${empId}&dateFrom=${QUARTER.dateFrom}&dateTo=${QUARTER.dateTo}`));
     const tl = (await (await res).json()).data as { total: number; kpi: { total: number; completed: number; inProgress: number } };
-    expect(tl.total).toBe(count(`SELECT count(*) FROM "TaskAssignee" a JOIN "Task" t ON t.id=a."taskId" WHERE a."userId"='${empId}' AND t."createdAt" >= '${utc(QUARTER.dateFrom)}' AND t."createdAt" <= '${utc(QUARTER.dateTo)}'`));
+    expect(tl.total).toBe(count(`SELECT count(*) FROM "TaskAssignee" a JOIN "Task" t ON t.id=a."taskId" WHERE a."userId"='${empId}' AND t."createdAt" >= '${utc(QUARTER.dateFrom)}' AND t."createdAt" <= '${utcEnd(QUARTER.dateTo)}'`));
     // V1 đặt lại về tháng hiện tại; V2 giữ khoảng ngày của link
     await page.waitForTimeout(800);
     await expect(page).toHaveURL(new RegExp(`dateFrom=${QUARTER.dateFrom}&dateTo=${QUARTER.dateTo}`));
