@@ -354,6 +354,12 @@ const vi = {
   'setx.sec.resetD': 'Toàn bộ cấu hình bảo mật được ghi về giá trị mặc định ngay khi bấm. Các thay đổi chưa lưu sẽ mất.',
   'setx.sec.resetDone': 'Đã đặt lại cấu hình bảo mật về mặc định.',
   'setx.sec.multiNote': 'Hiện chỉ được lưu lại, chưa có tác dụng khi đăng nhập.',
+  'rpx.sort.titleD': 'Tên Z → A',
+  'rpx.lbl.month': 'Tháng {n}/{y}',
+  'rpx.dd.max': 'Hiển thị tối đa 100 việc',
+  'rpx.p.sub': 'Phần việc giao cho nhân viên, theo việc tạo trong kỳ, không gồm việc đã hủy',
+  'rpx.p.ontimeT': 'Như V1: số phần việc xong đúng hạn / tổng phần việc được giao',
+  'rpx.rs.dates': 'Ngày tạo việc (để trống = tất cả)',
 };
 
 const en = {
@@ -700,6 +706,12 @@ const en = {
   'setx.sec.resetD': 'All security settings are overwritten with the defaults right away. Unsaved changes are lost.',
   'setx.sec.resetDone': 'Security settings reset to defaults.',
   'setx.sec.multiNote': 'Currently stored only; not enforced at sign-in yet.',
+  'rpx.sort.titleD': 'Title Z → A',
+  'rpx.lbl.month': '{n, select, 1 {January} 2 {February} 3 {March} 4 {April} 5 {May} 6 {June} 7 {July} 8 {August} 9 {September} 10 {October} 11 {November} 12 {December} other {{n}}} {y}',
+  'rpx.dd.max': 'Showing up to 100 tasks',
+  'rpx.p.sub': 'Staff assignments on tasks created in this period, excluding cancelled tasks',
+  'rpx.p.ontimeT': 'As in V1: assignments done on time ÷ all assignments',
+  'rpx.rs.dates': 'Task created date (leave empty for all)',
 };
 
 export const EXTRA = { vi, en };

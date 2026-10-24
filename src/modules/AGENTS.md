@@ -41,7 +41,7 @@ Module không được import trực tiếp từ module khác (chỉ qua API).
 | `tasks/` | Quản lý công việc, workflow phê duyệt | [xem](tasks/AGENTS.md) |
 | `helpdesk/` | Đồng bộ Helpdesk API, quản lý ticket | [xem](helpdesk/AGENTS.md) |
 | `hr/` | Quản lý nhân sự, user accounts | [xem](hr/AGENTS.md) |
-| `analytics/` | Báo cáo, thống kê hoạt động | — |
+| `analytics/` | Báo cáo, thống kê hoạt động | [xem](analytics/AGENTS.md) |
 | `notifications/` | Thông báo, email alerts | [xem](notifications/AGENTS.md) |
 | `settings/` | Cài đặt hệ thống, Hồ sơ cá nhân | [xem](settings/AGENTS.md) |
 | `logs/` | Nhật ký hoạt động người dùng | — |
