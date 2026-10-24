@@ -902,6 +902,279 @@
     "en": "EN",
     "vi": "VI"
   },
+  "lg": {
+    "a": {
+      "ACKNOWLEDGED": "Accepted task",
+      "COMMENT_ADDED": "Commented",
+      "COMPLETED": "Reported done",
+      "COMPLETED_PART": "Reported own part",
+      "EXTENSION_APPROVED": "Approved extension",
+      "EXTENSION_REJECTED": "Rejected extension",
+      "EXTENSION_REQUESTED": "Requested extension",
+      "EXTENSION_WITHDRAWN": "Withdrew extension",
+      "FORCE_MODE_TOGGLED": "Changed mandatory mode",
+      "PLAN_APPROVED": "Approved",
+      "PLAN_REJECTED": "Rejected approval",
+      "REASSIGNED": "Reassigned",
+      "REJECTED": "Declined task",
+      "REPORT_SUPPLEMENTED": "Added to report",
+      "RESTORED": "Restored",
+      "REVIEW_APPROVED": "Signed off",
+      "REVIEW_REJECTED": "Requested rework",
+      "STATUS_CHANGED": "Changed status",
+      "TASK_CANCELLED": "Cancelled task",
+      "TASK_CREATED": "Created task",
+      "TASK_DELETED": "Deleted task",
+      "TASK_UPDATED": "Edited task",
+      "TRANSFERRED": "Transferred"
+    },
+    "chg": {
+      "assign": "Assigned to {p}",
+      "ext": "Until {d}",
+      "more": "+{n}",
+      "moreSr": "and {n} more changes",
+      "newDue": "New due date {d}",
+      "none": "No data changed",
+      "reassign": "Reassigned to {p}",
+      "to": "To {p}",
+      "ver": "Report {v}"
+    },
+    "col": {
+      "act": "Action",
+      "chg": "Change",
+      "code": "Code",
+      "created": "Created",
+      "detail": "Details",
+      "id": "System ID",
+      "obj": "Task",
+      "src": "Source",
+      "time": "Time",
+      "title": "Title",
+      "user": "User",
+      "who": "Person"
+    },
+    "copied": "Copied {x}",
+    "copy": "Copy {x}",
+    "copyFail": "Couldn’t copy. Select the code and copy it manually.",
+    "count": "{n} events",
+    "countRef": "{n} tasks",
+    "d": {
+      "account": "Account {u}",
+      "digest": "Digest email: {v}",
+      "export": "Exported {n} rows · {x}",
+      "lockedFor": "Locked {m} min after {n} failures",
+      "mail": "Reset link sent by email",
+      "policy": "New password too short",
+      "rate": "{n} attempts in {m} min",
+      "sec": "Security: {n} settings changed"
+    },
+    "day": {
+      "today": "Today",
+      "yday": "Yesterday"
+    },
+    "deleted": "deleted",
+    "dev": {
+      "Desktop": "Desktop",
+      "Mobile": "Phone",
+      "Tablet": "Tablet"
+    },
+    "dr": {
+      "act": "Action",
+      "changes": "Changes",
+      "created": "Created",
+      "creator": "Created by",
+      "device": "Device",
+      "evId": "Event ID",
+      "field": "Field",
+      "ip": "IP address",
+      "isp": "ISP",
+      "loc": "Location",
+      "new": "After",
+      "noTask": "This task is no longer in the system.",
+      "note": "Note",
+      "obj": "Task",
+      "old": "Before",
+      "openTask": "Open task",
+      "reason": "Reason",
+      "ref": "Code details",
+      "result": "Result",
+      "same": "Unchanged",
+      "sched": "Schedule",
+      "status": "Status",
+      "task": "Task event",
+      "taskLog": "See this task’s log",
+      "ua": "User agent",
+      "user": "User event",
+      "when": "When",
+      "who": "Person"
+    },
+    "f": {
+      "act": "Action",
+      "actAll": "All actions",
+      "clear": "Clear filters",
+      "creator": "Creator",
+      "creatorAll": "Any creator",
+      "errRange": "The start date must be before the end date",
+      "from": "From",
+      "ip": "Source",
+      "ipAll": "Any source",
+      "label": "Filters",
+      "to": "To",
+      "unknown": "Unknown username",
+      "who": "Person",
+      "whoAll": "Everyone"
+    },
+    "fld": {
+      "assignee": "Assignees",
+      "digest": "Digest email",
+      "digestAt": "Digest send time",
+      "due": "Due date",
+      "force": "Mandatory",
+      "lockMin": "Lockout time",
+      "maxTry": "Max failed attempts",
+      "mode": "Workflow",
+      "priority": "Priority",
+      "report": "Report version",
+      "start": "Start date",
+      "status": "Status"
+    },
+    "g": {
+      "account": "Accounts",
+      "alert": "Security alerts",
+      "create": "Create and edit",
+      "done": "Reports and sign-off",
+      "ext": "Extensions",
+      "flow": "Approval and handoff",
+      "neg": "Rejections and cancels",
+      "session": "Sessions",
+      "system": "System"
+    },
+    "ip": {
+      "external": "Outside network",
+      "externalSr": "Access from outside the internal network",
+      "internal": "Internal"
+    },
+    "ne": {
+      "d": "Lost the connection to the server. Check your network and try again.",
+      "t": "Couldn’t load the activity log"
+    },
+    "nm": {
+      "d": "Try a longer period or remove some filters.",
+      "t": "No events match your filters",
+      "tRef": "No tasks match"
+    },
+    "pg": {
+      "label": "Pagination",
+      "next": "Next page",
+      "page": "Page {n}",
+      "prev": "Previous page",
+      "range": "{a}–{b} of {n}"
+    },
+    "r": {
+      "USER_INACTIVE": "Account is deactivated",
+      "USER_NOT_FOUND": "Username doesn’t exist",
+      "WRONG_PASSWORD": "Wrong password",
+      "left": "Wrong password, {n} tries left",
+      "locked": "Wrong password, IP locked"
+    },
+    "ref": {
+      "exact": "Exact match"
+    },
+    "row": {
+      "open": "View details"
+    },
+    "sub": "Kept for 90 days. On the 1st of each month, last month’s log is exported to Excel.",
+    "tab": {
+      "ref": "Code lookup",
+      "task": "Tasks",
+      "user": "Users"
+    },
+    "tabs": "Log type",
+    "title": "Activity log",
+    "tried": "tried “{u}”",
+    "u": {
+      "ACCOUNT_LOCKED": "Account locked",
+      "ACCOUNT_UNLOCKED": "Unlocked account",
+      "ACTIVATE_USER": "Reactivated user",
+      "CHANGE_SETTINGS": "Changed settings",
+      "CREATE_USER": "Created user",
+      "DEACTIVATE_USER": "Deactivated user",
+      "DELETE_USER": "Deleted user",
+      "EXPORT_DATA": "Exported data",
+      "LOGIN": "Signed in",
+      "LOGIN_FAILED": "Failed sign-in",
+      "LOGOUT": "Signed out",
+      "PASSWORD_CHANGED_SELF": "Changed own password",
+      "PASSWORD_POLICY_VIOLATION": "Password failed policy",
+      "PASSWORD_RESET_COMPLETED": "Reset password by email",
+      "PASSWORD_RESET_REQUESTED": "Requested password reset",
+      "RATE_LIMIT_EXCEEDED": "Hit attempt limit",
+      "RESET_PASSWORD": "Reset someone’s password",
+      "REVOKE_SESSION": "Revoked session",
+      "SECURITY_SETTING_CHANGED": "Changed security settings",
+      "SESSION_TIMEOUT": "Session expired",
+      "UPDATE_USER": "Edited user",
+      "VIEW_PAGE": "Viewed page"
+    },
+    "unknown": "Unknown",
+    "v": {
+      "min": "{n} min",
+      "off": "Off",
+      "on": "On"
+    }
+  },
+  "lgx": {
+    "chg": {
+      "cmDel": "Deleted a comment",
+      "cmUpd": "Edited a comment",
+      "field": "{f}: {o} → {n}",
+      "hd": "Created from Helpdesk {x}",
+      "restore": "{a} declined, returned to {b}",
+      "status": "{o} → {n}"
+    },
+    "col": {
+      "sched": "Schedule"
+    },
+    "d": {
+      "notif": "Email notifications: {v}",
+      "priority": "Priority: {x}",
+      "sec": "Security",
+      "secChg": "Security: changed {x}",
+      "secReset": "Security: reset to defaults",
+      "smtp": "SMTP settings",
+      "taskType": "Task type: {x}",
+      "tpl": "Email template: {x}"
+    },
+    "dr": {
+      "cmPB": "V1 logs store only the comment ID, not its text.",
+      "raw": "Text stored in the log as is (not translated)"
+    },
+    "f": {
+      "dates": "Date range",
+      "qRef": "Search task code or title",
+      "qTask": "Search by task title",
+      "schedFrom": "Scheduled from",
+      "schedTo": "Scheduled to"
+    },
+    "fld": {
+      "addAs": "Added assignees",
+      "content": "Description",
+      "extTo": "Extension until",
+      "important": "Important",
+      "rmAs": "Removed assignees",
+      "title": "Title",
+      "type": "Task type"
+    },
+    "g": {
+      "other": "Other"
+    },
+    "ref": {
+      "hint": "Paste a task code from an email, spreadsheet or error report to find the task and its system ID."
+    },
+    "v": {
+      "edited": "Edited"
+    }
+  },
   "n": {
     "allFailed": "Everyone assigned declined “{t}”. You can cancel it or ask an Admin to reassign it.",
     "transfer": "{a} handed “{t}” over to you"

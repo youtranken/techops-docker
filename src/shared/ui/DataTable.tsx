@@ -41,6 +41,8 @@ export interface DataTableProps<T> {
   selectedId?: string;
   /** Lớp thêm cho từng dòng (vd tô dòng cần chú ý) */
   rowClassName?: (row: T) => string | false | null | undefined;
+  /** Dòng tiêu đề nhóm chèn TRƯỚC dòng (vd nhóm theo ngày ở Nhật ký) — trả null/undefined thì không chèn */
+  groupHeader?: (row: T, index: number) => React.ReactNode;
   className?: string;
   'data-testid'?: string;
 }
@@ -68,7 +70,7 @@ function FullRow({ children }: { children: React.ReactNode }) {
 }
 
 export function DataTable<T>({
-  ariaLabel, columns, rows, getRowId, loading = false, skeletonRows = 6, error, onRetry, empty, onRowClick, selectedId, rowClassName, className,
+  ariaLabel, columns, rows, getRowId, loading = false, skeletonRows = 6, error, onRetry, empty, onRowClick, selectedId, rowClassName, groupHeader, className,
   'data-testid': testId,
 }: DataTableProps<T>) {
   const g = gridTemplates(columns);
@@ -91,11 +93,13 @@ export function DataTable<T>({
   } else if (rows.length === 0) {
     body = <FullRow><EmptyState {...empty} /></FullRow>;
   } else {
-    body = rows.map((row) => {
+    body = rows.map((row, ri) => {
       const id = getRowId(row);
+      const group = groupHeader?.(row, ri);
       return (
+        <React.Fragment key={id}>
+        {group ? <div role="row" className="v2-tgroup"><div role="cell" className="contents">{group}</div></div> : null}
         <div
-          key={id}
           role="row"
           className={cn('v2-tr', selectedId === id && 'is-sel', rowClassName?.(row))}
           tabIndex={onRowClick ? 0 : undefined}
@@ -116,6 +120,7 @@ export function DataTable<T>({
             </div>
           ))}
         </div>
+        </React.Fragment>
       );
     });
   }

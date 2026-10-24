@@ -43,6 +43,7 @@ export const INCLUDE = {
     'db', // A3-1 Tổng quan
     'hd', // A3-3 Helpdesk (danh sách, ngăn chi tiết, hộp thoại, Nhập dữ liệu)
     'pp', // A3-4 Nhân sự + Phân quyền (nhãn vai trò dùng ppx.role.* = ROLE_LABELS V1)
+    'lg', // A3-6 Nhật ký (công việc / người dùng / tra cứu mã + ngăn chi tiết)
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
@@ -66,6 +67,9 @@ export const INCLUDE = {
     'pf.av.rm', 'pf.saved.avRm', 'pf.pw.last', // A3-2: bỏ ảnh / ngày đổi mật khẩu — V1 không có
     'db.pv.', // thanh điều khiển preview Tổng quan
     'hd.pv.', 'hd.reset.otpH', 'hd.dept.', 'hd.ty.', // A3-3: thanh điều khiển preview + dữ liệu mẫu
+    'lg.pv.', 'lg.pb', 'lg.export', 'lg.f.alerts', 'lg.f.qUser', 'lg.dr.byIp', // A3-6: preview + Phase B (xuất Excel, ô tìm/lọc cảnh báo nhật ký người dùng)
+    'lg.f.period', 'lg.p.', 'lg.dr.comment', 'lg.dr.part', 'lg.chg.verPart', // A3-6: chọn nhanh khoảng ngày, trích bình luận, tiến độ báo cáo — Phase B
+    'lg.f.qTask', 'lg.f.qRef', 'lg.ref.hint', 'lg.na.', // A3-6: câu preview nói tìm theo mã/ID — V1 không có → bản đúng V1 ở lgx.*; trang không quyền do server chuyển hướng
     'hd.imp.jsonH', 'hd.imp.e.shape', // A3-3: có dấu { } không hợp lệ ICU → bản thoát ở extra-messages (hdx.imp.*)
   ],
 };
