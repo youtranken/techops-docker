@@ -10,10 +10,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { AlertCircle, CheckCircle2, Circle } from 'lucide-react';
 import { ActionDialog, DialogNote } from '@/shared/ui/ActionDialog';
 import { Field } from '@/shared/ui/Field';
-import { cn } from '@/lib/utils';
 import { toApiError } from '@/lib/errors';
 import { useErrorMessage } from '@/lib/useErrorMessage';
 import type { PasswordPolicyConfig } from '../../types';
@@ -21,7 +19,8 @@ import {
   DEFAULT_POLICY, policyChecks, validatePasswordForm, changePasswordPayload, passwordServerError,
   type PasswordErrors, type PasswordForm,
 } from '../../lib/password-rules';
-import { PasswordInput } from './PasswordInput';
+import { PasswordInput } from '@/shared/ui/PasswordInput';
+import { PasswordPolicyList } from '@/shared/ui/PasswordPolicyList';
 
 const EMPTY: PasswordForm = { current: '', next: '', confirm: '' };
 const IDS: Record<keyof PasswordForm, string> = { current: 'pw-cur', next: 'pw-new', confirm: 'pw-confirm' };
@@ -51,7 +50,6 @@ export function ChangePasswordDialog({ open, onClose }: { open: boolean; onClose
 
   const pol = policy ?? DEFAULT_POLICY;
   const checks = policyChecks(pol, form.next);
-  const met = checks.filter((c) => c.ok).length;
 
   function set(k: keyof PasswordForm, v: string) {
     const next = { ...form, [k]: v };
@@ -126,26 +124,7 @@ export function ChangePasswordDialog({ open, onClose }: { open: boolean; onClose
         <Field id={IDS.next} label={t('au.new._')} optional={false} error={fieldErr('next')}>
           <PasswordInput value={form.next} onChange={(v) => set('next', v)} autoComplete="new-password" extraDescribedBy="pw-pol-h" />
         </Field>
-        <div
-          className={cn('-mt-2 mb-4 rounded-ctl bg-surface-2 px-3 py-2.5', errors.next === 'au.err.policy' && 'shadow-[inset_0_0_0_1px_var(--danger)]')}
-          data-testid="pw-policy"
-        >
-          <p id="pw-pol-h" className="m-0 mb-1.5 text-xs font-medium text-ink-2">{policy ? t('au.pol.title') : t('pfx.pol.loading')}</p>
-          <ul aria-labelledby="pw-pol-h" className="m-0 grid list-none gap-1 p-0">
-            {checks.map((c) => (
-              <li key={c.key} data-ok={c.ok || undefined} className={cn('flex items-center gap-2 text-xs', c.ok ? 'text-ink' : 'text-ink-2')}>
-                {c.ok
-                  ? <CheckCircle2 aria-hidden className="size-3.5 text-c-done" />
-                  : errors.next === 'au.err.policy'
-                    ? <AlertCircle aria-hidden className="size-3.5 text-danger" />
-                    : <Circle aria-hidden className="size-3.5 text-ink-3" />}
-                <span>{t(c.key, c.values)}</span>
-                <span className="sr-only">, {t(c.ok ? 'au.pol.met' : 'au.pol.unmet')}</span>
-              </li>
-            ))}
-          </ul>
-          <span className="sr-only" aria-live="polite">{t('au.pol.count', { x: met, n: checks.length })}</span>
-        </div>
+        <PasswordPolicyList id="pw-pol-h" checks={checks} bad={errors.next === 'au.err.policy'} loading={!policy} className="-mt-2 mb-4" />
         <Field id={IDS.confirm} label={t('au.new2._')} optional={false} error={fieldErr('confirm')}>
           <PasswordInput value={form.confirm} onChange={(v) => set('confirm', v)} autoComplete="new-password" />
         </Field>

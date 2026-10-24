@@ -362,6 +362,21 @@ const vi = {
   'rpx.rs.dates': 'Ngày tạo việc (để trống = tất cả)',
   'rpx.c.received': 'Ngày nhận', // user chốt 24/10: cột là ngày nhận việc (receivedAt V1), không phải ngày tạo
   'rpx.l.received': 'Nhận {d}',
+  // ── A3-8 Đăng nhập / Mật khẩu: câu đúng V1 khi preview khác (V1 không phân biệt link hết hạn/sai, không biết tên tài khoản, đổi lần đầu phải đăng nhập lại) ──
+  'aux.err.generic': 'Đã xảy ra lỗi. Vui lòng thử lại.',
+  'aux.link.exp.t': 'Link đã hết hạn hoặc không hợp lệ',
+  'aux.link.exp.d': 'Link đặt lại mật khẩu chỉ dùng được một lần và có thời hạn. Nhờ Vice Manager hoặc Admin gửi link mới.',
+  'aux.reset.d': 'Nhập mật khẩu mới cho tài khoản của bạn.',
+  'aux.first.ok.d': 'Đăng nhập lại bằng mật khẩu mới để tiếp tục làm việc.',
+  'aux.first.ok.btn': 'Đăng nhập lại',
+  'aux.vf.ok.d': 'Địa chỉ email của bạn đã được xác nhận thành công.',
+  'aux.vf.unknown.t': 'Xác nhận thất bại',
+  'aux.vf.unknown.d': 'Có lỗi xảy ra, vui lòng thử lại.',
+  'aux.toHome': 'Về trang chủ',
+  'aux.theme.dark': 'Tối',
+  'aux.theme.light': 'Sáng',
+  'aux.lang': 'Ngôn ngữ',
+  'aux.vf.title': 'Xác nhận email',
 };
 
 const en = {
@@ -716,6 +731,20 @@ const en = {
   'rpx.rs.dates': 'Task created date (leave empty for all)',
   'rpx.c.received': 'Received',
   'rpx.l.received': 'Received {d}',
+  'aux.err.generic': 'Something went wrong. Please try again.',
+  'aux.link.exp.t': 'This link has expired or isn’t valid',
+  'aux.link.exp.d': 'Password reset links work only once and for a limited time. Ask a Vice Manager or an Admin for a new one.',
+  'aux.reset.d': 'Enter a new password for your account.',
+  'aux.first.ok.d': 'Sign in again with your new password to continue.',
+  'aux.first.ok.btn': 'Sign in again',
+  'aux.vf.ok.d': 'Your email address has been verified.',
+  'aux.vf.unknown.t': 'Verification failed',
+  'aux.vf.unknown.d': 'Something went wrong. Please try again.',
+  'aux.toHome': 'Go to home',
+  'aux.theme.dark': 'Dark',
+  'aux.theme.light': 'Light',
+  'aux.lang': 'Language',
+  'aux.vf.title': 'Verify email',
 };
 
 export const EXTRA = { vi, en };

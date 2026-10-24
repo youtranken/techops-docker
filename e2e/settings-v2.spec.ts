@@ -37,7 +37,8 @@ async function signIn(page: Page, username: string) {
     await page.locator('#username').fill(username);
     await page.locator('#password').fill(E2E_PASSWORD);
     await page.locator('button[type="submit"]').click();
-    try { await expect(page).not.toHaveURL(/\/login/, { timeout: 20_000 }); return; } catch (e) {
+    // chờ trang đích tải xong: /api/auth/session của trang mới có thể đặt lại cookie SAU clearCookies của lượt đăng nhập kế tiếp
+    try { await expect(page).not.toHaveURL(/\/login/, { timeout: 20_000 }); await page.waitForLoadState('networkidle').catch(() => {}); return; } catch (e) {
       if (attempt) throw e;
       await page.waitForTimeout(61_000);
     }

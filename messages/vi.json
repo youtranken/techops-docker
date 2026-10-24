@@ -200,6 +200,7 @@
     }
   },
   "au": {
+    "check": "Đang kiểm tra link…",
     "cur": {
       "_": "Mật khẩu hiện tại",
       "req": "Nhập mật khẩu hiện tại"
@@ -208,9 +209,37 @@
       "cur": "Mật khẩu hiện tại không đúng.",
       "match": "Hai mật khẩu chưa khớp.",
       "policy": "Mật khẩu mới chưa đạt đủ yêu cầu bên dưới.",
-      "same": "Mật khẩu mới phải khác mật khẩu hiện tại."
+      "same": "Mật khẩu mới phải khác mật khẩu hiện tại.",
+      "wrong": "Sai tên đăng nhập hoặc mật khẩu."
+    },
+    "first": {
+      "btn": "Lưu mật khẩu và tiếp tục",
+      "d": "Bạn đang dùng mật khẩu do quản trị viên cấp. Đổi sang mật khẩu của riêng bạn trước khi tiếp tục.",
+      "ok": {
+        "t": "Đã đổi mật khẩu"
+      },
+      "t": "Đặt mật khẩu của riêng bạn"
+    },
+    "foot": "© 2026 Phòng IT · PMH",
+    "forgot": {
+      "_": "Quên mật khẩu?",
+      "d": "Nhờ Vice Manager hoặc Admin gửi link đặt lại mật khẩu tới email của bạn. Link có hiệu lực 15 phút."
     },
     "hide": "Ẩn mật khẩu",
+    "link": {
+      "bad": {
+        "d": "Link bị thiếu hoặc sai mã. Mở lại đúng link trong email, hoặc nhờ Admin gửi link mới.",
+        "t": "Link không hợp lệ"
+      },
+      "net": {
+        "d": "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.",
+        "t": "Chưa kiểm tra được link"
+      }
+    },
+    "login": {
+      "d": "Dùng tài khoản TechOps do phòng IT cấp.",
+      "t": "Đăng nhập"
+    },
     "new": {
       "_": "Mật khẩu mới",
       "req": "Nhập mật khẩu mới"
@@ -218,6 +247,10 @@
     "new2": {
       "_": "Nhập lại mật khẩu mới",
       "req": "Nhập lại mật khẩu mới"
+    },
+    "pass": {
+      "_": "Mật khẩu",
+      "req": "Nhập mật khẩu"
     },
     "pol": {
       "count": "Đạt {x}/{n} yêu cầu",
@@ -230,8 +263,47 @@
       "unmet": "chưa đạt",
       "up": "Một chữ hoa (A–Z)"
     },
+    "reset": {
+      "btn": "Đặt lại mật khẩu",
+      "ok": {
+        "d": "Tự chuyển sang trang đăng nhập sau {n} giây.",
+        "t": "Đã đặt lại mật khẩu"
+      },
+      "t": "Đặt lại mật khẩu"
+    },
     "saving": "Đang lưu…",
-    "show": "Hiện mật khẩu"
+    "show": "Hiện mật khẩu",
+    "signout": "Đăng xuất",
+    "submit": "Đăng nhập",
+    "submitting": "Đang đăng nhập…",
+    "theme": "Giao diện",
+    "toLogin": "Về trang đăng nhập",
+    "user": {
+      "_": "Tên đăng nhập",
+      "ph": "Ví dụ: leminh",
+      "req": "Nhập tên đăng nhập"
+    },
+    "vf": {
+      "busy": {
+        "d": "Chờ vài giây, không cần đóng trang.",
+        "t": "Đang xác nhận email…"
+      },
+      "changed": {
+        "d": "Email đã được đổi sau khi gửi link này nên link không còn dùng được. Mở link trong email gửi gần nhất.",
+        "t": "Email của tài khoản đã đổi"
+      },
+      "expired": {
+        "d": "Link có hiệu lực 24 giờ và chỉ dùng được một lần. Nhờ Admin gửi lại email xác nhận.",
+        "t": "Link xác nhận đã hết hạn"
+      },
+      "missing": {
+        "d": "Link bị thiếu mã xác nhận. Mở lại đúng link trong email.",
+        "t": "Link xác nhận không hợp lệ"
+      },
+      "ok": {
+        "t": "Đã xác nhận email"
+      }
+    }
   },
   "auth": {
     "forgotPassword": "Quên mật khẩu",
@@ -240,6 +312,42 @@
     "password": "Mật khẩu",
     "rememberMe": "Ghi nhớ đăng nhập",
     "username": "Tên đăng nhập"
+  },
+  "aux": {
+    "err": {
+      "generic": "Đã xảy ra lỗi. Vui lòng thử lại."
+    },
+    "first": {
+      "ok": {
+        "btn": "Đăng nhập lại",
+        "d": "Đăng nhập lại bằng mật khẩu mới để tiếp tục làm việc."
+      }
+    },
+    "lang": "Ngôn ngữ",
+    "link": {
+      "exp": {
+        "d": "Link đặt lại mật khẩu chỉ dùng được một lần và có thời hạn. Nhờ Vice Manager hoặc Admin gửi link mới.",
+        "t": "Link đã hết hạn hoặc không hợp lệ"
+      }
+    },
+    "reset": {
+      "d": "Nhập mật khẩu mới cho tài khoản của bạn."
+    },
+    "theme": {
+      "dark": "Tối",
+      "light": "Sáng"
+    },
+    "toHome": "Về trang chủ",
+    "vf": {
+      "ok": {
+        "d": "Địa chỉ email của bạn đã được xác nhận thành công."
+      },
+      "title": "Xác nhận email",
+      "unknown": {
+        "d": "Có lỗi xảy ra, vui lòng thử lại.",
+        "t": "Xác nhận thất bại"
+      }
+    }
   },
   "card": {
     "comments": "{n} bình luận",
