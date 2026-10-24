@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getRedis } from '@/lib/redis';
 import { sendEmail } from '@/lib/email';
 import { randomBytes } from 'crypto';
-import type { UserWithRole, CreateUserInput, UpdateUserInput } from '../types';
+import { withoutPassword, type UserWithRole, type CreateUserInput, type UpdateUserInput } from '../types';
 import { userQueryService } from './user-query.service';
 import { notificationService } from '@/modules/notifications/services/notification.service';
 
@@ -119,7 +119,7 @@ class UserMutationService {
         metadata: { targetUserId: user.id, username: user.username } },
     });
 
-    return user;
+    return withoutPassword(user);
   }
 
   async update(id: string, data: UpdateUserInput, performedById: string): Promise<UserWithRole> {
@@ -177,7 +177,7 @@ class UserMutationService {
       );
     }
 
-    return user;
+    return withoutPassword(user);
   }
 
   async deactivate(id: string, performedById: string): Promise<UserWithRole> {
@@ -236,7 +236,7 @@ class UserMutationService {
     }
 
     await invalidateActiveCache(id);
-    return user;
+    return withoutPassword(user);
   }
 
   async deleteHard(id: string, performedById: string): Promise<UserWithRole> {
@@ -261,7 +261,7 @@ class UserMutationService {
         metadata: { targetUserId: id, username: deleted.username } },
     });
 
-    return deleted;
+    return withoutPassword(deleted);
   }
 
   async resetPassword(id: string, newPassword: string, performedById: string): Promise<void> {
