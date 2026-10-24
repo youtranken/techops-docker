@@ -41,6 +41,7 @@ export const INCLUDE = {
     'nt', // A3-2 trang Thông báo
     'pf', // A3-2 Hồ sơ của tôi
     'db', // A3-1 Tổng quan
+    'hd', // A3-3 Helpdesk (danh sách, ngăn chi tiết, hộp thoại, Nhập dữ liệu)
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
@@ -62,6 +63,8 @@ export const INCLUDE = {
     'pf.pb', 'pf.email.ok', 'pf.email.pending', 'pf.email.resend', 'pf.email.sent', 'pf.email.note', // A3-2: xác nhận email — Phase B
     'pf.av.rm', 'pf.saved.avRm', 'pf.pw.last', // A3-2: bỏ ảnh / ngày đổi mật khẩu — V1 không có
     'db.pv.', // thanh điều khiển preview Tổng quan
+    'hd.pv.', 'hd.reset.otpH', 'hd.dept.', 'hd.ty.', // A3-3: thanh điều khiển preview + dữ liệu mẫu
+    'hd.imp.jsonH', 'hd.imp.e.shape', // A3-3: có dấu { } không hợp lệ ICU → bản thoát ở extra-messages (hdx.imp.*)
   ],
 };
 

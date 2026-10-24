@@ -547,6 +547,344 @@
     "label": "Quy trình công việc",
     "mine": "{n} chờ bạn"
   },
+  "hd": {
+    "act": {
+      "assign": "Gán người",
+      "create": "Tạo công việc",
+      "del": "Xoá"
+    },
+    "as": {
+      "err": "Chọn người xử lý",
+      "hintMatch": "Đã chọn sẵn theo IT Support trên Helpdesk: {n}.",
+      "hintNoMatch": "IT Support “{n}” không khớp nhân sự nào, hãy chọn người.",
+      "hintNone": "Ticket chưa có IT Support trên Helpdesk.",
+      "label": "Người xử lý",
+      "pick": "Chọn người xử lý"
+    },
+    "attn": {
+      "t": "Cần chú ý"
+    },
+    "bulk": {
+      "clear": "Bỏ chọn",
+      "label": "Thao tác hàng loạt",
+      "n": "Đã chọn {n} ticket"
+    },
+    "col": {
+      "as": "Người xử lý",
+      "at": "Ngày tạo",
+      "req": "Người yêu cầu",
+      "status": "Trạng thái Helpdesk",
+      "ticket": "Ticket"
+    },
+    "cron": {
+      "errEmpty": "Nhập giờ chạy",
+      "errSame": "Trùng giờ với khung giờ 1",
+      "last": "Lần chạy tự động gần nhất: {t} · {r}",
+      "off": "Tắt",
+      "s1": "Khung giờ 1",
+      "s2": "Khung giờ 2 (tuỳ chọn)",
+      "save": "Lưu lịch",
+      "short": "Tự động: {t}",
+      "sub": "Tự lấy dữ liệu từ Helpdesk mỗi ngày, tối đa 2 khung giờ",
+      "sum": "Mỗi ngày lúc {t} (giờ Việt Nam).",
+      "sumOff": "Đã tắt đồng bộ tự động. Chỉ lấy dữ liệu khi bấm “Lấy dữ liệu ngay”.",
+      "time": "Giờ chạy",
+      "title": "Lịch tự động"
+    },
+    "dlg": {
+      "bAssign": {
+        "d": "Mỗi ticket sẽ thành một công việc Đã xong, giao cho cùng một người.",
+        "ok": "Gán và tạo {n} công việc",
+        "t": "Gán người cho {n} ticket"
+      },
+      "bCreate": {
+        "d": "Người xử lý lấy theo IT Support trên Helpdesk. Chỉ ticket đã hoàn thành và có IT Support khớp nhân sự mới được tạo; ticket còn lại được bỏ qua.",
+        "t": "Tạo công việc cho {n} ticket?"
+      },
+      "create": {
+        "d": "Công việc được tạo ở trạng thái Đã xong và giao cho người này. Ngày hoàn thành lấy theo Helpdesk.",
+        "t": "Tạo công việc từ ticket"
+      },
+      "del": {
+        "d": "Ticket bị xoá khỏi danh sách chờ, không thể hoàn tác. Nếu ticket vẫn còn trên Helpdesk, lần đồng bộ sau sẽ lấy lại."
+      },
+      "del1": {
+        "t": "Xoá ticket {id}?"
+      },
+      "delN": {
+        "ok": "Xoá {n} ticket",
+        "t": "Xoá {n} ticket?"
+      }
+    },
+    "dr": {
+      "label": "Chi tiết ticket"
+    },
+    "empty": {
+      "dBoss": "Bấm “Lấy dữ liệu ngay” để đồng bộ ticket từ Helpdesk.",
+      "dEmp": "Ticket sẽ hiện ở đây sau lần đồng bộ tiếp theo.",
+      "t": "Chưa có ticket nào"
+    },
+    "err": {
+      "timeout": "Không kết nối được Helpdesk API: ETIMEDOUT"
+    },
+    "f": {
+      "all": "Tất cả",
+      "apply": "Áp dụng",
+      "clear": "Xoá bộ lọc",
+      "errRange": "Ngày kết thúc phải sau ngày bắt đầu",
+      "from": "Từ ngày",
+      "it": "IT Support",
+      "itNone": "Chưa có IT Support",
+      "remove": "Bỏ lọc {f}",
+      "title": "Lọc ticket",
+      "to": "Đến ngày"
+    },
+    "hist": {
+      "btn": "Lịch sử",
+      "empty": "Chưa có lần đồng bộ nào.",
+      "line": "{a} công việc mới · {b} chờ gán · {c} bỏ qua · đã lấy {f}",
+      "sub": "5 lần gần nhất",
+      "title": "Lịch sử đồng bộ"
+    },
+    "imp": {
+      "api": "Helpdesk API",
+      "apiD": "Gọi trực tiếp hệ thống Helpdesk, chỉ lấy ticket của năm nay.",
+      "apiErrD": "Chưa có dữ liệu nào được nhập. Thử lại sau ít phút, hoặc dán dữ liệu JSON lấy từ Helpdesk.",
+      "apiErrT": "Helpdesk API không phản hồi",
+      "apiNote": "TechOps sẽ gọi Helpdesk API và cho bạn xem trước số ticket mới, trùng và lỗi trước khi nhập.",
+      "apiNoteV1": "TechOps gọi Helpdesk API và nhập ngay: ticket đã hoàn thành có IT Support khớp nhân sự được tạo công việc, còn lại vào danh sách chờ.",
+      "bNote": "Xem trước khi nhập (chạy thử) chưa có ở V1, cần API mới.",
+      "back": "Quay lại",
+      "btn": "Nhập dữ liệu",
+      "check": "Kiểm tra dữ liệu",
+      "doneT": "Đã nhập xong. Lần nhập được ghi vào lịch sử đồng bộ.",
+      "e": {
+        "big": "Tối đa 500 ticket mỗi lần (đang có {n})",
+        "empty": "Dán dữ liệu JSON vào ô trên",
+        "json": "JSON không hợp lệ, kiểm tra lại cú pháp",
+        "row": "Dòng không phải ticket",
+        "title": "Thiếu tiêu đề"
+      },
+      "errDetail": "Chi tiết lỗi",
+      "fetch": "Lấy và xem trước",
+      "fetching": "Đang gọi Helpdesk API…",
+      "fetchingD": "Tối đa 15 giây. Chưa có gì được ghi vào TechOps.",
+      "fetchingV1": "Tối đa 15 giây. Dữ liệu được nhập ngay khi lấy xong.",
+      "go": "Nhập {n} ticket",
+      "json": "Dán dữ liệu JSON",
+      "jsonD": "Dùng khi API không phản hồi: dán kết quả đã lấy từ Helpdesk.",
+      "jsonL": "Dữ liệu JSON",
+      "next": "Tiếp tục",
+      "nothing": "Không có ticket mới để nhập.",
+      "p": {
+        "dup": "Đã có, bỏ qua",
+        "dupD": "Ticket đã có trong TechOps",
+        "err": "Lỗi",
+        "errD": "Không nhập được, xem chi tiết bên dưới",
+        "new": "Tạo công việc ngay",
+        "newD": "Đã hoàn thành và IT Support khớp nhân sự",
+        "wait": "Vào danh sách chờ",
+        "waitD": "Chưa hoàn thành hoặc chưa rõ người xử lý"
+      },
+      "prevApi": "Helpdesk trả về {n} ticket, đã bỏ {f} ticket không thuộc năm nay.",
+      "prevJson": "Dữ liệu có {n} ticket.",
+      "prevNote": "Chưa có gì được ghi. Bấm nhập để lưu vào TechOps.",
+      "preview": "Xem trước",
+      "r": {
+        "dup": "Bỏ qua",
+        "dupD": "Đã có từ trước",
+        "err": "Lỗi",
+        "new": "Công việc mới",
+        "newD": "Đã tạo ở trạng thái Đã xong",
+        "wait": "Chờ gán",
+        "waitD": "Đã thêm vào danh sách chờ"
+      },
+      "runApi": "Lấy và nhập ngay",
+      "runJson": "Nhập dữ liệu",
+      "running": "Đang nhập…",
+      "runningD": "Đang tạo công việc và cập nhật danh sách chờ.",
+      "s1": "Chọn nguồn",
+      "s2": "Xem trước",
+      "s3": "Kết quả",
+      "sample": "Dán dữ liệu mẫu",
+      "srcL": "Lấy dữ liệu từ",
+      "steps": "Các bước",
+      "title": "Nhập dữ liệu Helpdesk",
+      "useJson": "Dán JSON thay thế"
+    },
+    "it": {
+      "nomatch": "Không khớp nhân sự TechOps",
+      "none": "Chưa có"
+    },
+    "kv": {
+      "created": "Ngày tạo",
+      "desc": "Diễn giải",
+      "done": "Ngày hoàn thành",
+      "imp": "Nhập vào lúc",
+      "it": "Người xử lý",
+      "itHd": "Helpdesk ghi: {n}",
+      "noTask": "Chưa tạo",
+      "req": "Người yêu cầu",
+      "sync": "Đồng bộ",
+      "task": "Công việc",
+      "type": "Loại yêu cầu",
+      "upd": "Cập nhật lúc"
+    },
+    "loadErr": {
+      "d": "Kiểm tra kết nối mạng rồi thử lại.",
+      "t": "Không tải được danh sách ticket"
+    },
+    "mode": {
+      "auto": "Tự động",
+      "manual": "Thủ công"
+    },
+    "more": "Thao tác khác",
+    "na": {
+      "back": "Về Tổng quan",
+      "d": "Nhờ Vice Manager hoặc Admin cấp menu Helpdesk cho bạn trong Phân quyền.",
+      "t": "Bạn chưa được cấp menu Helpdesk"
+    },
+    "none": {
+      "_": "Không có ticket nào",
+      "attn": "Không có ticket nào cần chú ý",
+      "d": "Thử bỏ bớt bộ lọc hoặc đổi từ khoá."
+    },
+    "note": {
+      "attn": "Ticket đã hoàn thành trên Helpdesk nhưng chưa có IT Support nên chưa có công việc tương ứng.",
+      "attnBoss": "Ticket đã hoàn thành trên Helpdesk nhưng chưa có IT Support nên chưa tạo được công việc. Chọn người xử lý để tạo.",
+      "nomatch": "IT Support “{n}” trên Helpdesk không khớp nhân sự nào trong TechOps. Khi tạo công việc, hãy chọn người xử lý.",
+      "pushed": "Đã tạo công việc {id} từ ticket này."
+    },
+    "openTask": "Mở công việc {id}",
+    "pb": {
+      "_": "Phase B",
+      "bulk": "V1 chỉ có “Đẩy tất cả sang công việc”. Tạo việc cho riêng các ticket đã chọn là Phase B.",
+      "s": "B",
+      "tip": "Phase B: cần backend mới hoặc đổi logic so với V1"
+    },
+    "pg": {
+      "next": "Trang sau",
+      "per": "{n} / trang",
+      "prev": "Trang trước",
+      "range": "{a} trên {n} ticket",
+      "size": "Số ticket mỗi trang"
+    },
+    "push": {
+      "d": "Tạo công việc cho {n} ticket đã hoàn thành có IT Support. Ticket đã có công việc sẽ được bỏ qua; IT Support không khớp nhân sự thì không tạo.",
+      "menu": "Đẩy tất cả sang công việc",
+      "ok": "Đẩy sang công việc",
+      "res": "Đã tạo {a} công việc · bỏ qua {b} (đã có) · {c} không tìm thấy người",
+      "t": "Đẩy ticket sang công việc?"
+    },
+    "res": {
+      "err": "{n} lỗi",
+      "line": "{a} công việc mới · {b} chờ gán · {c} bỏ qua"
+    },
+    "reset": {
+      "adminOnly": "Chỉ Quản trị viên (Admin) thực hiện được.",
+      "done": "Đã xoá {t} công việc và {p} ticket",
+      "e6": "Mã gồm 6 chữ số",
+      "eBad": "Mã không đúng hoặc đã hết hạn",
+      "l1": "{n} công việc có nguồn Helpdesk, kèm người được giao và nhật ký",
+      "l2": "Toàn bộ {n} ticket trong danh sách",
+      "l3": "Lịch tự động và lịch sử đồng bộ được giữ nguyên",
+      "menu": "Đặt lại dữ liệu…",
+      "ok": "Xoá dữ liệu",
+      "otpL": "Mã xác nhận",
+      "otpTo": "Để xác nhận, mã 6 số sẽ được gửi tới {e}, hiệu lực 10 phút.",
+      "resend": "Gửi lại mã",
+      "send": "Gửi mã xác nhận",
+      "sending": "Đang gửi mã…",
+      "sent": "Đã gửi mã xác nhận tới {e}",
+      "step2": "Nhập mã 6 số vừa gửi tới {e}.",
+      "title": "Đặt lại dữ liệu Helpdesk",
+      "warn": "Thao tác này xoá vĩnh viễn và không thể hoàn tác."
+    },
+    "search": "Tìm mã HD, tiêu đề, người yêu cầu",
+    "selOne": "Chọn {id}",
+    "selPage": "Chọn mọi ticket trên trang",
+    "src": "Ticket Helpdesk",
+    "st": {
+      "approved": "Đã duyệt",
+      "closed": "Đã đóng",
+      "done": "Hoàn thành",
+      "pending": "Chờ xử lý",
+      "progress": "Đang xử lý",
+      "rejected": "Từ chối"
+    },
+    "sub": {
+      "_": "{n} ticket từ hệ thống Helpdesk, {m} ticket chưa tạo công việc",
+      "attn": "{n} ticket từ hệ thống Helpdesk, {m} chưa tạo công việc, {a} cần chú ý"
+    },
+    "sync": {
+      "btn": "Lấy dữ liệu ngay",
+      "btnRun": "Đang lấy…",
+      "failed": "Đồng bộ không thành công",
+      "label": "Đồng bộ Helpdesk",
+      "last": "Đồng bộ lần cuối {t} · {m}",
+      "running": "Đang lấy dữ liệu từ Helpdesk…",
+      "runningD": "Có thể mất tới 15 giây. Bạn vẫn xem được danh sách."
+    },
+    "tabs": "Nhóm ticket",
+    "title": "Helpdesk",
+    "toast": {
+      "bAssign": "Đã tạo {n} công việc, giao cho {p}",
+      "bCreate": "Đã tạo {a} công việc, bỏ qua {b} ticket",
+      "created": "Đã tạo công việc {id} từ {hd}",
+      "cron": "Đã lưu lịch tự động: {t}",
+      "cronOff": "Đã tắt đồng bộ tự động",
+      "del1": "Đã xoá ticket {id}",
+      "delN": "Đã xoá {n} ticket",
+      "export": "Đang xuất {n} ticket ra Excel…",
+      "imported": "Nhập xong: {r}",
+      "synced": "Lấy xong: {r}"
+    },
+    "view": {
+      "all": "Tất cả",
+      "attn": "Cần chú ý",
+      "open": "Chưa tạo công việc",
+      "pushed": "Đã tạo công việc"
+    }
+  },
+  "hdx": {
+    "as": {
+      "loading": "Đang tải danh sách người…"
+    },
+    "bulk": {
+      "fail": "{n} ticket không thành công"
+    },
+    "cron": {
+      "loadErr": "Không tải được lịch tự động."
+    },
+    "export": {
+      "err": "Không xuất được Excel"
+    },
+    "hist": {
+      "loadErr": "Không tải được lịch sử đồng bộ."
+    },
+    "imp": {
+      "errList": "Ticket bị lỗi",
+      "failD": "Máy chủ báo lỗi bên dưới. Kiểm tra lại dữ liệu hoặc thử lại sau.",
+      "failT": "Nhập không thành công",
+      "jsonH": "Mảng ticket hoặc '{ success, data: [...] }', tối đa 500 ticket mỗi lần."
+    },
+    "note": {
+      "pushed": "Đã tạo công việc từ ticket này."
+    },
+    "push": {
+      "d": "Tạo công việc cho mọi ticket đã hoàn thành có IT Support trong danh sách. Ticket đã có công việc được bỏ qua; IT Support không khớp nhân sự thì không tạo.",
+      "err": "Lỗi ở ticket: {ids}"
+    },
+    "reset": {
+      "otpTo": "Để xác nhận, mã 6 số sẽ được gửi tới email của bạn.",
+      "sent": "Đã gửi mã xác nhận tới email của bạn",
+      "step2": "Nhập mã 6 số vừa gửi tới email của bạn."
+    },
+    "sync": {
+      "never": "Chưa đồng bộ lần nào"
+    },
+    "total": "Tổng cộng {n} ticket từ hệ thống Helpdesk"
+  },
   "idle": {
     "d": "Bạn không thao tác gần {m} phút. Tự đăng xuất sau",
     "expired": {

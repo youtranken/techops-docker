@@ -11,6 +11,4 @@ export type {
   CronConfig,
 } from './types';
 
-export { ImportSection }      from './sections/ImportSection';
-export { PushToTasksSection } from './sections/PushToTasksSection';
-export { TicketListSection }  from './sections/TicketListSection';
+export { HelpdeskPage } from './components/HelpdeskPage/HelpdeskPage';

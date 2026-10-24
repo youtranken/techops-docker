@@ -235,6 +235,24 @@ const vi = {
   'pfx.invalid': 'Giá trị chưa hợp lệ.',
   'pfx.lang.hint': 'Áp dụng ngay, lưu trên trình duyệt này.',
   'pfx.pol.loading': 'Đang tải yêu cầu mật khẩu…',
+  // ── A3-3 Helpdesk ──
+  'hdx.total': 'Tổng cộng {n} ticket từ hệ thống Helpdesk',
+  'hdx.note.pushed': 'Đã tạo công việc từ ticket này.',
+  'hdx.push.d': 'Tạo công việc cho mọi ticket đã hoàn thành có IT Support trong danh sách. Ticket đã có công việc được bỏ qua; IT Support không khớp nhân sự thì không tạo.',
+  'hdx.push.err': 'Lỗi ở ticket: {ids}',
+  'hdx.reset.otpTo': 'Để xác nhận, mã 6 số sẽ được gửi tới email của bạn.',
+  'hdx.reset.step2': 'Nhập mã 6 số vừa gửi tới email của bạn.',
+  'hdx.reset.sent': 'Đã gửi mã xác nhận tới email của bạn',
+  'hdx.sync.never': 'Chưa đồng bộ lần nào',
+  'hdx.export.err': 'Không xuất được Excel',
+  'hdx.imp.failT': 'Nhập không thành công',
+  'hdx.imp.failD': 'Máy chủ báo lỗi bên dưới. Kiểm tra lại dữ liệu hoặc thử lại sau.',
+  'hdx.imp.errList': 'Ticket bị lỗi',
+  'hdx.bulk.fail': '{n} ticket không thành công',
+  'hdx.as.loading': 'Đang tải danh sách người…',
+  'hdx.hist.loadErr': 'Không tải được lịch sử đồng bộ.',
+  'hdx.cron.loadErr': 'Không tải được lịch tự động.',
+  'hdx.imp.jsonH': "Mảng ticket hoặc '{ success, data: [...] }', tối đa 500 ticket mỗi lần.",
 };
 
 const en = {
@@ -462,6 +480,24 @@ const en = {
   'pfx.invalid': 'This value isn’t valid.',
   'pfx.lang.hint': 'Applies right away and is saved in this browser.',
   'pfx.pol.loading': 'Loading password requirements…',
+  // ── A3-3 Helpdesk ──
+  'hdx.total': '{n} tickets from Helpdesk in total',
+  'hdx.note.pushed': 'A task was created from this ticket.',
+  'hdx.push.d': 'Creates tasks for every completed ticket in the list that has an IT Support. Tickets that already have a task are skipped; no task is created when the IT Support doesn’t match a person.',
+  'hdx.push.err': 'Errors on tickets: {ids}',
+  'hdx.reset.otpTo': 'To confirm, a 6-digit code will be sent to your email.',
+  'hdx.reset.step2': 'Enter the 6-digit code sent to your email.',
+  'hdx.reset.sent': 'Verification code sent to your email',
+  'hdx.sync.never': 'Never synced',
+  'hdx.export.err': 'Couldn’t export to Excel',
+  'hdx.imp.failT': 'Import failed',
+  'hdx.imp.failD': 'The server reported the error below. Check the data or try again later.',
+  'hdx.imp.errList': 'Tickets with errors',
+  'hdx.bulk.fail': '{n} tickets failed',
+  'hdx.as.loading': 'Loading people…',
+  'hdx.hist.loadErr': 'Couldn’t load sync history.',
+  'hdx.cron.loadErr': 'Couldn’t load the sync schedule.',
+  'hdx.imp.jsonH': "An array of tickets or '{ success, data: [...] }', up to 500 tickets at a time.",
 };
 
 export const EXTRA = { vi, en };

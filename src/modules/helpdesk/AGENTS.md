@@ -18,29 +18,26 @@ helpdesk/
     helpdesk-pending.service.ts         # list(), filterOptions(), assign(), delete()
 
   hooks/
-    useHelpdeskPending.ts               # useHelpdeskPending, useHelpdeskFilterOptions
-    useHelpdeskMutations.ts             # useAssignHelpdesk, useDeleteHelpdesk
-    useHelpdeskSync.ts                  # useHelpdeskSync
-    usePushToTasks.ts                   # usePushToTasks
+    useHelpdeskPending.ts               # useHelpdeskPending, useHelpdeskFilterOptions (URL từ hd-logic.pendingUrl)
+    useHelpdeskMutations.ts             # gán / xoá 1 hoặc nhiều ticket (BulkError đếm cả HTTP lỗi)
+    useHelpdeskSync.ts                  # useHelpdeskSync (POST /sync: không body = Get từ API, { manualData } = nhập JSON), useHelpdeskSyncLogs
+    useHelpdeskCronConfig.ts            # lịch tự động 2 khung giờ
+    useHelpdeskReset.ts                 # gửi OTP + đặt lại dữ liệu (chỉ ADMIN)
+    useAssignableUsers.ts               # người nhận việc (/api/tasks/assignable-users)
+    usePushToTasks.ts                   # đẩy tất cả ticket hoàn thành sang công việc
 
-  components/
-    import/ManualImportCard.tsx         # Card nhập JSON thủ công từ API
-    sync/SyncStatusCard.tsx             # Card auto-sync
-    tickets/
-      HelpdeskTicketTable.tsx           # Bảng danh sách ticket
-      HelpdeskTicketRow.tsx             # 1 hàng trong bảng
-      StatusBadge.tsx                   # Badge trạng thái ticket + ưu tiên
-    modals/
-      AssignHelpdeskModal.tsx           # Modal gán IT Support
-
-  sections/
-    ImportSection.tsx                   # Wraps ManualImportCard
-    PushToTasksSection.tsx              # Card đẩy ticket sang Task
-    ResetSection.tsx                    # Card xóa dữ liệu test
-    TicketListSection.tsx               # Filter bar + bảng + pagination
-
-  mocks/
-    helpdesk-mock-data.ts               # Dữ liệu mẫu để test
+  components/HelpdeskPage/              # Trang /helpdesk V2 (A3-3, preview docs/previews/ds-v2/helpdesk.html)
+    HelpdeskPage.tsx                    # ghép trang: đầu trang, khu đồng bộ, tìm + lọc, bảng, phân trang, hộp thoại
+    hd-logic.ts                         # logic thuần: URL danh sách/xuất Excel, bộ lọc, chọn nhiều, lịch, nhập JSON, OTP
+    __tests__/                          # hd-logic.test.ts + v1-helpdesk.fixture.ts (bản sao logic V1 để đối chiếu)
+    HdTable.tsx · HdCells.tsx           # bảng ticket (DataTable) · trạng thái / cờ ưu tiên dịch từ giá trị gốc
+    HdFilters.tsx · HdBulkBar.tsx       # ô tìm, hộp "Lọc ticket", chip · thanh hàng loạt
+    HdSyncBar.tsx                       # khu đồng bộ (Boss/Admin)
+    HdTicketDrawer.tsx                  # ngăn chi tiết ticket
+    HdAssignDialog.tsx                  # gán người (1 ticket = "Tạo công việc" / hàng loạt)
+    HdImportDialog.tsx                  # Nhập dữ liệu: Helpdesk API hoặc dán JSON → kết quả
+    HdCronDialog.tsx · HdHistoryDrawer.tsx · HdResetDialog.tsx
+    useHdActions.ts                     # đồng bộ, xuất Excel, gán/xoá, đẩy tất cả (+ xác nhận, thông báo)
 ```
 
 ## API Routes (src/app/api/integrations/helpdesk/)
@@ -52,7 +49,8 @@ helpdesk/
 | `/unassigned/[id]` | POST | Gán IT Support |
 | `/unassigned/[id]` | DELETE | Xóa ticket khỏi danh sách |
 | `/push-to-tasks` | POST | Đẩy ticket Completed sang Task |
-| `/reset` | DELETE | Xóa hết dữ liệu (chỉ dùng khi test) |
+| `/reset` | DELETE | Xóa hết dữ liệu (chỉ ADMIN, cần OTP từ `/reset/request-otp`) |
+| `/cron-config` | GET/POST | Lịch tự động 2 khung giờ |
 
 ## Logic nghiệp vụ quan trọng
 
@@ -81,8 +79,9 @@ JSON input
 ### Ticket được hiển thị trong Danh sách
 
 **Tất cả** records trong `HelpdeskPendingTask` đều hiển thị, kể cả `PUSHED`.
-- Row `PUSHED`: nền xanh nhạt, badge "✓ Đã tạo Task", không có nút thao tác
-- Row `UNASSIGNED`: bình thường, có nút "Gán người" và "Xóa"
+- Dòng `PUSHED`: chữ "✓ Đã tạo công việc" dưới tiêu đề, không có ô chọn, ngăn chi tiết không có nút.
+- Dòng `UNASSIGNED` đã hoàn thành mà chưa có IT Support: nền đỏ nhạt + biểu tượng "Cần chú ý".
+- Bấm dòng → ngăn chi tiết; Boss/Admin có [Xoá] và [Tạo công việc] (= "Gán người" V1). Nhân viên chỉ xem.
 
 ## Điểm cần lưu ý khi sửa code
 
@@ -109,7 +108,7 @@ JSON input
 2. Logic nghiệp vụ → `ticket-processor.service.ts` hoặc `helpdesk-pending.service.ts`
 3. API endpoint mới → tạo file trong `src/app/api/integrations/helpdesk/`
 4. Hook mới → `hooks/useHelpdeskMutations.ts` hoặc file hook mới
-5. UI mới → component trong `components/[domain]/`, section trong `sections/`
+5. UI mới → `components/HelpdeskPage/` (logic thuần vào `hd-logic.ts` + test đối chiếu V1)
 6. Chạy `npx tsc --noEmit` verify
 
 ## Cron Job tự động (`src/lib/cron/helpdesk-sync.ts`)

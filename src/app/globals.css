@@ -301,6 +301,26 @@
   }
 }
 
+/* ===================== Helpdesk V2 (A3-3) =====================
+ * Bảng `.v2-hd` (helpdesk/components/HelpdeskPage/HdTable.tsx) theo preview helpdesk: dòng 2 tầng (tiêu đề + mã) cao 52,
+ * dòng "cần chú ý" (đã hoàn thành, chưa có IT Support) nền đỏ nhạt, dòng đang chọn nền primary-soft.
+ */
+@layer components {
+  .v2-hd .v2-thead,
+  .v2-hd .v2-tr { column-gap: 16px; padding: 0 12px 0 20px; }
+  .v2-hd .v2-tr { min-height: 52px; padding-top: 5px; padding-bottom: 5px; }
+  .v2-hd .v2-tr.hd-attn { background: color-mix(in srgb, var(--danger) 6%, var(--surface)); }
+  .v2-hd .v2-tr.hd-attn:hover { background: color-mix(in srgb, var(--danger) 10%, var(--surface)); }
+  .v2-hd .v2-tr.hd-on { background: color-mix(in srgb, var(--primary-soft) 55%, var(--surface)); }
+  @media (max-width: 1023px) {
+    .v2-hd .v2-thead,
+    .v2-hd .v2-tr { column-gap: 14px; padding: 0 12px 0 16px; }
+  }
+  @media (max-width: 680px) {
+    .v2-hd .v2-tr { padding: 10px 12px 12px 16px; row-gap: 4px; column-gap: 12px; }
+  }
+}
+
 /* ===================== Khung app V2 (A1-4) =====================
  * Vùng nội dung (preview `.content`): padding 20 · 24 ngang (--content-px) · ≤1023: 16.
  * Đáy 24 (preview để 88 vì có thanh điều khiển xem trước — app thật không có).
