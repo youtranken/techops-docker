@@ -28,7 +28,7 @@ export const E2E_EXTRA_USERNAMES = ['e2e_pw', 'e2e_hrnew'];
 const usernames = [...Object.values(E2E_USERS).map((u) => u.username), ...E2E_EXTRA_USERNAMES].map((u) => `'${u}'`).join(',');
 
 /** Xoá toàn bộ dữ liệu [E2E]: task do user E2E tạo (cascade assignee/report/comment/audit/view), user
- *  (cascade thông báo + quyền menu SidebarPermission), mức ưu tiên [E2E]. */
+ *  (cascade thông báo + quyền menu SidebarPermission), mức ưu tiên / loại công việc / mẫu hoàn thành [E2E]. */
 export function cleanupE2E() {
   psql(`
     DELETE FROM "Task" WHERE "creatorId" IN (SELECT id FROM "User" WHERE username IN (${usernames}))
@@ -42,5 +42,9 @@ export function cleanupE2E() {
     -- mức ưu tiên tạo trong E2E (chưa gắn task nào)
     DELETE FROM "Priority" WHERE name LIKE '[E2E]%'
       AND NOT EXISTS (SELECT 1 FROM "Task" t WHERE t."priorityId" = "Priority".id);
+    -- loại công việc + mẫu hoàn thành tạo trong E2E (settings-v2.spec.ts)
+    DELETE FROM "TaskType" WHERE name LIKE '[E2E]%'
+      AND NOT EXISTS (SELECT 1 FROM "Task" t WHERE t."typeId" = "TaskType".id);
+    DELETE FROM "ReportTemplate" WHERE title LIKE '[E2E]%';
   `);
 }

@@ -1985,6 +1985,531 @@
     "boss": "Vice Manager",
     "emp": "Staff"
   },
+  "set": {
+    "added": "Added “{x}”.",
+    "adminOnly": "Admins only",
+    "clearAll": "Clear all",
+    "col": {
+      "act": "Actions",
+      "cat": "Category",
+      "def": "Default",
+      "desc": "Description",
+      "level": "Level",
+      "name": "Name",
+      "notif": "Notification",
+      "status": "Status",
+      "subject": "Email subject",
+      "title": "Title",
+      "type": "Task type",
+      "used": "In use"
+    },
+    "d": {
+      "digest": "Automatically email a summary of task status. With no recipients chosen, it goes to Vice Managers.",
+      "emails": "Subject and body of the email for each notification type.",
+      "general": "System-wide settings.",
+      "notifications": "Choose which events send an email to people in the system.",
+      "overdue": "Send a daily email about tasks that are past due and not done.",
+      "priorities": "Priority levels used when creating tasks. Higher numbers sort first.",
+      "security": "Sign-in limits, password policy and sessions.",
+      "smtp": "The server that sends every TechOps email.",
+      "templates": "Prefilled text offered when an assignee reports a task as done.",
+      "types": "Categories used for filtering, reports and suggesting completion templates."
+    },
+    "dc": {
+      "DEADLINE_SOON": {
+        "_": "Due soon",
+        "d": "Tasks due within the next 2 days"
+      },
+      "IN_PROGRESS": {
+        "_": "In progress",
+        "d": "What each person is working on"
+      },
+      "OVERDUE": {
+        "_": "Overdue",
+        "d": "Past-due tasks that aren’t done"
+      },
+      "PENDING_APPROVAL": {
+        "_": "Awaiting approval",
+        "d": "Tasks waiting for a Vice Manager or Admin to approve"
+      },
+      "SUMMARY_BY_EMPLOYEE": {
+        "_": "Summary by person",
+        "d": "In progress, done and overdue counts per person"
+      }
+    },
+    "del": "Delete",
+    "delD": {
+      "_": "Nothing uses this yet. Deleting can’t be undone.",
+      "tpl": "Assignees won’t see this template when reporting anymore. Deleting can’t be undone."
+    },
+    "delQ": "Delete “{x}”?",
+    "delX": "Delete “{x}”",
+    "deleted": "Deleted “{x}”.",
+    "dg": {
+      "content": "Content",
+      "contentH": "Sections included in the digest.",
+      "days": "Also on these days",
+      "greet": "Greeting",
+      "master": "Send scheduled digest",
+      "masterH": "Emails a summary on the schedule below.",
+      "monthly": "Monthly",
+      "monthlyH": "Last day of the month",
+      "noMail": "No email",
+      "period": "Recurring",
+      "rcp": "Recipients",
+      "rcpAll": "Default: all Vice Managers",
+      "rcpH": "If no one is selected, it goes to all active Vice Managers.",
+      "rcpN": "{n} selected",
+      "rcpNone": "No users found.",
+      "rcpQ": "Search by name or email",
+      "sched": "Schedule",
+      "sent": "Test email sent to {e}.",
+      "subj": "Email subject",
+      "subjH": "Use {v} to insert the send date.",
+      "sumM": "at month end",
+      "sumNone": "No schedule selected.",
+      "sumW": "every Monday",
+      "test": "Send test",
+      "testH": "The test uses the saved settings and current data.",
+      "testTo": "Send a test to",
+      "tpl": "Email template",
+      "warnContent": "The digest is on but no content is selected, so the email would be empty.",
+      "warnSched": "The digest is on but has no schedule, so it won’t run. Pick weekly, monthly or at least one day.",
+      "weekly": "Weekly",
+      "weeklyH": "Monday morning"
+    },
+    "dirty": "You have unsaved changes",
+    "dl": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "ds": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "edit": "Edit",
+    "editX": "Edit “{x}”",
+    "em": {
+      "body": "Body (HTML)",
+      "custom": "Customized",
+      "default": "Default",
+      "dlgSub": "Email template",
+      "edit": "Edit",
+      "insert": "Insert at cursor",
+      "isDefault": "Using the system default.",
+      "note": "Default templates come with the system; editing one makes it customized.",
+      "prev": "Preview",
+      "save": "Save template",
+      "subject": "Subject",
+      "vars": "Insertable variables",
+      "varsH": "Click a variable to insert it into the subject or body.",
+      "view": "View"
+    },
+    "err": {
+      "formD": "The form is locked so default values can’t overwrite the settings in use.",
+      "formT": "Couldn’t load settings",
+      "listD": "Check your connection and try again.",
+      "listT": "Couldn’t load the list"
+    },
+    "g": {
+      "notif": "Notifications",
+      "sys": "System",
+      "work": "Work"
+    },
+    "gen": {
+      "legacy": "legacy",
+      "pendingNote": "This page exists in V1 but isn’t in any menu (orphan route /settings/general). Waiting for the owner to decide whether to keep it.",
+      "tz": "System time zone",
+      "tzH": "Affects email schedules, reminders and displayed times. Applies after the server restarts.",
+      "tzT": "Time"
+    },
+    "hour": "Hour",
+    "ic": {
+      "Bug": "Bug",
+      "Cloud": "Cloud",
+      "Code": "Code",
+      "Cpu": "CPU",
+      "Database": "Database",
+      "FileText": "Document",
+      "Globe": "Globe",
+      "HardDrive": "Hard drive",
+      "LayoutGrid": "Grid",
+      "Lock": "Lock",
+      "Mail": "Mail",
+      "Monitor": "Monitor",
+      "Network": "Network",
+      "Package": "Package",
+      "Phone": "Phone",
+      "Printer": "Printer",
+      "Server": "Server",
+      "Settings": "Gear",
+      "Shield": "Shield",
+      "Terminal": "Terminal",
+      "Users": "Users",
+      "Wifi": "Wi-Fi",
+      "Wrench": "Wrench",
+      "Zap": "Lightning"
+    },
+    "inUse": {
+      "d": "It’s used by {n}. Move those tasks to another option first, then delete it.",
+      "see": "View {n} tasks",
+      "t": "Can’t delete “{x}” yet"
+    },
+    "leave": {
+      "d": "“{s}” has unsaved changes. They will be lost if you switch sections.",
+      "ok": "Discard changes",
+      "t": "Discard unsaved changes?"
+    },
+    "min1": "Keep at least one selected.",
+    "minute": "Minute",
+    "moreX": "More actions for “{x}”",
+    "nSel": "{a} of {b} selected",
+    "nTasks": "{n} tasks",
+    "na": {
+      "d": "You haven’t been given this section. Ask an Admin if you need it.",
+      "dAdmin": "This section is for Admins only.",
+      "t": "You don’t have access to this section"
+    },
+    "nav": {
+      "empNote": "Other sections are managed by Vice Managers and Admins.",
+      "label": "Settings sections",
+      "pick": "Section"
+    },
+    "nt": {
+      "ALL_FAILED": {
+        "_": "All assignees declined",
+        "d": "When everyone assigned declines the task"
+      },
+      "COMMENT_ADDED": {
+        "_": "New comment",
+        "d": "Only to people @mentioned in the comment"
+      },
+      "DEADLINE_REMINDER": {
+        "_": "Due date reminder",
+        "d": "3 days before the due date, at 08:00"
+      },
+      "EXTENSION_APPROVED": {
+        "_": "Extension approved",
+        "d": "When an extension is approved"
+      },
+      "EXTENSION_REJECTED": {
+        "_": "Extension declined",
+        "d": "When an extension is declined"
+      },
+      "EXTENSION_REQUESTED": {
+        "_": "Extension requested",
+        "d": "When an assignee asks for more time"
+      },
+      "PLAN_APPROVAL_REQUESTED": {
+        "_": "Approval requested",
+        "d": "When someone submits a task for approval"
+      },
+      "REVIEW_REQUIRED": {
+        "_": "Ready for review",
+        "d": "When an assignee reports a task as done"
+      },
+      "REVISION_REQUIRED": {
+        "_": "Rework requested",
+        "d": "When results need rework"
+      },
+      "TASK_APPROVED": {
+        "_": "Task approved",
+        "d": "When a Vice Manager approves a task"
+      },
+      "TASK_ASSIGNED": {
+        "_": "Task assigned",
+        "d": "When a task is assigned to you"
+      },
+      "TASK_COMPLETED": {
+        "_": "Task completed",
+        "d": "When results are accepted and the task is done"
+      },
+      "TASK_REJECTED": {
+        "_": "Task rejected",
+        "d": "When a Vice Manager rejects a task"
+      },
+      "TRANSFER_RECEIVED": {
+        "_": "Task handed over",
+        "d": "When a task is handed over to you"
+      },
+      "f": {
+        "all": "All"
+      },
+      "filter": "Filter by recipient",
+      "master": "Email notifications",
+      "masterH": "Turn off to stop all notification emails.",
+      "masterRo": "Turned on or off for everyone by an Admin or Vice Manager.",
+      "offNote": "Notification email is off. These choices are kept and apply when it’s turned back on.",
+      "roNote": "Admins and Vice Managers manage this for everyone. You can only view it.",
+      "types": "Events that send email",
+      "typesH": "Applies to everyone; the right column shows who receives it.",
+      "typesHe": "Emails you get when something involves you."
+    },
+    "oc": {
+      "IN_PROGRESS": {
+        "_": "In progress",
+        "d": "Past due and still in progress"
+      },
+      "PENDING_APPROVAL": {
+        "_": "Awaiting approval",
+        "d": "Past due and still not approved"
+      },
+      "PENDING_REVIEW": {
+        "_": "Awaiting review",
+        "d": "Past due, results not reviewed yet"
+      },
+      "WAITING_ACKNOWLEDGE": {
+        "_": "Waiting to be accepted",
+        "d": "Past due and nobody has accepted it"
+      }
+    },
+    "off": "Off",
+    "oi": {
+      "OVERDUE": {
+        "_": "Overdue, not done",
+        "d": "That person’s tasks that are past due"
+      },
+      "PENDING_ACK": {
+        "_": "Not accepted and past due",
+        "d": "Assigned but not accepted yet"
+      },
+      "UPCOMING": {
+        "_": "Due within 24 hours",
+        "d": "Only for tasks that run a day or longer"
+      }
+    },
+    "on": "On",
+    "ov": {
+      "cat": "Summary email to Vice Managers and Admins",
+      "catH": "Lists past-due tasks in these statuses.",
+      "days": "Send on",
+      "ind": "Personal emails to assignees",
+      "indH": "Each person gets one email about their own tasks.",
+      "master": "Send overdue reminders",
+      "masterH": "Sent once on each selected day.",
+      "warnDays": "Reminders are on but no days are selected, so nothing will be sent."
+    },
+    "pending": {
+      "_": "Awaiting decision",
+      "short": "Pending"
+    },
+    "pri": {
+      "add": "Add priority",
+      "addT": "Add priority",
+      "color": "Color",
+      "def": "Make default",
+      "defDelD": "Make another priority the default first, then delete this one.",
+      "defDelT": "Can’t delete the default priority",
+      "defH": "Only one priority can be the default; the current default is cleared.",
+      "isDef": "Default",
+      "levelH": "1 to 10; higher means more urgent (Low 1 → Urgent 4).",
+      "namePh": "e.g. Urgent",
+      "note": "The default priority is preselected on new tasks.",
+      "pick": "Pick a color"
+    },
+    "pw": {
+      "hide": "Hide password",
+      "show": "Show password"
+    },
+    "range": "{a}–{b}",
+    "ro": {
+      "_": "View only",
+      "short": "View only"
+    },
+    "s": {
+      "digest": "Scheduled digest",
+      "emails": "Email templates",
+      "general": "General",
+      "notifications": "Notifications",
+      "overdue": "Overdue reminders",
+      "priorities": "Priorities",
+      "security": "Security",
+      "smtp": "Email (SMTP)",
+      "templates": "Completion templates",
+      "types": "Task types"
+    },
+    "save": "Save changes",
+    "saveBtn": "Save",
+    "saved": {
+      "_": "{s} saved.",
+      "restart": "Saved. The new time zone applies after the server restarts."
+    },
+    "saving": "Saving…",
+    "sec": {
+      "api": "API request limit",
+      "apiH": "per IP",
+      "exp": "Expires after",
+      "expH": "0 = never; reminder 3 days before",
+      "idle": "Sign out after inactivity",
+      "idleH": "since the last activity",
+      "lock": "Lockout time",
+      "lockH": "temporary lock after too many attempts",
+      "login": "Max failed sign-ins",
+      "loginH": "recommended 5–10",
+      "max": "Maximum session length",
+      "maxH": "expires even while active",
+      "minLen": "Minimum length",
+      "minLenH": "recommended 8–12",
+      "multi": "Allow multiple devices",
+      "multiPB": "V1 stores this but doesn’t enforce it. Real support is Phase B (needs session tracking and revocation).",
+      "pw": "Password policy",
+      "pwH": "Rules for setting or changing a password.",
+      "req": "Password must include",
+      "requireLowercase": {
+        "_": "A lowercase letter",
+        "d": "e.g. a, b, c"
+      },
+      "requireNumber": {
+        "_": "A number",
+        "d": "e.g. 0, 1, 2"
+      },
+      "requireSpecialChar": {
+        "_": "A special character",
+        "d": "e.g. ! @ # $ %"
+      },
+      "requireUppercase": {
+        "_": "An uppercase letter",
+        "d": "e.g. A, B, C"
+      },
+      "reset": "Reset to defaults",
+      "resetQ": "Reset to defaults?",
+      "rl": "Rate limiting",
+      "rlH": "Blocks password guessing by limiting attempts and requests.",
+      "rlOn": "Enable rate limiting",
+      "rlOnH": "Only turn off in development.",
+      "ss": "Sessions",
+      "ssH": "Automatic sign-out and session length.",
+      "warn": "Changes apply to every user. Limits that are too strict can make signing in difficult."
+    },
+    "selAll": "Select all",
+    "selAllN": "Select all ({n})",
+    "sending": "Sending…",
+    "sm": {
+      "active": "Sending enabled",
+      "activeH": "Turn off to pause all system email.",
+      "auth": "Server sign-in",
+      "badRes": "Timed out connecting to {h}. Check the host, port and SSL/TLS.",
+      "badT": "Couldn’t connect.",
+      "fromEmail": "From address",
+      "fromName": "Display name",
+      "host": "SMTP host",
+      "none": "Not set up",
+      "ok": "Active",
+      "okRes": "Connected — test email sent to {e} at {t}.",
+      "pass": "App password",
+      "passKeep": "Leave blank to keep the saved password.",
+      "passNew": "The app password from your email provider.",
+      "paused": "Paused",
+      "port": "Port",
+      "sender": "Sender",
+      "server": "Server",
+      "ssl": "Use SSL/TLS",
+      "sslOff": "Using STARTTLS, usually port 587.",
+      "sslOn": "Using SSL/TLS, usually port 465.",
+      "test": "Test connection",
+      "testBtn": "Send test email",
+      "testH": "Sends a test email using the saved settings.",
+      "testNeedConf": "Save the SMTP settings before testing.",
+      "testTo": "Recipient",
+      "testing": "Testing…",
+      "user": "Account (email)"
+    },
+    "sub": "Shared configuration for the whole IT team.",
+    "sumAt": "Sends {d} at {t}",
+    "testDirty": "Save your changes first — test emails use the saved settings.",
+    "time": "Send time",
+    "title": "Settings",
+    "to": "To: {w}",
+    "tpl": {
+      "activeL": "Offer this template when reporting",
+      "add": "Add template",
+      "addT": "Add completion template",
+      "allTypes": "All types",
+      "catPh": "e.g. Technical",
+      "content": "Template text",
+      "contentH": "Assignees can edit the text when reporting.",
+      "contentPh": "What the assignee should fill in when reporting…",
+      "emptyD": "Add one so assignees can report faster and more completely.",
+      "emptyT": "No completion templates yet",
+      "hidden": "Hid “{x}”.",
+      "hide": "Hide template",
+      "note": "Hidden templates aren’t offered when reporting but keep their content.",
+      "off": "Hidden",
+      "on": "Active",
+      "show": "Use template again",
+      "shown": "“{x}” is active again.",
+      "titlePh": "e.g. Hardware replacement record",
+      "typeH": "Only suggested for tasks of this type."
+    },
+    "typ": {
+      "add": "Add type",
+      "addT": "Add task type",
+      "descPh": "Short description",
+      "icon": "Icon",
+      "namePh": "e.g. Software"
+    },
+    "tz7": "Vietnam time (UTC+7)",
+    "u": {
+      "chars": "characters",
+      "days": "days",
+      "hours": "hours",
+      "min": "min",
+      "rpm": "requests/min",
+      "times": "attempts"
+    },
+    "undo": "Discard",
+    "undone": "Changes discarded.",
+    "updated": "Saved “{x}”.",
+    "v": {
+      "dup": "This name already exists.",
+      "fix": "{n} fields need fixing.",
+      "hex": "Use a hex color like #RRGGBB.",
+      "int": "Enter a whole number.",
+      "mail": "Enter a valid email address.",
+      "range": "Enter a number from {a} to {b}.",
+      "req": "This field is required."
+    },
+    "wk": {
+      "off": "Clear weekdays",
+      "on": "Weekdays"
+    }
+  },
+  "setx": {
+    "dg": {
+      "schedH": "Vietnam time (UTC+7). You can combine recurring and weekday options."
+    },
+    "inUse": {
+      "see": "View these tasks"
+    },
+    "nt": {
+      "roNote": "You can only view which notification emails you get. An Admin or Manager can change them."
+    },
+    "ov": {
+      "schedH": "Sent once on each selected day, Vietnam time (UTC+7)."
+    },
+    "sec": {
+      "multiNote": "Currently stored only; not enforced at sign-in yet.",
+      "resetD": "All security settings are overwritten with the defaults right away. Unsaved changes are lost.",
+      "resetDone": "Security settings reset to defaults."
+    },
+    "sm": {
+      "pickTo": "Choose a recipient…",
+      "tabs": "Email settings"
+    },
+    "v": {
+      "max": "Up to {n} characters."
+    }
+  },
   "st": {
     "CANCELLED": "Cancelled",
     "COMPLETED": "Done",

@@ -343,6 +343,17 @@ const vi = {
   'lgx.g.other': 'Khác',
   'lgx.dr.cmPB': 'Log V1 chỉ lưu mã bình luận, không lưu nội dung.',
   'lgx.dr.raw': 'Chuỗi lưu sẵn trong log (chưa dịch)',
+  // ── A3-7 Cài đặt (câu không có trong copy.js / bản đúng V1) ──
+  'setx.v.max': 'Tối đa {n} ký tự.',
+  'setx.inUse.see': 'Xem các công việc này',
+  'setx.nt.roNote': 'Bạn chỉ xem được những email thông báo mình đang nhận. Quản trị viên hoặc Quản lý điều chỉnh khi cần.',
+  'setx.dg.schedH': 'Giờ Việt Nam (UTC+7). Có thể chọn cả định kỳ và các ngày trong tuần.',
+  'setx.ov.schedH': 'Gửi một lần vào mỗi ngày đã chọn, giờ Việt Nam (UTC+7).',
+  'setx.sm.tabs': 'Cấu hình email',
+  'setx.sm.pickTo': 'Chọn người nhận…',
+  'setx.sec.resetD': 'Toàn bộ cấu hình bảo mật được ghi về giá trị mặc định ngay khi bấm. Các thay đổi chưa lưu sẽ mất.',
+  'setx.sec.resetDone': 'Đã đặt lại cấu hình bảo mật về mặc định.',
+  'setx.sec.multiNote': 'Hiện chỉ được lưu lại, chưa có tác dụng khi đăng nhập.',
 };
 
 const en = {
@@ -678,6 +689,17 @@ const en = {
   'lgx.g.other': 'Other',
   'lgx.dr.cmPB': 'V1 logs store only the comment ID, not its text.',
   'lgx.dr.raw': 'Text stored in the log as is (not translated)',
+  // ── A3-7 Settings ──
+  'setx.v.max': 'Up to {n} characters.',
+  'setx.inUse.see': 'View these tasks',
+  'setx.nt.roNote': 'You can only view which notification emails you get. An Admin or Manager can change them.',
+  'setx.dg.schedH': 'Vietnam time (UTC+7). You can combine recurring and weekday options.',
+  'setx.ov.schedH': 'Sent once on each selected day, Vietnam time (UTC+7).',
+  'setx.sm.tabs': 'Email settings',
+  'setx.sm.pickTo': 'Choose a recipient…',
+  'setx.sec.resetD': 'All security settings are overwritten with the defaults right away. Unsaved changes are lost.',
+  'setx.sec.resetDone': 'Security settings reset to defaults.',
+  'setx.sec.multiNote': 'Currently stored only; not enforced at sign-in yet.',
 };
 
 export const EXTRA = { vi, en };

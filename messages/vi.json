@@ -1985,6 +1985,531 @@
     "boss": "Vice Manager",
     "emp": "Nhân viên"
   },
+  "set": {
+    "added": "Đã thêm “{x}”.",
+    "adminOnly": "Chỉ Quản trị viên",
+    "clearAll": "Bỏ chọn tất cả",
+    "col": {
+      "act": "Thao tác",
+      "cat": "Danh mục",
+      "def": "Mặc định",
+      "desc": "Mô tả",
+      "level": "Mức",
+      "name": "Tên",
+      "notif": "Loại thông báo",
+      "status": "Trạng thái",
+      "subject": "Tiêu đề email",
+      "title": "Tiêu đề",
+      "type": "Loại công việc",
+      "used": "Đang dùng"
+    },
+    "d": {
+      "digest": "Tự động gửi email tổng hợp tình trạng công việc. Không chọn người nhận thì gửi cho Vice Manager.",
+      "emails": "Tiêu đề và nội dung email cho từng loại thông báo.",
+      "general": "Thiết lập áp dụng cho toàn hệ thống.",
+      "notifications": "Chọn những sự kiện được gửi email cho mọi người trong hệ thống.",
+      "overdue": "Gửi email hằng ngày về các công việc đã quá hạn mà chưa xong.",
+      "priorities": "Các mức ưu tiên dùng khi tạo công việc. Số lớn hơn được xếp trước.",
+      "security": "Giới hạn đăng nhập, chính sách mật khẩu và phiên làm việc.",
+      "smtp": "Máy chủ gửi toàn bộ email của TechOps.",
+      "templates": "Nội dung gợi ý sẵn khi người làm báo cáo hoàn thành công việc.",
+      "types": "Phân loại công việc để lọc, báo cáo và gợi ý mẫu hoàn thành."
+    },
+    "dc": {
+      "DEADLINE_SOON": {
+        "_": "Sắp đến hạn",
+        "d": "Công việc có hạn trong 2 ngày tới"
+      },
+      "IN_PROGRESS": {
+        "_": "Đang làm",
+        "d": "Việc đang làm của từng nhân viên"
+      },
+      "OVERDUE": {
+        "_": "Quá hạn",
+        "d": "Việc đã quá hạn mà chưa xong"
+      },
+      "PENDING_APPROVAL": {
+        "_": "Chờ duyệt",
+        "d": "Việc đang chờ Vice Manager hoặc Quản trị viên duyệt"
+      },
+      "SUMMARY_BY_EMPLOYEE": {
+        "_": "Tóm tắt theo người",
+        "d": "Số việc đang làm, đã xong, quá hạn của từng người"
+      }
+    },
+    "del": "Xoá",
+    "delD": {
+      "_": "Mục này chưa được dùng ở công việc nào. Xoá xong không khôi phục được.",
+      "tpl": "Người làm sẽ không còn thấy mẫu này khi báo cáo. Xoá xong không khôi phục được."
+    },
+    "delQ": "Xoá “{x}”?",
+    "delX": "Xoá “{x}”",
+    "deleted": "Đã xoá “{x}”.",
+    "dg": {
+      "content": "Nội dung",
+      "contentH": "Các phần có trong email tổng hợp.",
+      "days": "Thêm các ngày trong tuần",
+      "greet": "Lời mở đầu",
+      "master": "Bật báo cáo định kỳ",
+      "masterH": "Gửi email tổng hợp theo lịch bên dưới.",
+      "monthly": "Hằng tháng",
+      "monthlyH": "Ngày cuối tháng",
+      "noMail": "Chưa có email",
+      "period": "Định kỳ",
+      "rcp": "Người nhận",
+      "rcpAll": "Mặc định: tất cả Vice Manager",
+      "rcpH": "Không chọn ai thì gửi cho tất cả Vice Manager đang hoạt động.",
+      "rcpN": "Đã chọn {n} người",
+      "rcpNone": "Không tìm thấy người dùng.",
+      "rcpQ": "Tìm theo tên hoặc email",
+      "sched": "Lịch gửi",
+      "sent": "Đã gửi email thử tới {e}.",
+      "subj": "Tiêu đề email",
+      "subjH": "Dùng {v} để tự điền ngày gửi.",
+      "sumM": "cuối mỗi tháng",
+      "sumNone": "Chưa chọn lịch gửi.",
+      "sumW": "thứ Hai hằng tuần",
+      "test": "Gửi thử",
+      "testH": "Email thử dùng cấu hình đã lưu và dữ liệu hiện tại.",
+      "testTo": "Gửi thử tới",
+      "tpl": "Mẫu email",
+      "warnContent": "Báo cáo đang bật nhưng chưa chọn nội dung nào nên email sẽ trống.",
+      "warnSched": "Báo cáo đang bật nhưng chưa có lịch gửi nên sẽ không chạy. Chọn hằng tuần, hằng tháng hoặc ít nhất một ngày.",
+      "weekly": "Hằng tuần",
+      "weeklyH": "Sáng thứ Hai đầu tuần"
+    },
+    "dirty": "Bạn có thay đổi chưa lưu",
+    "dl": {
+      "0": "Chủ nhật",
+      "1": "Thứ Hai",
+      "2": "Thứ Ba",
+      "3": "Thứ Tư",
+      "4": "Thứ Năm",
+      "5": "Thứ Sáu",
+      "6": "Thứ Bảy"
+    },
+    "ds": {
+      "0": "CN",
+      "1": "T2",
+      "2": "T3",
+      "3": "T4",
+      "4": "T5",
+      "5": "T6",
+      "6": "T7"
+    },
+    "edit": "Sửa",
+    "editX": "Sửa “{x}”",
+    "em": {
+      "body": "Nội dung (HTML)",
+      "custom": "Đã chỉnh",
+      "default": "Mặc định",
+      "dlgSub": "Mẫu email",
+      "edit": "Soạn",
+      "insert": "Chèn vào vị trí con trỏ",
+      "isDefault": "Đang dùng mẫu mặc định của hệ thống.",
+      "note": "Mẫu mặc định do hệ thống cung cấp; sửa một mẫu sẽ chuyển nó thành mẫu đã chỉnh.",
+      "prev": "Xem trước",
+      "save": "Lưu mẫu",
+      "subject": "Tiêu đề",
+      "vars": "Biến có thể chèn",
+      "varsH": "Bấm một biến để chèn vào tiêu đề hoặc nội dung.",
+      "view": "Chế độ xem"
+    },
+    "err": {
+      "formD": "Biểu mẫu đã khoá để tránh lưu đè cấu hình đang dùng bằng giá trị mặc định.",
+      "formT": "Không tải được cấu hình",
+      "listD": "Kiểm tra kết nối rồi thử lại.",
+      "listT": "Không tải được danh sách"
+    },
+    "g": {
+      "notif": "Thông báo",
+      "sys": "Hệ thống",
+      "work": "Công việc"
+    },
+    "gen": {
+      "legacy": "tên cũ",
+      "pendingNote": "Trang này có ở V1 nhưng không nằm trong menu (route mồ côi /settings/general). Chờ chủ dự án quyết định giữ lại hay bỏ.",
+      "tz": "Múi giờ hệ thống",
+      "tzH": "Ảnh hưởng tới lịch gửi email, nhắc việc và giờ hiển thị. Có hiệu lực sau khi khởi động lại máy chủ.",
+      "tzT": "Thời gian"
+    },
+    "hour": "Giờ",
+    "ic": {
+      "Bug": "Lỗi phần mềm",
+      "Cloud": "Đám mây",
+      "Code": "Mã nguồn",
+      "Cpu": "Bộ xử lý",
+      "Database": "Cơ sở dữ liệu",
+      "FileText": "Tài liệu",
+      "Globe": "Quả địa cầu",
+      "HardDrive": "Ổ cứng",
+      "LayoutGrid": "Lưới",
+      "Lock": "Ổ khoá",
+      "Mail": "Thư",
+      "Monitor": "Màn hình",
+      "Network": "Mạng",
+      "Package": "Gói hàng",
+      "Phone": "Điện thoại",
+      "Printer": "Máy in",
+      "Server": "Máy chủ",
+      "Settings": "Bánh răng",
+      "Shield": "Khiên",
+      "Terminal": "Dòng lệnh",
+      "Users": "Người dùng",
+      "Wifi": "Wi-Fi",
+      "Wrench": "Cờ lê",
+      "Zap": "Tia sét"
+    },
+    "inUse": {
+      "d": "Đang được dùng ở {n}. Chuyển các việc đó sang lựa chọn khác trước rồi xoá lại.",
+      "see": "Xem {n} việc",
+      "t": "Chưa xoá được “{x}”"
+    },
+    "leave": {
+      "d": "Mục “{s}” còn thay đổi chưa lưu. Nếu chuyển mục, các thay đổi này sẽ mất.",
+      "ok": "Bỏ thay đổi",
+      "t": "Bỏ thay đổi chưa lưu?"
+    },
+    "min1": "Phải giữ ít nhất 1 mục.",
+    "minute": "Phút",
+    "moreX": "Thao tác khác cho “{x}”",
+    "nSel": "{a}/{b} đã chọn",
+    "nTasks": "{n} việc",
+    "na": {
+      "d": "Bạn chưa được cấp mục này. Nhờ Quản trị viên cấp quyền nếu bạn cần.",
+      "dAdmin": "Mục này chỉ dành cho Quản trị viên.",
+      "t": "Bạn không có quyền xem mục này"
+    },
+    "nav": {
+      "empNote": "Các mục khác do Vice Manager và Quản trị viên quản lý.",
+      "label": "Mục cài đặt",
+      "pick": "Mục cài đặt"
+    },
+    "nt": {
+      "ALL_FAILED": {
+        "_": "Mọi người làm đều từ chối",
+        "d": "Khi tất cả người được giao từ chối nhận việc"
+      },
+      "COMMENT_ADDED": {
+        "_": "Bình luận mới",
+        "d": "Chỉ gửi cho người được @nhắc trong bình luận"
+      },
+      "DEADLINE_REMINDER": {
+        "_": "Nhắc hạn",
+        "d": "3 ngày trước hạn, gửi lúc 08:00"
+      },
+      "EXTENSION_APPROVED": {
+        "_": "Gia hạn được duyệt",
+        "d": "Khi yêu cầu gia hạn được chấp nhận"
+      },
+      "EXTENSION_REJECTED": {
+        "_": "Gia hạn bị từ chối",
+        "d": "Khi yêu cầu gia hạn bị từ chối"
+      },
+      "EXTENSION_REQUESTED": {
+        "_": "Xin gia hạn",
+        "d": "Khi người làm xin dời hạn"
+      },
+      "PLAN_APPROVAL_REQUESTED": {
+        "_": "Yêu cầu duyệt",
+        "d": "Khi nhân viên gửi công việc cần duyệt"
+      },
+      "REVIEW_REQUIRED": {
+        "_": "Chờ nghiệm thu",
+        "d": "Khi người làm báo cáo xong, chờ nghiệm thu"
+      },
+      "REVISION_REQUIRED": {
+        "_": "Yêu cầu làm lại",
+        "d": "Khi kết quả cần làm lại"
+      },
+      "TASK_APPROVED": {
+        "_": "Việc được duyệt",
+        "d": "Khi Vice Manager duyệt công việc"
+      },
+      "TASK_ASSIGNED": {
+        "_": "Được giao việc",
+        "d": "Khi bạn được giao một công việc"
+      },
+      "TASK_COMPLETED": {
+        "_": "Việc đã xong",
+        "d": "Khi kết quả được nghiệm thu và công việc hoàn thành"
+      },
+      "TASK_REJECTED": {
+        "_": "Việc bị từ chối",
+        "d": "Khi Vice Manager từ chối công việc"
+      },
+      "TRANSFER_RECEIVED": {
+        "_": "Nhận chuyển giao",
+        "d": "Khi công việc được chuyển cho bạn"
+      },
+      "f": {
+        "all": "Tất cả"
+      },
+      "filter": "Lọc theo người nhận",
+      "master": "Gửi thông báo qua email",
+      "masterH": "Tắt để ngừng toàn bộ email thông báo của hệ thống.",
+      "masterRo": "Do Quản trị viên hoặc Vice Manager bật, tắt cho cả hệ thống.",
+      "offNote": "Email thông báo đang tắt. Lựa chọn dưới đây được giữ lại và áp dụng khi bật lại.",
+      "roNote": "Cài đặt này do Quản trị viên và Vice Manager quản lý cho cả hệ thống. Bạn chỉ xem được.",
+      "types": "Sự kiện gửi email",
+      "typesH": "Áp dụng chung; cột phải cho biết vai trò nhận email.",
+      "typesHe": "Những email bạn sẽ nhận khi có sự kiện liên quan tới mình."
+    },
+    "oc": {
+      "IN_PROGRESS": {
+        "_": "Đang làm",
+        "d": "Đã quá hạn mà vẫn đang làm"
+      },
+      "PENDING_APPROVAL": {
+        "_": "Chờ duyệt",
+        "d": "Đã quá hạn mà chưa được duyệt"
+      },
+      "PENDING_REVIEW": {
+        "_": "Chờ nghiệm thu",
+        "d": "Đã quá hạn, kết quả chưa được nghiệm thu"
+      },
+      "WAITING_ACKNOWLEDGE": {
+        "_": "Chờ nhận việc",
+        "d": "Đã quá hạn mà chưa ai nhận việc"
+      }
+    },
+    "off": "Đang tắt",
+    "oi": {
+      "OVERDUE": {
+        "_": "Quá hạn chưa xong",
+        "d": "Các việc của người đó đã quá hạn"
+      },
+      "PENDING_ACK": {
+        "_": "Chưa nhận việc và đã quá hạn",
+        "d": "Được giao nhưng chưa nhận việc"
+      },
+      "UPCOMING": {
+        "_": "Sắp đến hạn trong 24 giờ",
+        "d": "Chỉ áp dụng cho việc có thời hạn từ 1 ngày trở lên"
+      }
+    },
+    "on": "Đang bật",
+    "ov": {
+      "cat": "Email tổng hợp cho Vice Manager và Quản trị viên",
+      "catH": "Gồm các công việc đã quá hạn ở những trạng thái sau.",
+      "days": "Ngày gửi",
+      "ind": "Email riêng cho người làm",
+      "indH": "Mỗi người nhận một email về các việc của mình.",
+      "master": "Bật nhắc quá hạn",
+      "masterH": "Gửi một lần vào mỗi ngày đã chọn.",
+      "warnDays": "Nhắc quá hạn đang bật nhưng chưa chọn ngày gửi nên sẽ không chạy."
+    },
+    "pending": {
+      "_": "Chờ quyết định",
+      "short": "Chờ quyết định"
+    },
+    "pri": {
+      "add": "Thêm mức",
+      "addT": "Thêm mức ưu tiên",
+      "color": "Màu",
+      "def": "Đặt làm mặc định",
+      "defDelD": "Chọn một mức khác làm mặc định trước, rồi xoá mức này.",
+      "defDelT": "Chưa xoá được mức mặc định",
+      "defH": "Chỉ một mức là mặc định; mức mặc định cũ sẽ được bỏ.",
+      "isDef": "Mặc định",
+      "levelH": "Từ 1 đến 10, số lớn hơn = ưu tiên cao hơn (Thấp 1 → Khẩn cấp 4).",
+      "namePh": "Ví dụ: Khẩn cấp",
+      "note": "Mức mặc định được chọn sẵn khi tạo công việc mới.",
+      "pick": "Chọn màu"
+    },
+    "pw": {
+      "hide": "Ẩn mật khẩu",
+      "show": "Hiện mật khẩu"
+    },
+    "range": "Từ {a} đến {b}",
+    "ro": {
+      "_": "Chỉ xem",
+      "short": "Chỉ xem"
+    },
+    "s": {
+      "digest": "Báo cáo định kỳ",
+      "emails": "Mẫu email",
+      "general": "Chung",
+      "notifications": "Thông báo",
+      "overdue": "Nhắc quá hạn",
+      "priorities": "Mức ưu tiên",
+      "security": "Bảo mật",
+      "smtp": "Email (SMTP)",
+      "templates": "Mẫu hoàn thành",
+      "types": "Loại công việc"
+    },
+    "save": "Lưu thay đổi",
+    "saveBtn": "Lưu",
+    "saved": {
+      "_": "Đã lưu {s}.",
+      "restart": "Đã lưu. Múi giờ mới có hiệu lực sau khi khởi động lại máy chủ."
+    },
+    "saving": "Đang lưu…",
+    "sec": {
+      "api": "Giới hạn yêu cầu API",
+      "apiH": "tính theo mỗi IP",
+      "exp": "Hết hạn sau",
+      "expH": "0 = không hết hạn; nhắc đổi trước 3 ngày",
+      "idle": "Tự đăng xuất khi không thao tác",
+      "idleH": "tính từ lần thao tác cuối",
+      "lock": "Thời gian khoá",
+      "lockH": "khoá tạm sau khi vượt số lần",
+      "login": "Số lần đăng nhập sai tối đa",
+      "loginH": "khuyến nghị 5–10",
+      "max": "Thời gian phiên tối đa",
+      "maxH": "hết hạn kể cả khi đang dùng",
+      "minLen": "Độ dài tối thiểu",
+      "minLenH": "khuyến nghị 8–12",
+      "multi": "Cho phép đăng nhập nhiều thiết bị",
+      "multiPB": "V1 có lưu cài đặt này nhưng chưa áp dụng. Làm thật ở Phase B (cần lưu và thu hồi phiên).",
+      "pw": "Chính sách mật khẩu",
+      "pwH": "Quy tắc bắt buộc khi đặt hoặc đổi mật khẩu.",
+      "req": "Mật khẩu phải có",
+      "requireLowercase": {
+        "_": "Chữ thường",
+        "d": "Ví dụ a, b, c"
+      },
+      "requireNumber": {
+        "_": "Chữ số",
+        "d": "Ví dụ 0, 1, 2"
+      },
+      "requireSpecialChar": {
+        "_": "Ký tự đặc biệt",
+        "d": "Ví dụ ! @ # $ %"
+      },
+      "requireUppercase": {
+        "_": "Chữ in hoa",
+        "d": "Ví dụ A, B, C"
+      },
+      "reset": "Đặt lại mặc định",
+      "resetQ": "Đặt lại về mặc định?",
+      "rl": "Giới hạn truy cập",
+      "rlH": "Chặn dò mật khẩu bằng cách giới hạn số lần thử và số yêu cầu.",
+      "rlOn": "Bật giới hạn truy cập",
+      "rlOnH": "Chỉ nên tắt trên môi trường phát triển.",
+      "ss": "Phiên làm việc",
+      "ssH": "Tự đăng xuất và giới hạn thời gian đăng nhập.",
+      "warn": "Thay đổi áp dụng cho mọi người dùng. Giới hạn quá chặt có thể khiến mọi người khó đăng nhập."
+    },
+    "selAll": "Chọn tất cả",
+    "selAllN": "Chọn tất cả ({n})",
+    "sending": "Đang gửi…",
+    "sm": {
+      "active": "Bật gửi email",
+      "activeH": "Tắt để tạm dừng mọi email của hệ thống.",
+      "auth": "Đăng nhập máy chủ",
+      "badRes": "Hết thời gian chờ khi kết nối {h}. Kiểm tra máy chủ, cổng và SSL/TLS.",
+      "badT": "Không kết nối được.",
+      "fromEmail": "Email gửi",
+      "fromName": "Tên hiển thị",
+      "host": "Máy chủ SMTP",
+      "none": "Chưa cấu hình",
+      "ok": "Đang hoạt động",
+      "okRes": "Kết nối thành công — đã gửi email thử tới {e} lúc {t}.",
+      "pass": "Mật khẩu ứng dụng",
+      "passKeep": "Để trống để giữ mật khẩu đang lưu.",
+      "passNew": "Mật khẩu ứng dụng do nhà cung cấp email cấp.",
+      "paused": "Đang tạm dừng",
+      "port": "Cổng",
+      "sender": "Người gửi",
+      "server": "Máy chủ",
+      "ssl": "Dùng SSL/TLS",
+      "sslOff": "Đang dùng STARTTLS, thường là cổng 587.",
+      "sslOn": "Đang dùng SSL/TLS, thường là cổng 465.",
+      "test": "Kiểm tra kết nối",
+      "testBtn": "Gửi email thử",
+      "testH": "Gửi một email thử bằng cấu hình đã lưu.",
+      "testNeedConf": "Lưu cấu hình SMTP trước khi kiểm tra.",
+      "testTo": "Người nhận",
+      "testing": "Đang kiểm tra…",
+      "user": "Tài khoản (email)"
+    },
+    "sub": "Cấu hình dùng chung cho cả phòng IT.",
+    "sumAt": "Sẽ gửi {d} lúc {t}",
+    "testDirty": "Lưu thay đổi trước khi gửi thử — email thử dùng cấu hình đã lưu.",
+    "time": "Giờ gửi",
+    "title": "Cài đặt",
+    "to": "Gửi cho: {w}",
+    "tpl": {
+      "activeL": "Hiện mẫu này khi người làm báo cáo",
+      "add": "Thêm mẫu",
+      "addT": "Thêm mẫu hoàn thành",
+      "allTypes": "Mọi loại",
+      "catPh": "Ví dụ: Kỹ thuật",
+      "content": "Nội dung mẫu",
+      "contentH": "Người làm có thể sửa nội dung khi báo cáo.",
+      "contentPh": "Các mục người làm cần điền khi báo cáo…",
+      "emptyD": "Thêm mẫu để người làm báo cáo nhanh và đủ ý hơn.",
+      "emptyT": "Chưa có mẫu hoàn thành",
+      "hidden": "Đã ẩn “{x}”.",
+      "hide": "Tạm ẩn mẫu",
+      "note": "Mẫu tạm ẩn không hiện khi báo cáo nhưng vẫn giữ nội dung.",
+      "off": "Tạm ẩn",
+      "on": "Đang dùng",
+      "show": "Dùng lại mẫu",
+      "shown": "Đã dùng lại “{x}”.",
+      "titlePh": "Ví dụ: Biên bản thay thế thiết bị",
+      "typeH": "Chỉ gợi ý mẫu cho công việc thuộc loại này."
+    },
+    "typ": {
+      "add": "Thêm loại",
+      "addT": "Thêm loại công việc",
+      "descPh": "Mô tả ngắn",
+      "icon": "Biểu tượng",
+      "namePh": "Ví dụ: Phần mềm"
+    },
+    "tz7": "Giờ Việt Nam (UTC+7)",
+    "u": {
+      "chars": "ký tự",
+      "days": "ngày",
+      "hours": "giờ",
+      "min": "phút",
+      "rpm": "yêu cầu/phút",
+      "times": "lần"
+    },
+    "undo": "Hoàn tác",
+    "undone": "Đã hoàn tác thay đổi.",
+    "updated": "Đã lưu “{x}”.",
+    "v": {
+      "dup": "Tên này đã có.",
+      "fix": "Còn {n} ô cần sửa.",
+      "hex": "Mã màu dạng #RRGGBB.",
+      "int": "Nhập số nguyên.",
+      "mail": "Email chưa đúng định dạng.",
+      "range": "Nhập số từ {a} đến {b}.",
+      "req": "Không được để trống."
+    },
+    "wk": {
+      "off": "Bỏ T2–T6",
+      "on": "Chọn T2–T6"
+    }
+  },
+  "setx": {
+    "dg": {
+      "schedH": "Giờ Việt Nam (UTC+7). Có thể chọn cả định kỳ và các ngày trong tuần."
+    },
+    "inUse": {
+      "see": "Xem các công việc này"
+    },
+    "nt": {
+      "roNote": "Bạn chỉ xem được những email thông báo mình đang nhận. Quản trị viên hoặc Quản lý điều chỉnh khi cần."
+    },
+    "ov": {
+      "schedH": "Gửi một lần vào mỗi ngày đã chọn, giờ Việt Nam (UTC+7)."
+    },
+    "sec": {
+      "multiNote": "Hiện chỉ được lưu lại, chưa có tác dụng khi đăng nhập.",
+      "resetD": "Toàn bộ cấu hình bảo mật được ghi về giá trị mặc định ngay khi bấm. Các thay đổi chưa lưu sẽ mất.",
+      "resetDone": "Đã đặt lại cấu hình bảo mật về mặc định."
+    },
+    "sm": {
+      "pickTo": "Chọn người nhận…",
+      "tabs": "Cấu hình email"
+    },
+    "v": {
+      "max": "Tối đa {n} ký tự."
+    }
+  },
   "st": {
     "CANCELLED": "Đã hủy",
     "COMPLETED": "Đã xong",

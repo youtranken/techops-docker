@@ -100,7 +100,8 @@ describe('copy.js thật → messages', () => {
     const r = buildMessages({ copyPath: COPY });
     expect(r.vi.st.PENDING_APPROVAL).toBe('Chờ duyệt');
     expect(r.en.due.overdue).toBe('{n}d overdue');
-    expect(r.vi.set).toBeUndefined(); // khoá màn Cài đặt chưa đưa vào
+    expect(r.vi.set.title).toBe('Cài đặt'); // A3-7: nhóm Cài đặt đã đưa vào
+    expect(r.vi.set.pv).toBeUndefined(); // … trừ khoá điều khiển preview
     expect(r.vi.common.save).toBe('Lưu'); // giữ khoá cũ
     expect(diffKeySets(r.vi, r.en)).toEqual({ onlyVi: [], onlyEn: [] });
     expect(r.problems).toEqual([]);

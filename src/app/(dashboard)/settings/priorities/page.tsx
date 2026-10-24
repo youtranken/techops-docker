@@ -1,7 +1,7 @@
 import { requireSettingsFeature } from '@/lib/settings-guard';
-import { PrioritiesSection } from '@/modules/settings/components/PrioritiesSection';
+import { PrioritiesPage } from '@/modules/settings/components/catalog/PrioritiesPage';
 
-export default async function PrioritiesPage() {
+export default async function Page() {
   await requireSettingsFeature('priorities');
-  return <PrioritiesSection />;
+  return <PrioritiesPage />;
 }

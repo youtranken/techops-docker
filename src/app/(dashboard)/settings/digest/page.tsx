@@ -1,7 +1,7 @@
 import { requireSettingsFeature } from '@/lib/settings-guard';
-import { DigestSection } from '@/modules/settings/components/DigestSection';
+import { DigestPage } from '@/modules/settings/components/config/DigestPage';
 
-export default async function DigestPage() {
+export default async function Page() {
   await requireSettingsFeature(); // Admin/Boss always allowed, Employee redirected to /
-  return <DigestSection />;
+  return <DigestPage />;
 }

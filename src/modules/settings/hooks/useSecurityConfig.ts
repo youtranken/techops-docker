@@ -1,88 +1,59 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import type { SecurityConfig } from '../types';
-import { useErrorMessage } from '@/lib/useErrorMessage';
+import { toApiError } from '@/lib/errors';
 
+/** Cấu hình bảo mật hệ thống (chỉ Admin). A3-7: trang tự báo kết quả (toast) — hook không tự toast nữa. */
 const QUERY_KEY = ['settings', 'security-config'];
-
-// ─── Fetch ───────────────────────────────────────────────────────────────────
 
 async function fetchSecurityConfig(): Promise<SecurityConfig> {
   const res = await fetch('/api/settings/security');
-  if (!res.ok) throw new Error('Không thể tải cấu hình bảo mật');
-  return res.json();
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw toApiError(json, 'Không thể tải cấu hình bảo mật', res.status);
+  return json as SecurityConfig;
 }
 
-// ─── Update ──────────────────────────────────────────────────────────────────
-
+/** V1: PUT cả cấu hình */
 async function updateSecurityConfig(data: Partial<SecurityConfig>): Promise<SecurityConfig> {
   const res = await fetch('/api/settings/security', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error?.message || 'Không thể cập nhật cấu hình');
-  }
-  return res.json();
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw toApiError(json, 'Không thể cập nhật cấu hình', res.status);
+  return json as SecurityConfig;
 }
 
-// ─── Reset ───────────────────────────────────────────────────────────────────
-
+/** V1: POST { action: 'reset' } — ghi mặc định ngay */
 async function resetSecurityConfig(): Promise<SecurityConfig> {
   const res = await fetch('/api/settings/security', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'reset' }),
   });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error?.message || 'Không thể reset cấu hình');
-  }
-  return res.json();
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw toApiError(json, 'Không thể reset cấu hình', res.status);
+  return json as SecurityConfig;
 }
 
-// ─── Hook ────────────────────────────────────────────────────────────────────
-
 export function useSecurityConfig() {
-  const errMsg = useErrorMessage();
   const queryClient = useQueryClient();
-
-  const query = useQuery({
-    queryKey: QUERY_KEY,
-    queryFn: fetchSecurityConfig,
-    staleTime: 5 * 60 * 1000, // 5 phút
-  });
-
+  const query = useQuery({ queryKey: QUERY_KEY, queryFn: fetchSecurityConfig, staleTime: 5 * 60 * 1000, retry: (n, e) => (e as { status?: number }).status !== 403 && n < 2 });
   const updateMutation = useMutation({
     mutationFn: updateSecurityConfig,
-    onSuccess: (data) => {
-      queryClient.setQueryData(QUERY_KEY, data);
-      toast.success('Đã lưu cấu hình bảo mật');
-    },
-    onError: (err: Error) => {
-      toast.error(errMsg(err));
-    },
+    onSuccess: (data) => queryClient.setQueryData(QUERY_KEY, data),
   });
-
   const resetMutation = useMutation({
     mutationFn: resetSecurityConfig,
-    onSuccess: (data) => {
-      queryClient.setQueryData(QUERY_KEY, data);
-      toast.success('Đã reset về cấu hình mặc định');
-    },
-    onError: (err: Error) => {
-      toast.error(errMsg(err));
-    },
+    onSuccess: (data) => queryClient.setQueryData(QUERY_KEY, data),
   });
-
   return {
     config: query.data,
     isLoading: query.isLoading,
     error: query.error,
-    update: updateMutation.mutate,
-    reset: resetMutation.mutate,
+    refetch: query.refetch,
+    updateAsync: updateMutation.mutateAsync,
+    resetAsync: () => resetMutation.mutateAsync(),
     isUpdating: updateMutation.isPending,
     isResetting: resetMutation.isPending,
   };

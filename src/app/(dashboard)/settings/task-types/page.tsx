@@ -1,7 +1,7 @@
 import { requireSettingsFeature } from '@/lib/settings-guard';
-import { TaskTypesSection } from '@/modules/settings/components/TaskTypesSection';
+import { TaskTypesPage } from '@/modules/settings/components/catalog/TaskTypesPage';
 
-export default async function TaskTypesPage() {
+export default async function Page() {
   await requireSettingsFeature('task_types');
-  return <TaskTypesSection />;
+  return <TaskTypesPage />;
 }
