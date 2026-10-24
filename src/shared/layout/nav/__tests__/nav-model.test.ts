@@ -45,7 +45,8 @@ describe('buildNav — đối chiếu y hệt logic lọc menu V1', () => {
     const diffs: string[] = [];
     for (const input of inputs) {
       const got = [...navHrefs(buildNav(input))].sort();
-      const want = [...v1VisibleHrefs(toV1(input))].sort();
+      // V2 (user chốt 24/10): sidebar chỉ 1 mục Cài đặt → các mục con V1 /settings/* gộp thành /settings
+      const want = [...new Set(v1VisibleHrefs(toV1(input)).map((h) => (h.startsWith('/settings/') ? '/settings' : h)))].sort();
       if (JSON.stringify(got) !== JSON.stringify(want)) diffs.push(`${JSON.stringify(input)}\n  got  ${got.join(' ')}\n  want ${want.join(' ')}`);
     }
     expect(diffs.slice(0, 5).join('\n')).toBe('');
@@ -99,9 +100,9 @@ describe('activeNav — tô mục đang chọn theo route', () => {
     ['/hr/users/ck1/permissions', null, { section: 'hr', link: 'hr-users' }],
     ['/hr/permissions/logs', null, { section: 'hr', link: 'hr-perm-logs' }],
     ['/logs/task-activity', null, { link: 'logs' }],
-    ['/settings/priorities', null, { section: 'settings', link: 'settings-priorities' }],
-    ['/settings/smtp', null, { section: 'settings', link: 'settings-smtp' }],
-    ['/settings', null, { section: 'settings' }],
+    ['/settings/priorities', null, { link: 'settings' }],
+    ['/settings/smtp', null, { link: 'settings' }],
+    ['/settings', null, { link: 'settings' }],
     ['/khong-ton-tai', null, {}],
     ['/tasksabc', null, {}],
   ];

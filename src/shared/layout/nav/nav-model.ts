@@ -148,9 +148,9 @@ export function buildNav({ role, perms, loaded }: NavInput): NavGroup[] {
   if (knownRole && canSee('logs')) admin.push(link('logs', '/logs', 'nav.logs', 'logs'));
   const showSettings = isPrivileged || (menuLoaded && canSee('settings'));
   const sChildren = showSettings ? settingsChildren(role, featurePerms) : null;
-  if (sChildren) {
-    admin.push({ kind: 'section', key: 'settings', label: 'nav.settings', icon: 'settings', href: '/settings', prefix: '/settings', children: sChildren });
-  }
+  // V2 (user chốt 24/10): sidebar chỉ 1 mục Cài đặt; các trang con nằm ở thanh điều hướng trong khu Cài đặt.
+  // Vẫn dùng settingsChildren để giữ đúng điều kiện hiện nhóm của V1.
+  if (sChildren) admin.push(link('settings', '/settings', 'nav.settings', 'settings'));
 
   const groups: NavGroup[] = [{ key: 'work', label: 'nav.group.work', entries: work }];
   if (admin.length) groups.push({ key: 'admin', label: isPrivileged ? 'nav.group.admin' : 'nav.group.granted', entries: admin });

@@ -37,9 +37,8 @@ test.describe.serial('A1-4 — khung app', () => {
     // Chỉ cấp Helpdesk + Cài đặt (Hồ sơ) → thấy đúng các mục đó
     setMenus(E2E_USERS.emp.username, ['helpdesk', 'settings'], { settings: ['profile'] });
     await page.reload();
+    // V2: sidebar chỉ 1 mục Cài đặt (trang con nằm ở thanh điều hướng trong khu Cài đặt)
     await expect.poll(() => navKeys(page)).toEqual(['dashboard', 'tasks', 'helpdesk', 'settings']);
-    await page.locator('#app-sidebar button[data-nav="settings"]').click();
-    await expect.poll(() => navKeys(page)).toEqual(['dashboard', 'tasks', 'helpdesk', 'settings', 'settings-profile']);
     // Không có ★ / Mới xong cho nhân viên
     await expect(page.getByRole('link', { name: /Quan trọng/ })).toHaveCount(0);
 
@@ -48,23 +47,24 @@ test.describe.serial('A1-4 — khung app', () => {
     await page.reload();
     await expect.poll(() => navKeys(page)).toEqual(['dashboard', 'tasks']);
 
-    // Boss: đủ menu + ★/Mới xong; Cài đặt có Báo cáo định kỳ, không có Bảo mật/SMTP (chỉ Admin)
+    // Boss: đủ menu + ★/Mới xong; Cài đặt là 1 mục, thanh con trong trang có Báo cáo định kỳ, không có Bảo mật/SMTP (chỉ Admin)
     await login(page, E2E_USERS.boss.username);
     await page.goto('/settings/priorities');
-    await expect.poll(() => navKeys(page)).toContain('settings-digest');
+    const setNav = page.getByTestId('set-nav');
+    await expect(setNav.getByRole('link', { name: 'Báo cáo định kỳ' })).toBeVisible({ timeout: 60_000 });
     const boss = await navKeys(page);
-    expect(boss.slice(0, 9)).toEqual(['dashboard', 'tasks', 'tasks-important', 'tasks-unseen', 'helpdesk', 'analytics', 'hr', 'logs', 'settings']);
-    expect(boss).not.toContain('settings-smtp');
-    expect(boss).not.toContain('settings-security');
+    expect(boss).toEqual(['dashboard', 'tasks', 'tasks-important', 'tasks-unseen', 'helpdesk', 'analytics', 'hr', 'logs', 'settings']);
+    await expect(setNav.getByRole('link', { name: 'Email (SMTP)' })).toHaveCount(0);
+    await expect(setNav.getByRole('link', { name: 'Bảo mật' })).toHaveCount(0);
     // mục đang chọn tô theo route
-    await expect(page.locator('#app-sidebar a[data-nav="settings-priorities"]')).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('#app-sidebar a[data-nav="settings"]')).toHaveAttribute('aria-current', 'page');
     await expect(page.getByRole('navigation', { name: 'Đường dẫn' })).toContainText('Mức ưu tiên');
 
     // Admin: có thêm Bảo mật + SMTP
     await login(page, E2E_USERS.admin.username);
     await page.goto('/settings/priorities');
-    await expect.poll(() => navKeys(page)).toContain('settings-smtp');
-    expect(await navKeys(page)).toContain('settings-security');
+    await expect(page.getByTestId('set-nav').getByRole('link', { name: 'Email (SMTP)' })).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByTestId('set-nav').getByRole('link', { name: 'Bảo mật' })).toBeVisible();
 
     // route con /tasks/[id] → tô "Công việc"
     await page.goto('/tasks/khong-ton-tai-e2e', { timeout: 90_000 });
