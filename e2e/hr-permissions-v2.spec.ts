@@ -222,7 +222,17 @@ test.describe.serial('A3-4 — Nhân sự + Phân quyền', () => {
     await expect(page.getByRole('menuitem')).toHaveText(['Lịch sử hoạt động', 'Sửa thông tin']);
     await page.keyboard.press('Escape');
 
+    // Bảo mật: API nhân sự không trả mã băm mật khẩu (hotfix 2559fee)
+    const empList = await page.request.get('/api/hr/users?search=%5BE2E%5D');
+    expect(empList.ok()).toBe(true);
+    expect(await empList.text()).not.toContain('"password"');
+
     await as(page, 'admin');
+    for (const url of ['/api/hr/users?search=%5BE2E%5D', `/api/hr/users/${uid(E2E_USERS.emp.username)}`]) {
+      const r = await page.request.get(url);
+      expect(r.ok(), url).toBe(true);
+      expect(await r.text(), url).not.toContain('"password"');
+    }
     const res = await page.goto(`/hr/users/${uid(E2E_USERS.emp.username)}/permissions`);
     expect(res?.status()).toBe(404);
   });
