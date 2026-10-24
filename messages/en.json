@@ -200,6 +200,7 @@
     }
   },
   "au": {
+    "check": "Checking your link…",
     "cur": {
       "_": "Current password",
       "req": "Enter your current password"
@@ -208,9 +209,37 @@
       "cur": "Your current password is incorrect.",
       "match": "The passwords don’t match.",
       "policy": "The new password doesn’t meet all the requirements below.",
-      "same": "The new password must differ from the current one."
+      "same": "The new password must differ from the current one.",
+      "wrong": "Incorrect username or password."
+    },
+    "first": {
+      "btn": "Save password and continue",
+      "d": "You’re using a password set by an administrator. Replace it with your own before you continue.",
+      "ok": {
+        "t": "Password changed"
+      },
+      "t": "Set your own password"
+    },
+    "foot": "© 2026 IT Department · PMH",
+    "forgot": {
+      "_": "Forgot password?",
+      "d": "Ask a Vice Manager or an Admin to email you a password reset link. The link works for 15 minutes."
     },
     "hide": "Hide password",
+    "link": {
+      "bad": {
+        "d": "The link is missing its code or the code is wrong. Open the exact link from the email, or ask an Admin for a new one.",
+        "t": "This link isn’t valid"
+      },
+      "net": {
+        "d": "We couldn’t reach the server. Check your connection and try again.",
+        "t": "Couldn’t check your link"
+      }
+    },
+    "login": {
+      "d": "Use the TechOps account the IT team gave you.",
+      "t": "Sign in"
+    },
     "new": {
       "_": "New password",
       "req": "Enter a new password"
@@ -218,6 +247,10 @@
     "new2": {
       "_": "Confirm new password",
       "req": "Re-enter the new password"
+    },
+    "pass": {
+      "_": "Password",
+      "req": "Enter your password"
     },
     "pol": {
       "count": "{x} of {n} requirements met",
@@ -230,8 +263,47 @@
       "unmet": "not met",
       "up": "One uppercase letter (A–Z)"
     },
+    "reset": {
+      "btn": "Reset password",
+      "ok": {
+        "d": "Taking you to sign in in {n} seconds.",
+        "t": "Password reset"
+      },
+      "t": "Reset your password"
+    },
     "saving": "Saving…",
-    "show": "Show password"
+    "show": "Show password",
+    "signout": "Sign out",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "theme": "Appearance",
+    "toLogin": "Back to sign in",
+    "user": {
+      "_": "Username",
+      "ph": "e.g. leminh",
+      "req": "Enter your username"
+    },
+    "vf": {
+      "busy": {
+        "d": "This takes a few seconds. You can keep this page open.",
+        "t": "Verifying your email…"
+      },
+      "changed": {
+        "d": "The email changed after this link was sent, so it no longer works. Use the link in the most recent email.",
+        "t": "Your account email has changed"
+      },
+      "expired": {
+        "d": "Links work for 24 hours and only once. Ask an Admin to resend the verification email.",
+        "t": "This verification link has expired"
+      },
+      "missing": {
+        "d": "The link is missing its verification code. Open the exact link from the email.",
+        "t": "This verification link isn’t valid"
+      },
+      "ok": {
+        "t": "Email verified"
+      }
+    }
   },
   "auth": {
     "forgotPassword": "Forgot Password",
@@ -240,6 +312,42 @@
     "password": "Password",
     "rememberMe": "Remember Me",
     "username": "Username"
+  },
+  "aux": {
+    "err": {
+      "generic": "Something went wrong. Please try again."
+    },
+    "first": {
+      "ok": {
+        "btn": "Sign in again",
+        "d": "Sign in again with your new password to continue."
+      }
+    },
+    "lang": "Language",
+    "link": {
+      "exp": {
+        "d": "Password reset links work only once and for a limited time. Ask a Vice Manager or an Admin for a new one.",
+        "t": "This link has expired or isn’t valid"
+      }
+    },
+    "reset": {
+      "d": "Enter a new password for your account."
+    },
+    "theme": {
+      "dark": "Dark",
+      "light": "Light"
+    },
+    "toHome": "Go to home",
+    "vf": {
+      "ok": {
+        "d": "Your email address has been verified."
+      },
+      "title": "Verify email",
+      "unknown": {
+        "d": "Something went wrong. Please try again.",
+        "t": "Verification failed"
+      }
+    }
   },
   "card": {
     "comments": "{n} comments",

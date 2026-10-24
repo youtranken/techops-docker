@@ -45,7 +45,7 @@ Module không được import trực tiếp từ module khác (chỉ qua API).
 | `notifications/` | Thông báo, email alerts | [xem](notifications/AGENTS.md) |
 | `settings/` | Cài đặt hệ thống, Hồ sơ cá nhân | [xem](settings/AGENTS.md) |
 | `logs/` | Nhật ký hoạt động người dùng | — |
-| `auth/` | Xác thực (NextAuth wrapper) | — |
+| `auth/` | Xác thực (NextAuth wrapper) + giao diện Đăng nhập / Đổi mật khẩu lần đầu / Đặt lại / Xác nhận email (`lib/auth-logic.ts`) | — |
 | `dashboard/` | Tổng quan dashboard | [xem](dashboard/AGENTS.md) |
 
 ## Quy ước đặt tên

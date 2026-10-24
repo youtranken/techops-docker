@@ -10,6 +10,8 @@ export async function login(page: Page, username: string) {
   await page.locator('#password').fill(E2E_PASSWORD);
   await page.locator('button[type="submit"]').click();
   await expect(page).not.toHaveURL(/\/login/, { timeout: 20_000 });
+  // chờ trang đích tải xong (yêu cầu /api/auth/session của trang mới đặt lại cookie — tránh đè lên clearCookies của lần đăng nhập sau)
+  await page.waitForLoadState('networkidle').catch(() => {});
 }
 
 /** Gọi API từ trong trình duyệt (cùng origin + cookie phiên) */

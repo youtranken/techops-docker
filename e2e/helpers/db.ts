@@ -23,7 +23,7 @@ export const E2E_USERS = {
 } as const;
 
 /** User [E2E] do từng spec tự tạo (vd e2e_pw của notifications-profile-v2) — globalSetup không tạo, teardown vẫn dọn. */
-export const E2E_EXTRA_USERNAMES = ['e2e_pw', 'e2e_hrnew'];
+export const E2E_EXTRA_USERNAMES = ['e2e_pw', 'e2e_hrnew', 'e2e_auth', 'e2e_auth1st'];
 
 const usernames = [...Object.values(E2E_USERS).map((u) => u.username), ...E2E_EXTRA_USERNAMES].map((u) => `'${u}'`).join(',');
 

@@ -45,6 +45,7 @@ export const INCLUDE = {
     'pp', // A3-4 Nhân sự + Phân quyền (nhãn vai trò dùng ppx.role.* = ROLE_LABELS V1)
     'lg', // A3-6 Nhật ký (công việc / người dùng / tra cứu mã + ngăn chi tiết)
     'set', // A3-7 Cài đặt (trừ Hồ sơ — nhóm pf)
+    'au', // A3-8 Đăng nhập / Mật khẩu / Xác nhận email
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
@@ -77,6 +78,10 @@ export const INCLUDE = {
     'set.em.reset', 'set.sec.resetD', 'set.sec.resetOk', 'set.sec.resetDone', 'set.sec.resetSame',
     // A3-7: V1 không chặn chọn người chưa có email; không có trang "không quyền" kèm nút chuyển mục; khoá nhiều phiên không dùng
     'set.dg.noMailH', 'set.na.go', 'set.sec.multiH', 'set.role.',
+    // A3-8: thanh điều khiển preview; báo lỗi đăng nhập theo loại / đếm ngược / phiên hết hạn — Phase B (V1 chỉ 1 câu chung);
+    // câu preview có dữ liệu V1 không trả (tên tài khoản, email) hoặc không phân biệt (link hết hạn vs sai) → bản đúng V1 ở aux.*
+    'au.pv.', 'au.scn.', 'au.mode.', 'au.pb', 'au.err.left', 'au.err.locked.', 'au.err.rate.', 'au.err.pwRate', 'au.expired', 'au.ok',
+    'au.reset.d', 'au.vf.ok.d', 'au.link.exp.', 'au.first.ok.d', 'au.toTasks',
     'hd.imp.jsonH', 'hd.imp.e.shape', // A3-3: có dấu { } không hợp lệ ICU → bản thoát ở extra-messages (hdx.imp.*)
   ],
 };
