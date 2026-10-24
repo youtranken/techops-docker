@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, type PaginatedResult } from '@/lib/types/pagination';
-import type { UserWithRole, UserWithRoleAndTasks, ListUsersFilters } from '../types';
+import { withoutPassword, type UserWithRole, type UserWithRoleAndTasks, type ListUsersFilters } from '../types';
 
 type OrFilter = { username?: { contains: string; mode: 'insensitive' }; displayName?: { contains: string; mode: 'insensitive' }; email?: { contains: string; mode: 'insensitive' } };
 type WhereClause = {
@@ -53,7 +53,7 @@ class UserQueryService {
     ]);
 
     const data: UserWithRoleAndTasks[] = rawData.map(({ _count, ...u }) => ({
-      ...u,
+      ...withoutPassword(u),
       hasTasks: _count.createdTasks > 0 || _count.assignments > 0,
     }));
 
@@ -79,7 +79,7 @@ class UserQueryService {
     ]);
 
     const data: UserWithRoleAndTasks[] = rawData.map(({ _count, ...u }) => ({
-      ...u,
+      ...withoutPassword(u),
       hasTasks: _count.createdTasks > 0 || _count.assignments > 0,
     }));
 
@@ -93,7 +93,7 @@ class UserQueryService {
       err.code = 'USER_NOT_FOUND';
       throw err;
     }
-    return user;
+    return withoutPassword(user);
   }
 }
 

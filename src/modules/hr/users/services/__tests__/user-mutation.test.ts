@@ -173,3 +173,15 @@ describe('bulkDeactivate — S10', () => {
     );
   });
 });
+
+describe('không lộ password ở kết quả trả về', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('deactivate() bỏ trường password', async () => {
+    mocks.findMany.mockResolvedValue([]);
+    mocks.txUserUpdate.mockResolvedValueOnce({ id: 'u-1', password: '$2a$12$hash', role: { name: 'EMPLOYEE' } });
+    const u = await userMutationService.deactivate('u-1', 'admin-1');
+    expect(u).not.toHaveProperty('password');
+    expect(u).toMatchObject({ id: 'u-1', role: { name: 'EMPLOYEE' } });
+  });
+});
