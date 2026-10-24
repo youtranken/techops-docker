@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import type { TaskAction, TaskStatus, Prisma } from '@prisma/client';
 import type { PaginatedResult } from '@/lib/types/pagination';
+import { vnDayStart, vnDayEnd } from './vn-day-range';
 import type { TaskLogEntry } from '../types';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -118,8 +119,8 @@ class TaskAuditLogService {
       ...(filters.dateFrom || filters.dateTo
         ? {
             createdAt: {
-              ...(filters.dateFrom && { gte: filters.dateFrom }),
-              ...(filters.dateTo && { lte: new Date(filters.dateTo.toISOString().slice(0, 10) + 'T23:59:59.999Z') }),
+              ...(filters.dateFrom && { gte: vnDayStart(filters.dateFrom) }),
+              ...(filters.dateTo && { lte: vnDayEnd(filters.dateTo) }),
             },
           }
         : {}),

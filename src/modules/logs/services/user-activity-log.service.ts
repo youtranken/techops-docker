@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import type { UserAction, Prisma } from '@prisma/client';
 import { normalizeIp } from '@/lib/ip-utils';
 import type { PaginatedResult } from '@/lib/types/pagination';
+import { vnDayStart, vnDayEnd } from './vn-day-range';
 import type { UserLogEntry, UserLogFilters, ParsedDevice } from '../types';
 
 // ─── Device Parser ────────────────────────────────────────────────────────────
@@ -89,8 +90,8 @@ class UserActivityLogService {
       ...(filters.dateFrom || filters.dateTo
         ? {
             createdAt: {
-              ...(filters.dateFrom && { gte: new Date(filters.dateFrom) }),
-              ...(filters.dateTo && { lte: new Date(filters.dateTo + 'T23:59:59.999Z') }),
+              ...(filters.dateFrom && { gte: vnDayStart(filters.dateFrom) }),
+              ...(filters.dateTo && { lte: vnDayEnd(filters.dateTo) }),
             },
           }
         : {}),

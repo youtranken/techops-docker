@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import type { TaskRefFilters, TaskRefEntry } from '../types';
 import type { PaginatedResult } from '@/lib/types/pagination';
+import { vnDayStart, vnDayEnd } from './vn-day-range';
 
 export const taskReferenceService = {
   async getAll(filters: TaskRefFilters & { page: number; limit: number }): Promise<PaginatedResult<TaskRefEntry>> {
@@ -14,8 +15,8 @@ export const taskReferenceService = {
         ],
       }),
       ...(creatorId && { creatorId }),
-      ...(scheduleFrom && { scheduleStart: { gte: new Date(scheduleFrom) } }),
-      ...(scheduleTo   && { scheduleEnd:   { lte: new Date(scheduleTo) } }),
+      ...(scheduleFrom && { scheduleStart: { gte: vnDayStart(scheduleFrom) } }),
+      ...(scheduleTo   && { scheduleEnd:   { lte: vnDayEnd(scheduleTo) } }),
     };
 
     const [total, rows] = await Promise.all([
