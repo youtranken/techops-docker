@@ -243,7 +243,8 @@ test.describe.serial('A3-3 — Helpdesk V2', () => {
 
     // Boss không có mục Đặt lại dữ liệu
     await page.locator('[data-testid=hd-more] button').click();
-    await expect(page.getByRole('menuitem', { name: 'Đẩy tất cả sang công việc' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Lịch tự động' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Đẩy tất cả sang công việc' })).toHaveCount(0); // Phase B (V1 không gắn nút)
     await expect(page.getByRole('menuitem', { name: /Đặt lại dữ liệu/ })).toHaveCount(0);
   });
 
