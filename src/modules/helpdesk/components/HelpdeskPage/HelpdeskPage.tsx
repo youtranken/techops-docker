@@ -11,7 +11,7 @@
 import * as React from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { Clock, Download, History, ListChecks, Trash2, Upload } from 'lucide-react';
+import { Clock, Download, History, Trash2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/shared/ui/Pagination';
 import { QuickMenu } from '@/shared/ui/QuickMenu';
@@ -76,7 +76,6 @@ export function HelpdeskPage() {
   const unselect = (ids: string[]) => setSelected((p) => { const n = new Set(p); ids.forEach((id) => n.delete(id)); return n; });
 
   const menu = canManage ? [[
-    { key: 'push', label: t('hd.push.menu'), icon: ListChecks, onSelect: () => void a.pushAll() },
     { key: 'cron', label: t('hd.cron.title'), icon: Clock, onSelect: () => setDlg('cron') },
     { key: 'hist', label: t('hd.hist.title'), icon: History, onSelect: () => setDlg('hist') },
   ], isAdmin ? [{ key: 'reset', label: t('hd.reset.menu'), icon: Trash2, danger: true, onSelect: () => setDlg('reset') }] : []] : [];

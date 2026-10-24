@@ -2,9 +2,8 @@
 
 /**
  * Hành động của trang Helpdesk — đúng API V1, chỉ thêm hộp xác nhận / thông báo song ngữ:
- * lấy dữ liệu ngay (POST /sync), xuất Excel, gán/xoá 1 hoặc nhiều ticket, đẩy tất cả sang công việc (push-to-tasks).
+ * lấy dữ liệu ngay (POST /sync), xuất Excel, gán/xoá 1 hoặc nhiều ticket. Đẩy tất cả sang công việc (push-to-tasks) để Phase B — V1 không gắn nút.
  */
-import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { useConfirm } from '@/shared/ui/ConfirmDialog';
@@ -12,7 +11,6 @@ import { useErrorMessage } from '@/lib/useErrorMessage';
 import type { HelpdeskPendingItem, PendingFilters } from '../../types';
 import { useHelpdeskSync } from '../../hooks/useHelpdeskSync';
 import { useAssignHelpdesk, useBulkAssignHelpdesk, useBulkDeleteHelpdesk, useDeleteHelpdesk, BulkError } from '../../hooks/useHelpdeskMutations';
-import { usePushToTasks } from '../../hooks/usePushToTasks';
 import { exportUrl } from './hd-logic';
 import { useCounts } from './HdSyncBar';
 
@@ -20,14 +18,12 @@ export function useHdActions() {
   const t = useTranslations();
   const errMsg = useErrorMessage();
   const confirm = useConfirm();
-  const qc = useQueryClient();
   const counts = useCounts();
   const sync = useHelpdeskSync();
   const assign = useAssignHelpdesk();
   const del = useDeleteHelpdesk();
   const bulkAssign = useBulkAssignHelpdesk();
   const bulkDel = useBulkDeleteHelpdesk();
-  const push = usePushToTasks();
 
   const bulkErr = (e: unknown) => toast.error(e instanceof BulkError ? t('hdx.bulk.fail', { n: e.failed }) : errMsg(e));
 
@@ -80,18 +76,5 @@ export function useHdActions() {
       bulkDel.mutate(ids, { onSuccess: () => { toast.success(t('hd.toast.delN', { n: ids.length })); done(); }, onError: bulkErr });
     },
 
-    /** V1 push-to-tasks: tạo việc cho mọi ticket đã hoàn thành có IT Support khớp tên nhân sự */
-    pushAll: async () => {
-      const ok = await confirm({ title: t('hd.push.t'), description: t('hdx.push.d'), confirmText: t('hd.push.ok') });
-      if (!ok) return;
-      push.mutate(undefined, {
-        onSuccess: (r) => {
-          void qc.invalidateQueries({ queryKey: ['helpdesk-pending'] });
-          toast.success(t('hd.push.res', { a: r.pushed, b: r.skipped, c: r.noUser }));
-          if (r.errors.length) toast.error(t('hdx.push.err', { ids: r.errors.map((e) => e.hdId).join(', ') }));
-        },
-        onError: (e) => toast.error(errMsg(e)),
-      });
-    },
   };
 }
