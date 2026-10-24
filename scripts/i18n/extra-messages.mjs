@@ -309,7 +309,13 @@ const vi = {
   'ppx.u.customN': 'Khác mặc định {n} mục',
   'ppx.u.tasksPB': 'V1 có dữ liệu và API (chỉ Quản trị viên) nhưng chưa có hiệu lực: trang quyền riêng trả 404 và luồng công việc dùng quyền viết cứng theo vai trò. Làm ở Phase B.',
   'ppx.fd.hr.deactivate': 'V1 chưa có tác dụng: chỉ Quản trị viên, Quản lý khoá được',
-  'ppx.fd.hr.delete': 'V1 chưa có tác dụng: chỉ Quản trị viên, Quản lý xoá được',
+  'ppx.fd.hr.delete': 'V1 chưa có tác dụng: chỉ Quản trị viên, Quản lý xoá được',  // ── A3-5 Báo cáo (bổ sung cho nhóm rp của copy.js) ──
+  'rpx.sort.titleD': 'Tên Z → A',
+  'rpx.lbl.month': 'Tháng {n}/{y}',
+  'rpx.dd.max': 'Hiển thị tối đa 100 việc',
+  'rpx.p.sub': 'Phần việc giao cho nhân viên, theo việc tạo trong kỳ, không gồm việc đã hủy',
+  'rpx.p.ontimeT': 'Như V1: số phần việc xong đúng hạn / tổng phần việc được giao',
+  'rpx.rs.dates': 'Ngày tạo việc (để trống = tất cả)',
 };
 
 const en = {
@@ -611,7 +617,13 @@ const en = {
   'ppx.u.customN': '{n} differences from the defaults',
   'ppx.u.tasksPB': 'V1 stores these and has an API (Admins only), but they have no effect: the page returns 404 and the task workflow uses permissions hard-coded by role. Planned for Phase B.',
   'ppx.fd.hr.deactivate': 'No effect in V1: only Admins and Managers can lock',
-  'ppx.fd.hr.delete': 'No effect in V1: only Admins and Managers can delete',
+  'ppx.fd.hr.delete': 'No effect in V1: only Admins and Managers can delete',  // ── A3-5 Reports ──
+  'rpx.sort.titleD': 'Title Z → A',
+  'rpx.lbl.month': '{n, select, 1 {January} 2 {February} 3 {March} 4 {April} 5 {May} 6 {June} 7 {July} 8 {August} 9 {September} 10 {October} 11 {November} 12 {December} other {{n}}} {y}',
+  'rpx.dd.max': 'Showing up to 100 tasks',
+  'rpx.p.sub': 'Staff assignments on tasks created in this period, excluding cancelled tasks',
+  'rpx.p.ontimeT': 'As in V1: assignments done on time ÷ all assignments',
+  'rpx.rs.dates': 'Task created date (leave empty for all)',
 };
 
 export const EXTRA = { vi, en };

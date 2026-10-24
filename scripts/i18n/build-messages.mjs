@@ -43,6 +43,7 @@ export const INCLUDE = {
     'db', // A3-1 Tổng quan
     'hd', // A3-3 Helpdesk (danh sách, ngăn chi tiết, hộp thoại, Nhập dữ liệu)
     'pp', // A3-4 Nhân sự + Phân quyền (nhãn vai trò dùng ppx.role.* = ROLE_LABELS V1)
+    'rp', // A3-5 Báo cáo (Tổng quan, Danh sách công việc, Research)
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
@@ -66,6 +67,7 @@ export const INCLUDE = {
     'pf.av.rm', 'pf.saved.avRm', 'pf.pw.last', // A3-2: bỏ ảnh / ngày đổi mật khẩu — V1 không có
     'db.pv.', // thanh điều khiển preview Tổng quan
     'hd.pv.', 'hd.reset.otpH', 'hd.dept.', 'hd.ty.', // A3-3: thanh điều khiển preview + dữ liệu mẫu
+    'rp.pv.', 'rp.pb', 'rp.d.force', 'rp.l.allSt', 'rp.l.filterBy', 'rp.na.', 'rp.lbl.month', // A3-5 (rp.lbl.month: vi/en khác placeholder → rpx.lbl.month): preview + Phase B (lọc trạng thái, chế độ Bắt buộc, kỳ Năm ở Tổng quan)
     'hd.imp.jsonH', 'hd.imp.e.shape', // A3-3: có dấu { } không hợp lệ ICU → bản thoát ở extra-messages (hdx.imp.*)
   ],
 };

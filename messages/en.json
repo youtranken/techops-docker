@@ -1712,6 +1712,205 @@
     "boss": "Vice Manager",
     "emp": "Staff"
   },
+  "rp": {
+    "c": {
+      "created": "Created",
+      "days": "Days",
+      "doneAt": "Completed",
+      "ontime": "On time / late"
+    },
+    "d": {
+      "aria": "Donut chart: {t}",
+      "flow": "Workflow",
+      "priority": "Priority",
+      "status": "Status",
+      "title": "Task breakdown",
+      "unit": "tasks"
+    },
+    "day1": "1 day",
+    "days": "{n} days",
+    "dd": {
+      "hint": "Select a row to see details",
+      "next": "Next page",
+      "over": "{n} days late",
+      "page": "Page {a} of {b}",
+      "prev": "Previous page",
+      "sub": "{n} tasks · {p}",
+      "subDone": "{n} tasks completed in {p} (by completion date)"
+    },
+    "done": {
+      "pdf": "Downloaded {f}",
+      "xlsx": "Downloaded {f} · {s} sheets, {n} rows"
+    },
+    "empty": {
+      "_": "No data yet",
+      "d": "Pick another period, or check back once tasks are created.",
+      "t": "No tasks in this period"
+    },
+    "err": {
+      "d": "Lost the connection to the server. Check your network and try again.",
+      "range": "Start date must be on or before the end date",
+      "t": "Couldn’t load the report"
+    },
+    "exportEmpty": "Nothing to export for this period",
+    "exportPdf": "Export PDF",
+    "exportXlsx": "Export to Excel",
+    "exporting": "Exporting…",
+    "f": {
+      "ack": "Picked up",
+      "created": "Created",
+      "done": "Completed",
+      "note": "Each step counts tasks that reached it. “Sent for review” only counts approval-workflow tasks.",
+      "prog": "In progress",
+      "review": "Sent for review",
+      "title": "Processing funnel"
+    },
+    "from": "From",
+    "k": {
+      "done": "Completed",
+      "ext": "Extensions",
+      "extSub": "{p} of tasks",
+      "extWarn": "Above the 20% limit ({p})",
+      "noDrill": "No detailed list for this metric yet",
+      "open": "View list: {k}",
+      "over": "Overdue",
+      "overSub": "Past due, not done",
+      "prog": "In progress",
+      "rate": "{p} completion rate",
+      "same": "Same as previous period",
+      "total": "Total tasks",
+      "vs": "{d} vs previous period ({v})",
+      "wait": "Waiting",
+      "waitSub": "{a} to pick up · {b} to review"
+    },
+    "l": {
+      "all": "Everyone",
+      "clear": "Clear filters",
+      "created": "Created {d}",
+      "doneOn": "Done {d}",
+      "empty": {
+        "d": "Try removing a filter or picking another period.",
+        "t": "No rows match"
+      },
+      "note": "Each row is one assignee on one task.",
+      "page": "Page {n}",
+      "pageSize": "Rows per page",
+      "pages": "Pagination",
+      "perPage": "{n} per page",
+      "s": {
+        "total": "Assignments"
+      },
+      "search": "Search title or code",
+      "shown": "{a}–{b} of {n} rows",
+      "sort": {
+        "_": "Sort",
+        "crA": "Oldest first",
+        "crD": "Newest first",
+        "dueA": "Due soonest",
+        "dueD": "Due latest",
+        "st": "By status",
+        "title": "Title A → Z"
+      },
+      "sub": "{p} · {u} · {n} rows"
+    },
+    "lbl": {
+      "quarter": "Q{q} {y}",
+      "range": "{a} – {b}",
+      "year": "{y}"
+    },
+    "m": {
+      "aria": "{y} chart: bars show tasks created and completed each month, the line shows the on-time rate",
+      "cancel": "Cancelled",
+      "created": "Created",
+      "done": "Completed",
+      "empty": "No data for {y} yet",
+      "note": "Completed counts by completion date. On time = tasks done by their due date ÷ tasks done that month.",
+      "ontime": "On time",
+      "title": "Monthly overview",
+      "year": "Chart year"
+    },
+    "months": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+    "monthsLong": "January,February,March,April,May,June,July,August,September,October,November,December",
+    "ot": {
+      "late": "Late",
+      "none": "Not done",
+      "on": "On time",
+      "over": "Overdue"
+    },
+    "p": {
+      "done": "Completed",
+      "empty": "No one was assigned work in this period",
+      "ontime": "On time",
+      "over": "Overdue",
+      "prog": "In progress",
+      "rateOf": "{p} of assigned",
+      "rej": "Declined",
+      "sort": "Sort by",
+      "sub": "Based on assignments in this period, excluding cancelled tasks",
+      "title": "Performance by person",
+      "total": "Assigned",
+      "trans": "Handed over",
+      "view": "View tasks for {n}"
+    },
+    "period": "Reporting period",
+    "pick": "Choose period",
+    "pr": {
+      "custom": "Custom",
+      "month": "Month",
+      "quarter": "Quarter",
+      "year": "Year"
+    },
+    "rs": {
+      "active": "open",
+      "created": "Task created date",
+      "days": "+{n} days",
+      "f": "Filter overdue tasks",
+      "late": "Overdue by",
+      "min": "Overdue ≥ N days",
+      "more": "{n} more tasks — narrow the filters to see them.",
+      "none": "No overdue tasks",
+      "ovT": "Overdue tasks",
+      "q": "Search tasks, assignees…",
+      "sub": "Overdue tasks and each person’s open workload",
+      "wlNone": "Nobody has open tasks",
+      "wlNote": "As in V1: “waiting” covers Pending approval and Pending review; tasks waiting to be accepted aren’t counted (V1 filters on WAITING_ACK by mistake).",
+      "wlRow": "active {a} · waiting {b}",
+      "wlT": "Current workload"
+    },
+    "sub": "{p} · compared with {q}",
+    "sum": "On time {a} · Avg. completion {b}",
+    "t": {
+      "note": "From creation to completion, rounded up to whole days.",
+      "row": "{n} completed",
+      "title": "Avg. completion time by type"
+    },
+    "tab": {
+      "overview": "Overview",
+      "research": "Overdue & workload",
+      "tasks": "Task list"
+    },
+    "tabs": "Report sections",
+    "title": "Reports",
+    "to": "To"
+  },
+  "rpx": {
+    "dd": {
+      "max": "Showing up to 100 tasks"
+    },
+    "lbl": {
+      "month": "{n, select, 1 {January} 2 {February} 3 {March} 4 {April} 5 {May} 6 {June} 7 {July} 8 {August} 9 {September} 10 {October} 11 {November} 12 {December} other {{n}}} {y}"
+    },
+    "p": {
+      "ontimeT": "As in V1: assignments done on time ÷ all assignments",
+      "sub": "Staff assignments on tasks created in this period, excluding cancelled tasks"
+    },
+    "rs": {
+      "dates": "Task created date (leave empty for all)"
+    },
+    "sort": {
+      "titleD": "Title Z → A"
+    }
+  },
   "st": {
     "CANCELLED": "Cancelled",
     "COMPLETED": "Done",
