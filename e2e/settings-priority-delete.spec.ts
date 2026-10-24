@@ -25,15 +25,15 @@ test('Xoá mức ưu tiên: Đóng/Esc giữ nguyên, Xóa mới xoá', async ({
     page.on('dialog', (d) => { throw new Error(`window dialog bất ngờ: ${d.message()}`); });
 
     await page.goto('/settings/priorities');
-    const row = page.getByRole('row').filter({ hasText: NAME });
+    const row = page.getByTestId('pri-table').getByRole('row').filter({ hasText: NAME });
     await expect(row).toBeVisible();
-    const del = page.getByRole('button', { name: `Xóa ${NAME}` });
+    const del = page.getByRole('button', { name: `Xoá “${NAME}”` });
 
     // 1) Đóng → không xoá
     await del.click();
     const dlg = page.getByRole('alertdialog');
     await expect(dlg).toBeVisible();
-    await expect(dlg).toContainText(`Xóa ưu tiên "${NAME}"?`);
+    await expect(dlg).toContainText(`Xoá “${NAME}”?`);
     await dlg.getByRole('button', { name: 'Đóng' }).click();
     await expect(dlg).toBeHidden();
     await expect(row).toBeVisible();
@@ -48,7 +48,7 @@ test('Xoá mức ưu tiên: Đóng/Esc giữ nguyên, Xóa mới xoá', async ({
 
     // 3) Xóa → gọi DELETE, dòng biến mất
     await del.click();
-    await dlg.getByRole('button', { name: 'Xóa', exact: true }).click();
+    await dlg.getByRole('button', { name: 'Xoá', exact: true }).click();
     await expect(dlg).toBeHidden();
     await expect(row).toHaveCount(0);
     expect(deleteCalls).toBe(1);

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { DigestConfig, DigestConfigInput } from '../types';
+import { toApiError } from '@/lib/errors';
 
 const QK = ['digest-config'] as const;
 
@@ -12,13 +13,14 @@ async function fetchConfig(): Promise<DigestConfig | null> {
   if (res.status === 404) return null;
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error((err as { error?: { message?: string } })?.error?.message ?? 'Không thể tải cài đặt báo cáo');
+    // A3-7: kèm HTTP status để trang biết 403 (không có quyền)
+    throw toApiError(err, 'Không thể tải cài đặt báo cáo', res.status);
   }
   return res.json();
 }
 
 export function useDigestConfig() {
-  return useQuery({ queryKey: QK, queryFn: fetchConfig });
+  return useQuery({ queryKey: QK, queryFn: fetchConfig, retry: (n, e) => (e as { status?: number }).status !== 403 && n < 1 });
 }
 
 export function useUpdateDigestConfig() {

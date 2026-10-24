@@ -1,7 +1,7 @@
 import { requireSettingsFeature } from '@/lib/settings-guard';
-import { NotificationSection } from '@/modules/settings/components/NotificationSection';
+import { NotificationsPage } from '@/modules/settings/components/config/NotificationsPage';
 
-export default async function NotificationsPage() {
+export default async function Page() {
   await requireSettingsFeature('notifications');
-  return <NotificationSection />;
+  return <NotificationsPage />;
 }

@@ -1,7 +1,7 @@
 import { requireSettingsFeature } from '@/lib/settings-guard';
-import { ReportTemplatesSection } from '@/modules/settings/components/ReportTemplatesSection';
+import { TemplatesPage } from '@/modules/settings/components/catalog/TemplatesPage';
 
 export default async function CompletionTemplatesPage() {
   await requireSettingsFeature('completion_templates');
-  return <ReportTemplatesSection />;
+  return <TemplatesPage />;
 }

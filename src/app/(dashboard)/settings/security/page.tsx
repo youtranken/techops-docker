@@ -1,7 +1,7 @@
 'use client';
 
-import { SecuritySection } from '@/modules/settings/components/SecuritySection';
+import { SecurityPage } from '@/modules/settings/components/config/SecurityPage';
 
-export default function SecurityPage() {
-  return <SecuritySection />;
+export default function Page() {
+  return <SecurityPage />;
 }

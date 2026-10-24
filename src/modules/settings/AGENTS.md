@@ -32,21 +32,32 @@ settings/
     useProfile.ts                  # TanStack Query — user profile
     useNotificationPrefs.ts        # TanStack Query — notification prefs
     useSmtp.ts                     # TanStack Query — smtp config (Admin only)
+    useGeneralConfig.ts            # A3-7: GET/PUT /api/settings/general (V1 gọi fetch trực tiếp trong component)
 
   components/
-    PrioritiesSection.tsx          # Inline edit table for priorities
-    TaskTypesSection.tsx           # Card grid + Lucide icon picker
-    TagsSection.tsx                # Tag CRUD with color picker
     profile/                       # A3-2 (V2): trang Hồ sơ của tôi — ProfilePage (khối Tài khoản/Ảnh/Cơ bản/Liên hệ/Múi giờ+ngôn ngữ/Mật khẩu,
                                    #   StickySaveBar), ChangePasswordDialog, PasswordInput. Thay AvatarSection/Profile*/ChangePasswordSection (đã xoá).
-    SettingsHeader.tsx             # Đầu khu Cài đặt (V1) — ẩn ở /settings/profile
-    NotificationSection.tsx        # Email toggle + role filter + type checklist
-    NotificationTypeList.tsx       # Sub-component: checklist with select-all
-    SmtpSection.tsx                # SMTP form orchestrator
-    SmtpServerFields.tsx           # Sub-component: host, port, SSL toggle
-    SmtpAuthFields.tsx             # Sub-component: user, password with show/hide
-    SmtpSenderFields.tsx           # Sub-component: fromName, fromEmail
+    shell/                         # A3-7: SettingsShell (đầu trang "Cài đặt" + nav con / ô chọn mục, hỏi khi rời mục chưa lưu),
+                                   #   parts (PanelHead, SettingsBlock tiêu đề trái/ô phải như Hồ sơ, Switch/SwitchRow, Note, NoAccess…),
+                                   #   choices (CheckList, DayPicker, TimePicker, ScheduleSummary)
+    catalog/                       # A3-7: Mức ưu tiên / Loại công việc / Mẫu hoàn thành — DataTable + hộp thoại ActionDialog
+    config/                        # A3-7: Thông báo, Báo cáo định kỳ, Nhắc quá hạn, SMTP (+ tab Mẫu email), Bảo mật, Chung — 1 StickySaveBar/trang
+  lib/
+    catalog-forms.ts / config-forms.ts  # luật nhập = zod route V1, body = V1 (test đối chiếu __tests__/v1-settings.fixture.ts)
+    schedule.ts                    # thứ/giờ gửi (giờ VN), T2–T6, "giữ ít nhất 1 mục"
+    settings-nav.ts                # mục nav con theo vai trò + featurePermissions.settings (đúng V1)
 ```
+
+## Cài đặt (A3-7, V2 Phase A)
+
+- `layout.tsx` (server) vẫn `requireSettingsFeature()` như V1, tính danh sách mục bằng `settingsSections` rồi bọc `SettingsShell`.
+  Các guard từng trang giữ nguyên V1 (`/settings/smtp` layout chỉ Admin, `/settings/overdue-reminder` chỉ Admin/Boss; `/settings/security`,
+  `/settings/general`, `/settings/digest` không chặn ở trang → API 403 → hiện "Bạn không có quyền xem mục này" thay vì quay mãi).
+- "Chung" (`/settings/general`) KHÔNG đưa vào nav (V1 không có trong menu), trang vẫn mở bằng URL, gắn "Chờ quyết định".
+- "Mẫu email" là tab `?tab=templates` của `/settings/smtp` (V1 là tab trong trang SMTP).
+- Lệnh ghi giữ V1. Sửa lỗi V1: tạo mẫu hoàn thành không danh mục (V1 gửi `category:null` → 400), sửa loại công việc xoá trống mô tả
+  (V1 bỏ trường → không xoá được). Bảo mật "Đặt lại mặc định" vẫn ghi ngay như V1, nay hỏi xác nhận trước.
+- Phase B: "Khôi phục mẫu email mặc định" (không có API), "Cho phép nhiều thiết bị" (V1 lưu nhưng chưa áp dụng — vẫn cho đổi, gắn nhãn).
 
 ## Phân quyền
 
@@ -88,7 +99,7 @@ settings/
 | GET/POST | `/api/settings/tags` | List + create |
 | PUT/DELETE | `/api/settings/tags/[id]` | Update + delete |
 | GET/PUT | `/api/settings/profile` | Read + update own profile |
-| GET/PUT | `/api/settings/notification-prefs` | Read + update own prefs |
+| GET/PATCH | `/api/settings/notification-prefs` | Boss/Admin: cấu hình chung (PATCH); nhân viên: chỉ xem của mình |
 | GET/PUT | `/api/settings/smtp` | Admin: read + upsert SMTP config |
 | POST | `/api/settings/smtp/test` | Admin: send test email |
 | POST | `/api/upload/avatar` | Upload avatar image |

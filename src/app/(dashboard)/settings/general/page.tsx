@@ -1,7 +1,7 @@
 'use client';
 
-import { GeneralSection } from '@/modules/settings/components/GeneralSection';
+import { GeneralPage } from '@/modules/settings/components/config/GeneralPage';
 
 export default function GeneralSettingsPage() {
-  return <GeneralSection />;
+  return <GeneralPage />;
 }

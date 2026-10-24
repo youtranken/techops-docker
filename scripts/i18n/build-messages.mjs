@@ -44,6 +44,7 @@ export const INCLUDE = {
     'hd', // A3-3 Helpdesk (danh sách, ngăn chi tiết, hộp thoại, Nhập dữ liệu)
     'pp', // A3-4 Nhân sự + Phân quyền (nhãn vai trò dùng ppx.role.* = ROLE_LABELS V1)
     'lg', // A3-6 Nhật ký (công việc / người dùng / tra cứu mã + ngăn chi tiết)
+    'set', // A3-7 Cài đặt (trừ Hồ sơ — nhóm pf)
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
@@ -70,6 +71,12 @@ export const INCLUDE = {
     'lg.pv.', 'lg.pb', 'lg.export', 'lg.f.alerts', 'lg.f.qUser', 'lg.dr.byIp', // A3-6: preview + Phase B (xuất Excel, ô tìm/lọc cảnh báo nhật ký người dùng)
     'lg.f.period', 'lg.p.', 'lg.dr.comment', 'lg.dr.part', 'lg.chg.verPart', // A3-6: chọn nhanh khoảng ngày, trích bình luận, tiến độ báo cáo — Phase B
     'lg.f.qTask', 'lg.f.qRef', 'lg.ref.hint', 'lg.na.', // A3-6: câu preview nói tìm theo mã/ID — V1 không có → bản đúng V1 ở lgx.*; trang không quyền do server chuyển hướng
+    // A3-7: thanh điều khiển preview + dữ liệu mẫu email (có {{biến}} không hợp lệ ICU) + mặc định digest (server giữ chữ V1)
+    'set.pv.', 'set.em.s.', 'set.em.l.', 'set.em.hi', 'set.em.due', 'set.em.cta', 'set.em.sTitle', 'set.dg.subjDef', 'set.dg.greetDef',
+    // A3-7: "Khôi phục mẫu email mặc định" — Phase B (V1 không có API); Đặt lại bảo mật V2 kiểu "chỉ điền form" — giữ V1 (ghi ngay) → câu ở setx.sec.*
+    'set.em.reset', 'set.sec.resetD', 'set.sec.resetOk', 'set.sec.resetDone', 'set.sec.resetSame',
+    // A3-7: V1 không chặn chọn người chưa có email; không có trang "không quyền" kèm nút chuyển mục; khoá nhiều phiên không dùng
+    'set.dg.noMailH', 'set.na.go', 'set.sec.multiH', 'set.role.',
     'hd.imp.jsonH', 'hd.imp.e.shape', // A3-3: có dấu { } không hợp lệ ICU → bản thoát ở extra-messages (hdx.imp.*)
   ],
 };
