@@ -902,6 +902,279 @@
     "en": "EN",
     "vi": "VI"
   },
+  "lg": {
+    "a": {
+      "ACKNOWLEDGED": "Nhận việc",
+      "COMMENT_ADDED": "Bình luận",
+      "COMPLETED": "Báo cáo xong",
+      "COMPLETED_PART": "Báo cáo phần mình",
+      "EXTENSION_APPROVED": "Duyệt gia hạn",
+      "EXTENSION_REJECTED": "Từ chối gia hạn",
+      "EXTENSION_REQUESTED": "Xin gia hạn",
+      "EXTENSION_WITHDRAWN": "Rút đơn gia hạn",
+      "FORCE_MODE_TOGGLED": "Đổi chế độ bắt buộc",
+      "PLAN_APPROVED": "Duyệt",
+      "PLAN_REJECTED": "Từ chối duyệt",
+      "REASSIGNED": "Giao lại",
+      "REJECTED": "Từ chối nhận việc",
+      "REPORT_SUPPLEMENTED": "Bổ sung báo cáo",
+      "RESTORED": "Khôi phục",
+      "REVIEW_APPROVED": "Nghiệm thu",
+      "REVIEW_REJECTED": "Yêu cầu làm lại",
+      "STATUS_CHANGED": "Đổi trạng thái",
+      "TASK_CANCELLED": "Hủy công việc",
+      "TASK_CREATED": "Tạo công việc",
+      "TASK_DELETED": "Xóa công việc",
+      "TASK_UPDATED": "Sửa công việc",
+      "TRANSFERRED": "Chuyển giao"
+    },
+    "chg": {
+      "assign": "Giao {p}",
+      "ext": "Xin đến {d}",
+      "more": "+{n}",
+      "moreSr": "và {n} thay đổi khác",
+      "newDue": "Hạn mới {d}",
+      "none": "Không đổi dữ liệu",
+      "reassign": "Giao lại cho {p}",
+      "to": "Chuyển cho {p}",
+      "ver": "Báo cáo {v}"
+    },
+    "col": {
+      "act": "Hành động",
+      "chg": "Thay đổi",
+      "code": "Mã CV",
+      "created": "Ngày tạo",
+      "detail": "Chi tiết",
+      "id": "Mã hệ thống (ID)",
+      "obj": "Công việc",
+      "src": "Nguồn",
+      "time": "Giờ",
+      "title": "Tiêu đề",
+      "user": "Người dùng",
+      "who": "Người thực hiện"
+    },
+    "copied": "Đã chép {x}",
+    "copy": "Chép {x}",
+    "copyFail": "Không chép được. Hãy bôi đen mã rồi chép tay.",
+    "count": "{n} sự kiện",
+    "countRef": "{n} công việc",
+    "d": {
+      "account": "Tài khoản {u}",
+      "digest": "Email tổng hợp: {v}",
+      "export": "Xuất {n} dòng · {x}",
+      "lockedFor": "Khóa {m} phút sau {n} lần sai",
+      "mail": "Đã gửi liên kết qua email",
+      "policy": "Mật khẩu mới quá ngắn",
+      "rate": "{n} lần trong {m} phút",
+      "sec": "Bảo mật: đổi {n} mục"
+    },
+    "day": {
+      "today": "Hôm nay",
+      "yday": "Hôm qua"
+    },
+    "deleted": "đã xóa",
+    "dev": {
+      "Desktop": "Máy tính",
+      "Mobile": "Điện thoại",
+      "Tablet": "Máy tính bảng"
+    },
+    "dr": {
+      "act": "Hành động",
+      "changes": "Thay đổi",
+      "created": "Ngày tạo",
+      "creator": "Người tạo",
+      "device": "Thiết bị",
+      "evId": "Mã sự kiện",
+      "field": "Mục",
+      "ip": "Địa chỉ IP",
+      "isp": "Nhà mạng",
+      "loc": "Vị trí",
+      "new": "Sau",
+      "noTask": "Công việc này không còn trong hệ thống.",
+      "note": "Ghi chú",
+      "obj": "Công việc",
+      "old": "Trước",
+      "openTask": "Mở công việc",
+      "reason": "Lý do",
+      "ref": "Thông tin mã",
+      "result": "Kết quả",
+      "same": "Giữ nguyên",
+      "sched": "Lịch thực hiện",
+      "status": "Trạng thái",
+      "task": "Sự kiện công việc",
+      "taskLog": "Xem nhật ký việc này",
+      "ua": "Chuỗi trình duyệt (user agent)",
+      "user": "Sự kiện người dùng",
+      "when": "Thời điểm",
+      "who": "Người thực hiện"
+    },
+    "f": {
+      "act": "Hành động",
+      "actAll": "Mọi hành động",
+      "clear": "Xóa lọc",
+      "creator": "Người tạo",
+      "creatorAll": "Mọi người tạo",
+      "errRange": "Ngày bắt đầu phải trước ngày kết thúc",
+      "from": "Từ ngày",
+      "ip": "Nguồn truy cập",
+      "ipAll": "Mọi nguồn",
+      "label": "Bộ lọc",
+      "to": "Đến ngày",
+      "unknown": "Tên đăng nhập không tồn tại",
+      "who": "Người thực hiện",
+      "whoAll": "Mọi người"
+    },
+    "fld": {
+      "assignee": "Người làm",
+      "digest": "Email tổng hợp",
+      "digestAt": "Giờ gửi tổng hợp",
+      "due": "Hạn chót",
+      "force": "Bắt buộc",
+      "lockMin": "Thời gian khóa",
+      "maxTry": "Số lần nhập sai tối đa",
+      "mode": "Quy trình",
+      "priority": "Độ ưu tiên",
+      "report": "Phiên bản báo cáo",
+      "start": "Ngày bắt đầu",
+      "status": "Trạng thái"
+    },
+    "g": {
+      "account": "Tài khoản",
+      "alert": "Cảnh báo bảo mật",
+      "create": "Tạo và sửa",
+      "done": "Báo cáo và nghiệm thu",
+      "ext": "Gia hạn",
+      "flow": "Duyệt và giao nhận",
+      "neg": "Từ chối và hủy",
+      "session": "Phiên đăng nhập",
+      "system": "Hệ thống"
+    },
+    "ip": {
+      "external": "Ngoài mạng nội bộ",
+      "externalSr": "Truy cập từ ngoài mạng nội bộ",
+      "internal": "Nội bộ"
+    },
+    "ne": {
+      "d": "Mất kết nối tới máy chủ. Kiểm tra mạng rồi thử lại.",
+      "t": "Không tải được nhật ký"
+    },
+    "nm": {
+      "d": "Thử nới khoảng thời gian hoặc bỏ bớt điều kiện lọc.",
+      "t": "Không có sự kiện nào khớp bộ lọc",
+      "tRef": "Không có công việc nào khớp"
+    },
+    "pg": {
+      "label": "Phân trang",
+      "next": "Trang sau",
+      "page": "Trang {n}",
+      "prev": "Trang trước",
+      "range": "{a}–{b} trên {n}"
+    },
+    "r": {
+      "USER_INACTIVE": "Tài khoản đã vô hiệu hóa",
+      "USER_NOT_FOUND": "Tên đăng nhập không tồn tại",
+      "WRONG_PASSWORD": "Sai mật khẩu",
+      "left": "Sai mật khẩu, còn {n} lần thử",
+      "locked": "Sai mật khẩu, IP đã bị khóa"
+    },
+    "ref": {
+      "exact": "Khớp chính xác"
+    },
+    "row": {
+      "open": "Xem chi tiết"
+    },
+    "sub": "Lưu 90 ngày. Ngày 1 hằng tháng, nhật ký tháng trước được xuất ra Excel.",
+    "tab": {
+      "ref": "Tra cứu mã",
+      "task": "Công việc",
+      "user": "Người dùng"
+    },
+    "tabs": "Loại nhật ký",
+    "title": "Nhật ký",
+    "tried": "thử “{u}”",
+    "u": {
+      "ACCOUNT_LOCKED": "Khóa tạm tài khoản",
+      "ACCOUNT_UNLOCKED": "Mở khóa tài khoản",
+      "ACTIVATE_USER": "Kích hoạt lại tài khoản",
+      "CHANGE_SETTINGS": "Đổi cài đặt",
+      "CREATE_USER": "Tạo tài khoản",
+      "DEACTIVATE_USER": "Vô hiệu hóa tài khoản",
+      "DELETE_USER": "Xóa tài khoản",
+      "EXPORT_DATA": "Xuất dữ liệu",
+      "LOGIN": "Đăng nhập",
+      "LOGIN_FAILED": "Đăng nhập thất bại",
+      "LOGOUT": "Đăng xuất",
+      "PASSWORD_CHANGED_SELF": "Tự đổi mật khẩu",
+      "PASSWORD_POLICY_VIOLATION": "Mật khẩu không đạt chính sách",
+      "PASSWORD_RESET_COMPLETED": "Đặt lại mật khẩu qua email",
+      "PASSWORD_RESET_REQUESTED": "Yêu cầu quên mật khẩu",
+      "RATE_LIMIT_EXCEEDED": "Vượt giới hạn thử",
+      "RESET_PASSWORD": "Đặt lại mật khẩu cho người khác",
+      "REVOKE_SESSION": "Thu hồi phiên",
+      "SECURITY_SETTING_CHANGED": "Đổi cài đặt bảo mật",
+      "SESSION_TIMEOUT": "Hết phiên",
+      "UPDATE_USER": "Sửa tài khoản",
+      "VIEW_PAGE": "Xem trang"
+    },
+    "unknown": "Không rõ",
+    "v": {
+      "min": "{n} phút",
+      "off": "Tắt",
+      "on": "Bật"
+    }
+  },
+  "lgx": {
+    "chg": {
+      "cmDel": "Xóa bình luận",
+      "cmUpd": "Sửa bình luận",
+      "field": "{f}: {o} → {n}",
+      "hd": "Tạo từ Helpdesk {x}",
+      "restore": "{a} từ chối nhận, trả lại cho {b}",
+      "status": "{o} → {n}"
+    },
+    "col": {
+      "sched": "Lịch thực hiện"
+    },
+    "d": {
+      "notif": "Thông báo email: {v}",
+      "priority": "Độ ưu tiên: {x}",
+      "sec": "Bảo mật",
+      "secChg": "Bảo mật: đổi {x}",
+      "secReset": "Bảo mật: khôi phục mặc định",
+      "smtp": "Cấu hình SMTP",
+      "taskType": "Loại công việc: {x}",
+      "tpl": "Mẫu email: {x}"
+    },
+    "dr": {
+      "cmPB": "Log V1 chỉ lưu mã bình luận, không lưu nội dung.",
+      "raw": "Chuỗi lưu sẵn trong log (chưa dịch)"
+    },
+    "f": {
+      "dates": "Khoảng ngày",
+      "qRef": "Tìm mã CV hoặc tiêu đề",
+      "qTask": "Tìm theo tiêu đề công việc",
+      "schedFrom": "Lịch từ ngày",
+      "schedTo": "Lịch đến ngày"
+    },
+    "fld": {
+      "addAs": "Thêm người làm",
+      "content": "Nội dung",
+      "extTo": "Xin gia hạn đến",
+      "important": "Quan trọng",
+      "rmAs": "Bỏ người làm",
+      "title": "Tiêu đề",
+      "type": "Loại công việc"
+    },
+    "g": {
+      "other": "Khác"
+    },
+    "ref": {
+      "hint": "Dán mã CV lấy từ email, Excel hay báo lỗi để tìm đúng công việc và mã hệ thống (ID) của nó."
+    },
+    "v": {
+      "edited": "Đã sửa"
+    }
+  },
   "n": {
     "allFailed": "Mọi người được giao đã từ chối “{t}”. Bạn có thể hủy hoặc nhờ Admin giao lại.",
     "transfer": "{a} chuyển giao “{t}” cho bạn"
