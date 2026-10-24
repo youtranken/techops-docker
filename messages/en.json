@@ -1152,6 +1152,547 @@
     },
     "tooLong": "This is longer than allowed."
   },
+  "pp": {
+    "a": {
+      "CREATE_USER": "Account created",
+      "DEACTIVATE_USER": "Account locked",
+      "LOGIN": "Signed in",
+      "LOGIN_FAILED": "Failed sign-in",
+      "PASSWORD_CHANGED_SELF": "Changed own password",
+      "PASSWORD_RESET_REQUESTED": "Setup link sent",
+      "RESET_PASSWORD": "Password reset",
+      "UPDATE_USER": "Details updated"
+    },
+    "act": {
+      "ACKNOWLEDGE": "Accept task",
+      "APPROVE": "Approve, sign off",
+      "APPROVE_EXTENSION": "Approve extension",
+      "CANCEL": "Cancel task",
+      "COMPLETE": "Report done",
+      "DELETE": "Delete",
+      "EDIT": "Edit",
+      "REASSIGN": "Reassign",
+      "REJECT": "Decline task",
+      "REJECT_REVIEW": "Request rework",
+      "REQUEST_EXTENSION": "Request extension",
+      "TOGGLE_FORCE_MODE": "Toggle Mandatory mode",
+      "TRANSFER": "Transfer",
+      "VIEW": "View",
+      "WITHDRAW_EXTENSION": "Withdraw extension"
+    },
+    "ad": {
+      "ACKNOWLEDGE": "Confirm taking on an assigned task",
+      "APPROVE": "Approve new tasks or sign off results",
+      "APPROVE_EXTENSION": "Accept or decline extension requests",
+      "CANCEL": "Stop the task with a reason",
+      "COMPLETE": "Submit the result for review",
+      "DELETE": "Delete a draft task",
+      "EDIT": "Change title, description and due date",
+      "REASSIGN": "Change the assignee",
+      "REJECT": "Send the task back with a reason",
+      "REJECT_REVIEW": "Send results back for rework",
+      "REQUEST_EXTENSION": "Ask for more time with a reason",
+      "TOGGLE_FORCE_MODE": "Make the task mandatory to accept",
+      "TRANSFER": "Hand the task to someone else",
+      "VIEW": "Open and read the task",
+      "WITHDRAW_EXTENSION": "Cancel a sent extension request"
+    },
+    "back": "List",
+    "bulk": {
+      "clear": "Clear selection",
+      "force": "Require password change",
+      "label": "Bulk actions",
+      "lock": "Lock accounts",
+      "n": "{n} selected",
+      "role": "Change role",
+      "unlock": "Unlock"
+    },
+    "c": {
+      "how": "How to set the password",
+      "mc": "Require a password change at first sign-in",
+      "ok": "Create user",
+      "okLink": "Create and send link",
+      "title": "New user",
+      "wLink": "Email a setup link",
+      "wLinkD": "They set their own password (link valid 24 hours) and must change it at first sign-in. Email required.",
+      "wPw": "Set a password now",
+      "wPwD": "You set it and share it. They aren’t forced to change it at first sign-in."
+    },
+    "col": {
+      "act": "Actions",
+      "dept": "Department",
+      "last": "Last sign-in",
+      "role": "Role",
+      "status": "Status",
+      "tasks": "Related tasks",
+      "tasksS": "Tasks",
+      "user": "User"
+    },
+    "create": "New user",
+    "d": {
+      "del": {
+        "d": "Account {u} is deleted permanently and can’t be restored. Only users with no tasks can be deleted; lock the others instead.",
+        "ok": "Delete permanently",
+        "t": "Delete {n}?"
+      },
+      "force": {
+        "d": "At their next sign-in they must set a new password that meets the security policy.",
+        "ok": "Require change",
+        "t": "Require {n} people to change password?"
+      },
+      "force1": {
+        "t": "Require {n} to change password?"
+      },
+      "lock": {
+        "d": "Locked users can no longer sign in. Their pending and in-progress tasks are marked Declined and the assigners are asked to reassign.",
+        "ok": "Lock account",
+        "t": "Lock {n} accounts?",
+        "tasks": "{n} tasks are affected right now."
+      },
+      "lock1": {
+        "t": "Lock {n}’s account?"
+      },
+      "resend": {
+        "d": "A new link goes to {e} and is valid for 24 hours. The old link stops working.",
+        "ok": "Send link",
+        "t": "Resend password setup link?"
+      },
+      "role": {
+        "d": "New role: {r}. Menu access and task permissions follow the new role from their next page load.",
+        "ok": "Change role",
+        "t": "Change role for {n} people?"
+      },
+      "unlock": {
+        "d": "They can sign in again right away. Tasks moved away earlier don’t come back automatically.",
+        "t": "Unlock {n}?"
+      },
+      "unlockN": {
+        "t": "Unlock {n} accounts?"
+      }
+    },
+    "e": {
+      "dupEmail": "This email belongs to another account",
+      "dupUser": "This username is already taken",
+      "email": "Enter a valid email",
+      "emailLink": "An email is needed to send the setup link",
+      "ok": "Save changes",
+      "pwMatch": "Passwords don’t match",
+      "pwPolicy": "Password doesn’t meet all requirements above",
+      "req": "Required",
+      "role": "Choose a role",
+      "selfRole": "Roles are changed by Admins or Vice Managers.",
+      "selfRoleW": "You’re editing yourself: V1 still lets you change your role, so be careful.",
+      "title": "Edit details",
+      "titleMe": "Edit my details",
+      "user": "Use letters, numbers and underscore only; 3–50 characters"
+    },
+    "empNote": "You see yourself and other employees. You can edit only your own details, and only if you have the Edit details permission.",
+    "err": {
+      "d": "Check your connection and try again.",
+      "pt": "Couldn’t load permissions",
+      "t": "Couldn’t load users"
+    },
+    "export": "Export CSV",
+    "f": {
+      "allRoles": "All roles",
+      "allSt": "All statuses",
+      "clear": "Clear filters",
+      "dept": "Department",
+      "email": "Email",
+      "name": "Display name",
+      "namePh": "e.g. Nguyen Van An",
+      "phone": "Phone",
+      "pickRole": "Choose a role",
+      "pos": "Job title",
+      "pw": "Password",
+      "pw2": "Confirm password",
+      "role": "Filter by role",
+      "status": "Filter by status",
+      "user": "Username",
+      "userHint": "3–50 characters: letters, numbers, underscore."
+    },
+    "fd": {
+      "hr": {
+        "change_password": "No effect in V1: employees can only act on themselves",
+        "deactivate": "No effect in V1: only Admins and Vice Managers can lock",
+        "delete": "No effect in V1: only Admins and Vice Managers can delete",
+        "edit": "Edit their own details"
+      },
+      "logs": {
+        "task_activity": "See who did what on each task",
+        "user_activity": "See sign-ins and account changes"
+      },
+      "settings": {
+        "completion_templates": "Write templates for completion reports",
+        "notifications": "See the notification setup (view only)",
+        "priorities": "Add and edit priority levels",
+        "profile": "Edit your own profile",
+        "task_types": "Manage the list of task types"
+      }
+    },
+    "feat": {
+      "hr": {
+        "change_password": "Change passwords",
+        "deactivate": "Lock and unlock accounts",
+        "delete": "Delete users",
+        "edit": "Edit details"
+      },
+      "logs": {
+        "task_activity": "Task activity",
+        "user_activity": "User activity"
+      },
+      "settings": {
+        "completion_templates": "Completion templates",
+        "notifications": "Notifications",
+        "priorities": "Priorities",
+        "profile": "Profile",
+        "task_types": "Task types"
+      }
+    },
+    "h": {
+      "all": "See all in Activity log",
+      "by": "by {n}"
+    },
+    "k": {
+      "created": "Created",
+      "pw": "Password last changed",
+      "pwNone": "Not set",
+      "user": "Username"
+    },
+    "m": {
+      "del": "Delete user",
+      "edit": "Edit details",
+      "editMe": "Edit my details",
+      "force": "Require password change",
+      "hist": "Activity history",
+      "lock": "Lock account",
+      "myPw": "Change my password",
+      "perm": "Menu access",
+      "pw": "Reset password",
+      "resend": "Resend setup link",
+      "unlock": "Unlock"
+    },
+    "mc": "Must change password at next sign-in",
+    "md": {
+      "analytics": "Progress reports. Employees see only their own performance",
+      "helpdesk": "View Helpdesk tickets and turn them into tasks",
+      "hr": "Team members and their accounts",
+      "logs": "View the activity history. Employees see only their own",
+      "settings": "Only the sections turned on below. Digest, overdue reminders, SMTP and security can’t be granted to employees",
+      "tasks": "Create, assign and track tasks"
+    },
+    "menu": {
+      "analytics": "Reports",
+      "helpdesk": "Helpdesk",
+      "hr": "People",
+      "logs": "Activity log",
+      "settings": "Settings",
+      "tasks": "Tasks"
+    },
+    "mode": {
+      "IMMEDIATE": "Direct",
+      "NEED_APPROVAL": "Needs approval"
+    },
+    "more": "Actions for {n}",
+    "n": {
+      "limited": "Only managers or the person themselves can see activity history.",
+      "locked": "This account is locked and can’t sign in.",
+      "mc": "This person must change their password at next sign-in.",
+      "pending": "A password setup link was sent to {e}. The user hasn’t set a password yet."
+    },
+    "na": {
+      "back": "Back to users",
+      "d": "Only Admins and Vice Managers can view and change permissions.",
+      "t": "You don’t have access to permissions"
+    },
+    "never": "Never signed in",
+    "noEmail": "No email yet",
+    "nomatch": {
+      "d": "Try another keyword or clear the filters.",
+      "t": "No one matches these filters"
+    },
+    "p": {
+      "how": "Reset method",
+      "mcNote": "Set manually: the current must-change flag stays as is. By link: once they reset, the must-change flag is cleared.",
+      "noEmail": "This person has no email yet.",
+      "okLink": "Send link",
+      "okSet": "Set password",
+      "title": "Reset password for {n}",
+      "wLink": "Email a reset link",
+      "wLinkD": "Sent to {e}. The link works for 15 minutes; they set it themselves.",
+      "wSet": "Set a new password",
+      "wSetD": "You set it and tell the user."
+    },
+    "pbLast": "V1 doesn’t store last sign-in on the user (only in the activity log).",
+    "pbPending": "V1 has no such status: link-created accounts are Active and must change the password at first sign-in.",
+    "pbT": "Not in V1 — needs new backend or logic, planned for Phase B. Shown for reference.",
+    "pbTasks": "V1 only knows whether a user has tasks (to block deletion); it doesn’t count them.",
+    "phaseB": "Phase B",
+    "pick": "Select {n}",
+    "pickAll": "Select all",
+    "pm": {
+      "always": "Always full access",
+      "byRole": "By role",
+      "byUser": "By user",
+      "colMenu": "Menus and features",
+      "core": "Core menu, always on",
+      "editable": "Editable",
+      "lg": {
+        "lock": "Locked: Admins and Vice Managers always have full access",
+        "off": "Menu off = hidden from the sidebar and blocked for pages and API",
+        "user": "People with custom permissions keep their exceptions"
+      },
+      "matrix": "Menu access by role",
+      "needMenu": "Turn on {m} first",
+      "roleD": "New logic: role defaults plus per-person exceptions. V1 doesn’t have this; menu access is set per employee only.",
+      "smtp": "SMTP settings are admin only",
+      "sub": "Who sees which menus and what they can do with tasks",
+      "title": "Permissions",
+      "userD": "Turn menus on or off for each active employee. Anyone not customized uses the defaults. V1 saves on every toggle; V2 batches changes behind Save.",
+      "view": "Permission view"
+    },
+    "pw": {
+      "len": "At least {n} characters",
+      "lo": "A lowercase letter (a–z)",
+      "no": "not met",
+      "num": "A number (0–9)",
+      "policy": "Password requirements",
+      "sp": "A special character (!@#…)",
+      "src": "Follows the password policy in Settings › Security.",
+      "up": "An uppercase letter (A–Z)",
+      "yes": "met"
+    },
+    "px": {
+      "allOn": "All menus on",
+      "clear": "Clear search",
+      "collapseAll": "Collapse all",
+      "core": "Core menu, always on for every role",
+      "custGo": "View by user",
+      "custN": "{n} employees customized",
+      "expandAll": "Expand all",
+      "grpEdit": "Editable",
+      "grpLock": "Always allowed",
+      "inh": "Role default: {v}",
+      "lgLock": "Vice Managers and Admins always have full access",
+      "menuOff": "Turn the menu on to configure features",
+      "menuOffR": "Menu is off for {r}. Turn it on to configure features.",
+      "nFeat": "{n} features",
+      "none": "No features match",
+      "noneD": "Try another keyword or clear the search.",
+      "off": "Off: {m}",
+      "planned": "Planned role",
+      "plannedT": "Not live yet; shown to preview the layout with more roles",
+      "ppl": "{n} people",
+      "ppl0": "No one yet",
+      "ppl1": "1 person",
+      "r": {
+        "ADMIN": "Admin",
+        "BOSS": "Vice Manager",
+        "EMPLOYEE": "Employee",
+        "MANAGER": "Manager"
+      },
+      "revert": "Back to role default",
+      "saved": "Saved {n} role permission changes",
+      "search": "Find a feature",
+      "sumL": "Summary by role",
+      "sumOn": "on for {r}",
+      "sumU": "differences from the defaults for {u}",
+      "toggle": "Expand or collapse {m}",
+      "uNone": "Using the defaults",
+      "yes": "Allowed"
+    },
+    "role": {
+      "ADMIN": "Admin",
+      "BOSS": "Vice Manager",
+      "EMPLOYEE": "Employee"
+    },
+    "search": "Search name, username, email",
+    "shown": "{n} people",
+    "st": {
+      "active": "Active",
+      "locked": "Locked",
+      "pending": "Invited"
+    },
+    "sub": "{n} people, {a} active",
+    "subEmp": "{n} people in your list",
+    "subnav": "People sections",
+    "sv": {
+      "label": "Unsaved changes",
+      "leaveD": "Your unsaved changes will be lost.",
+      "leaveOk": "Discard",
+      "leaveT": "Discard {n} unsaved changes?",
+      "n": "{n} unsaved changes",
+      "save": "Save changes",
+      "undo": "Undo"
+    },
+    "t": {
+      "created": "Created account for {n}",
+      "createdLink": "Account created and setup link sent to {e}",
+      "del": "Deleted {n}",
+      "export": "Exporting {n} people to CSV with current filters",
+      "force": "{n} people must change their password at next sign-in",
+      "lock": "Locked {n} accounts",
+      "lock1": "Locked {n}’s account",
+      "myPw": "Change your password in Settings › Profile (in design).",
+      "noop": "No one in the selection needs this change",
+      "pw": "New password set for {n}",
+      "reset": "{u} is back on the defaults",
+      "role": "Moved {n} people to {r}",
+      "roleSaved": "Saved {n} changes for the Employee role",
+      "saved": "Saved details for {n}",
+      "sent": "Link sent to {e}",
+      "undone": "Changes undone",
+      "unlock": "Unlocked {n}",
+      "unlockN": "Unlocked {n} accounts",
+      "userSaved": "Saved {n} changes for {u}"
+    },
+    "tab": {
+      "perms": "Permissions",
+      "users": "Users"
+    },
+    "title": "People",
+    "u": {
+      "adminD": "Custom permissions don’t apply to Admins. To limit access, change this person’s role.",
+      "adminT": "Admins always have full access",
+      "d": "Role default",
+      "empOnly": "Applies to active employees only. Admins and Vice Managers always have full access, so they aren’t listed.",
+      "g": "Allow",
+      "has": "Yes",
+      "inh": "Role: {v}",
+      "lg": {
+        "d": "use the role’s value",
+        "g": "grant to this person only",
+        "lock": "locked by workflow rule",
+        "r": "block even if the role has it"
+      },
+      "lockD": "Always off when the task is Mandatory, even if allowed",
+      "lockT": "Locked when the task is in Mandatory mode",
+      "menus": "Menus and features",
+      "menusD": "Menus shown in the sidebar and the features inside. Turning a menu off blocks both the page and its API.",
+      "menusPriv": "This role always sees every menu; it can’t be customized.",
+      "mode": "Workflow mode",
+      "nAct": "{n} permissions",
+      "none": "No one found",
+      "noneD": "Try another name or clear the search.",
+      "not": "No",
+      "ovN": "{n} custom",
+      "own": "Customized",
+      "pick": "Choose a user",
+      "r": "Revoke",
+      "reset": "Use defaults",
+      "resetD": "Removes this person’s custom setup; menus and features go back to the system defaults.",
+      "resetOk": "Reset",
+      "resetT": "Put {n} back on the defaults?",
+      "search": "Search people",
+      "selfD": "Ask another admin to change your permissions.",
+      "selfT": "You can’t set your own permissions",
+      "showAll": "Also show permissions the role lacks",
+      "tasks": "Custom task permissions",
+      "tasksD": "Per task status. By default only what the role has or what’s been customized is shown.",
+      "tasksPB": "V1 stores these and has an API (Admins only), but they have no effect: the page returns 404 and no API checks them. Real task permissions are hard-coded by role."
+    },
+    "you": "(you)"
+  },
+  "ppx": {
+    "a": {
+      "ACTIVATE_USER": "Account unlocked",
+      "CHANGE_SETTINGS": "Settings changed",
+      "CREATE_USER": "Account created",
+      "DEACTIVATE_USER": "Account locked",
+      "DELETE_USER": "Account deleted",
+      "EXPORT_DATA": "Data exported",
+      "LOGIN": "Signed in",
+      "LOGIN_FAILED": "Failed sign-in",
+      "LOGOUT": "Signed out",
+      "RESET_PASSWORD": "Password reset",
+      "SESSION_TIMEOUT": "Session expired",
+      "UPDATE_USER": "Details updated",
+      "VIEW_PAGE": "Page viewed"
+    },
+    "c": {
+      "wLinkD": "They set their own password by email (link valid 24 hours) and must change it at first sign-in. Email required."
+    },
+    "d": {
+      "deact1": {
+        "d": "They won’t be able to sign in anymore. Tasks assigned to them stay as they are; reassign them if needed."
+      },
+      "deactN": {
+        "d": "These accounts won’t be able to sign in anymore. Their pending and in-progress tasks are marked Declined."
+      },
+      "link": {
+        "d": "The link goes to {e} for {n} and works for 15 minutes. They set the new password themselves.",
+        "t": "Email a password reset link?"
+      },
+      "role": {
+        "d": "New role: {r}. It applies from their next page load."
+      },
+      "unlock": {
+        "d": "They can sign in again right away. Tasks moved away earlier don’t come back automatically."
+      }
+    },
+    "e": {
+      "emailKeep": "Leave blank to keep the current email.",
+      "nameMax": "Up to 100 characters",
+      "newPw": "New password",
+      "newPwHint": "Leave blank to keep it. A new password must meet the policy in Settings › Security.",
+      "pwMin6": "At least 6 characters",
+      "pwMin8": "At least 8 characters",
+      "selfRoleW": "You’re editing yourself: you can still change your role, so be careful."
+    },
+    "f": {
+      "clearDate": "Clear created date filter",
+      "created": "Created",
+      "from": "Created from",
+      "to": "Created to"
+    },
+    "fd": {
+      "hr": {
+        "deactivate": "No effect in V1: only Admins and Managers can lock",
+        "delete": "No effect in V1: only Admins and Managers can delete"
+      }
+    },
+    "h": {
+      "none": "No activity yet"
+    },
+    "m": {
+      "link": "Email a reset link"
+    },
+    "na": {
+      "d": "Only Admins and Managers can view and change permissions."
+    },
+    "p": {
+      "mcNote": "Any pending “change password at next sign-in” requirement stays as is."
+    },
+    "pm": {
+      "all": "All menus",
+      "filter": "Filter by menu",
+      "noEmp": "No active employees yet",
+      "pbRole": "Permissions by role (role defaults plus per-person exceptions) aren’t in V1 yet; planned for Phase B.",
+      "sub": "Menus and features each employee can see",
+      "userD": "Turn menus on or off for each active employee. Anyone not customized uses the defaults. Press Save to apply."
+    },
+    "role": {
+      "ADMIN": "Admin",
+      "BOSS": "Manager",
+      "EMPLOYEE": "Employee"
+    },
+    "sub": "{n} users",
+    "t": {
+      "bulk": {
+        "activate": "Unlocked {n} accounts",
+        "changeRole": "Changed the role for {n} people",
+        "deactivate": "Locked {n} accounts",
+        "forceChangePassword": "{n} people must change their password at next sign-in"
+      }
+    },
+    "u": {
+      "custom": "Customized",
+      "customN": "{n} differences from the defaults",
+      "empOnly": "Applies to active employees only. Admins and Managers always have full access, so they aren’t listed.",
+      "tasksPB": "V1 stores these and has an API (Admins only), but they have no effect: the page returns 404 and the task workflow uses permissions hard-coded by role. Planned for Phase B."
+    },
+    "verified": "Email verified"
+  },
   "pr": {
     "high": "High",
     "low": "Low",

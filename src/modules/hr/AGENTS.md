@@ -31,16 +31,15 @@ hr/
       useRoles.ts               # Danh sách roles
       useUserHistory.ts         # Lịch sử hoạt động per-user
 
-    components/
-      UserTable.tsx             # Bảng users (avatar thật từ profile, checkbox bulk, actions menu)
-      UserActionsMenu.tsx       # Dropdown: sửa, đổi pw, lịch sử, vô hiệu, xóa
-      ChangePasswordModal.tsx   # Modal đổi mật khẩu + password strength indicator
-      EditUserModal.tsx         # Modal sửa thông tin user
-      CreateUserModal.tsx       # Modal tạo user mới
-      UserFormFields.tsx        # Form fields dùng chung (displayName, email, role)
-      UserPasswordFields.tsx    # Password fields dùng chung
-      DeleteUserDialog.tsx      # Confirm xóa
-      UserHistoryModal.tsx      # Modal lịch sử hoạt động per-user
+    view/                       # Logic thuần V2 (A3-4), có test đối chiếu V1 (__tests__/v1-people.fixture.ts)
+      people-logic.ts           # quyền từng dòng (menu ⋯), chọn hàng loạt, bộ lọc → query/CSV
+      people-forms.ts           # luật nhập + body POST/PATCH của Tạo / Sửa / Đặt lại mật khẩu
+
+    components/People/          # Trang Nhân sự V2 (preview people.html)
+      PeoplePage.tsx            # ghép trang; usePeoplePage (bộ lọc, dữ liệu, chọn) + usePeopleActions (xác nhận, mutation)
+      PeopleFilters.tsx · PeopleBulkBar.tsx · PeopleTable.tsx (DataTable + QuickMenu)
+      UserDrawer.tsx + UserHistoryList.tsx   # ngăn chi tiết + lịch sử (thay UserHistoryModal)
+      CreateUserDialog.tsx · EditUserDialog.tsx · ResetPasswordDialog.tsx · PasswordChecklist.tsx
 
   permissions/
     types.ts                    # UserPermRow, SavePermissionInput
@@ -53,14 +52,15 @@ hr/
     hooks/
       useSidebarPermissions.ts  # Query + mutation sidebar permissions
 
-    components/
-      PermissionsTable.tsx      # Bảng phân quyền per-user
+    view/perm-logic.ts          # bật/tắt menu/tính năng = đúng phép biến đổi V1; đếm thay đổi; body PUT
 
-    sections/
-      PermissionsMatrixSection.tsx    # Section tổng hợp
+    components/PermissionsPage/ # Trang Phân quyền V2 (preview permissions.html, phần "Theo người dùng")
+      PermissionsPage.tsx       # danh sách nhân viên + khối menu + thanh Lưu; trang con /hr/permissions/{logs,users,…} = lọc menu
+      PermMenuBlock.tsx · PermUserList.tsx · usePermEditor.ts (bản nháp, 1 PUT khi Lưu)
+
+  shared/HrPageHead.tsx         # đầu trang + tab Người dùng · Phân quyền; nhãn vai trò ppx.role.* (= ROLE_LABELS V1)
 
   # Re-export wrappers (backward compat)
-  components/     → re-export từ users/components/
   hooks/          → re-export từ users/hooks/
   services/       → re-export từ users/services/
 ```
@@ -97,3 +97,9 @@ hr/
 - `UserActivityLog` — actions: CREATE_USER, UPDATE_USER, DELETE_USER, RESET_PASSWORD,
   DEACTIVATE_USER, ACTIVATE_USER (enum `UserAction`)
 - `SidebarPermission` — JSON fields: visibleMenus, featurePermissions
+
+## V2 (A3-4) — ghi chú
+
+- Phân quyền V2 gom các lần bật/tắt và gửi 1 PUT khi bấm Lưu (V1 lưu ngay mỗi lần bấm); body giữ dạng V1.
+- `/hr/users/[id]/permissions` vẫn 404 như V1; override quyền công việc (rbac) chưa có hiệu lực → Phase B.
+- Nhân viên không còn thấy mục "Lịch sử hoạt động" của người khác (API `/api/logs/users` chỉ trả lịch sử của chính họ).

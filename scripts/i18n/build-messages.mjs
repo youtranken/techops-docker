@@ -42,6 +42,7 @@ export const INCLUDE = {
     'pf', // A3-2 Hồ sơ của tôi
     'db', // A3-1 Tổng quan
     'hd', // A3-3 Helpdesk (danh sách, ngăn chi tiết, hộp thoại, Nhập dữ liệu)
+    'pp', // A3-4 Nhân sự + Phân quyền (nhãn vai trò dùng ppx.role.* = ROLE_LABELS V1)
   ],
   /** Khoá lẻ component A1-2 cần (theo tiền tố đầy đủ) */
   prefixes: [
@@ -59,6 +60,7 @@ export const INCLUDE = {
     'td.cm.lock', // khoá bình luận khi xong/hủy — Phase B
     'tf.pv.', // thanh điều khiển preview biểu mẫu
     'nt.scn', 'pf.scn', // A3-2: thanh điều khiển preview
+    'pp.pv.', // A3-4: thanh điều khiển preview
     'nt.pb', 'nt.type', 'nt.clear', 'nt.empty.type', // A3-2: lọc theo loại thông báo — Phase B (API V1 không có tham số loại)
     'pf.pb', 'pf.email.ok', 'pf.email.pending', 'pf.email.resend', 'pf.email.sent', 'pf.email.note', // A3-2: xác nhận email — Phase B
     'pf.av.rm', 'pf.saved.avRm', 'pf.pw.last', // A3-2: bỏ ảnh / ngày đổi mật khẩu — V1 không có
